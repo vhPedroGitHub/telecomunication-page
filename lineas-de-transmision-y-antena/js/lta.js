@@ -76,7 +76,7 @@
       [x, -x].forEach(function (xx) {
         const g = G(cx(0, xx)); const p = self.P(adm ? cx(-g.r, -g.i) : g);
         const ox = (p[0] - X) / R * 12, oy = (p[1] - Y) / R * 12;
-        ctx.fillText((xx > 0 ? (adm ? "−" : "+") : (adm ? "+" : "−")) + "j" + x, p[0] + ox, p[1] + oy + 5);
+        ctx.fillText((xx > 0 ? "+" : "−") + "j" + x, p[0] + ox, p[1] + oy + 5);
       });
     });
     ctx.textAlign = "left"; ctx.fillText(adm ? "y = ∞ (CC)" : "z = 0 (CC)", 2, Y + 14);
@@ -367,7 +367,7 @@
       const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
       const pad = 14, gw = W - 2 * pad, gh = H - 2 * pad, a = 2, b = 1;
       const ok = te ? (m + n > 0) : (m > 0 && n > 0);
-      ctx.strokeStyle = C.cssVar("--fg"); ctx.lineWidth = 3; ctx.strokeRect(pad, pad, gw, gh);
+      ctx.strokeStyle = C.cssVar("--text"); ctx.lineWidth = 3; ctx.strokeRect(pad, pad, gw, gh);
       if (!ok) { $("fd-out").textContent = te ? "TE₀₀ no existe (todos los campos serían nulos)." : "TM" + m + n + " no existe: los TM necesitan m ≥ 1 y n ≥ 1 (E_z = B sen(mπx/a) sen(nπy/b) sería nulo)."; return; }
       // campos (fase común omitida): TE ⇒ Ex ∝ (n/b) cos(mπx/a) sin(nπy/b), Ey ∝ −(m/a) sin cos; Hx ∝ (m/a) sin cos, Hy ∝ (n/b) cos sin
       //                               TM ⇒ Ex ∝ (m/a) cos sin, Ey ∝ (n/b) sin cos;          Hx ∝ −(n/b) sin cos, Hy ∝ (m/a) cos sin
@@ -399,7 +399,7 @@
       let hm = 0; for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) { const h = Hf(a * (i + 0.5) / nx, b * (j + 0.5) / ny); hm = Math.max(hm, Math.hypot(h[0], h[1])); }
       for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
         const x = a * (i + 0.5) / nx, y = b * (j + 0.5) / ny, e = E(x, y);
-        arrow(x, y, [e[0] / mx, e[1] / mx], C.cssVar("--fg"), step);
+        arrow(x, y, [e[0] / mx, e[1] / mx], C.cssVar("--text"), step);
         if (showH) { const h = Hf(x, y); arrow(x, y, [h[0] / hm * 0.7, h[1] / hm * 0.7], C.cssVar("--s2"), step); }
       }
       $("fd-out").textContent = (te ? "TE" : "TM") + m + n + ": " + m + " semiciclo(s) de variación a lo ancho (x, dimensión a) y " + n + " a lo alto (y, dimensión b). " +
@@ -553,7 +553,7 @@
       for (let k = 0; k <= 360; k++) { const b = Math.tan(-PI / 2 + PI * k / 360 * 0.999 + 0.0005); const w = tr(cx(1, b), -d); if (w !== Infinity) pts.push(gp(w)); }
       S.path(pts, "--s2", 2, [6, 3]);
       const gmax = 1 + 1 / (t * t);
-      S.circle(cx(-gmax / (1 + gmax), 0), 1 / (1 + gmax), "--danger", [2, 3], 1.5);
+      S.circle(cx(-gmax / (1 + gmax), 0), 1 / (1 + gmax), "--warn", [2, 3], 1.5);
       S.dot(gp(yl), "--s1", "y_L");
       sols.forEach(function (s, i) { S.dot(gp(s.y1), i ? "--s4" : "--s3", "y₁" + (i ? "′" : "")); S.dot(gp(s.y2), i ? "--s4" : "--s3", "y₂" + (i ? "′" : "")); });
       const len = function (b) { return abierto ? lenOf(Math.atan(b)) : lenOf(Math.atan2(-1, b)); };

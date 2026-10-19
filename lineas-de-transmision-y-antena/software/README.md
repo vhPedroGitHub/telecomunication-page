@@ -1,3 +1,4 @@
-# Software complementario
+# Software complementario de Líneas de Transmisión y Antenas
 
-Cada herramienta va en su propia carpeta con README (instalación y uso).
+- `ltx/` — paquete Python con todos los cálculos del curso (líneas, Smith, stubs, multisección, guías, microcinta, CPW).
+- Las versiones web (sin instalar nada) están en los interactivos de cada tema (`../js/lta.js`).

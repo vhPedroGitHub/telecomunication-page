@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema III · Acoplamiento de impedancias — LTyA</title>
+  <meta name="description" content="Líneas de Transmisión y Antenas, Tema III: adaptación de impedancias. Transformador de cuarto de onda con cargas complejas y su ancho de banda, stub simple en paralelo y en serie, stub doble y zona prohibida, teoría de las pequeñas reflexiones, transformadores binomial y de Chebyshev, transformador exponencial y simetrizadores (balun).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/lta.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/lta.js"></script>
+  <style>body { --accent: var(--c-lta); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Líneas de Transmisión y Antenas</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="t1-teoria-general.html">I · Teoría</a><a href="t1b-carta-smith.html">I · Smith</a><a href="t2-guias-de-onda.html">II · Guías</a><a href="t2b-lineas-planares.html">II · Planares</a><a href="t3-acoplamiento.html" aria-current="page">III · Acoplamiento</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema III · Encuentro 2A (λ/4 y stub simple) · 2B (stub doble y balun) · 2C (Chebyshev y exponencial)</p>
+<h1>Acoplamiento de impedancias</h1>
+<p class="lead">«¡De nada vale poseer una antena de muy buenas características de radiación si no existe adaptación de impedancias!» Una antena casi nunca presenta exactamente \(Z_0\). Entre la línea y la carga se intercala una <strong>red adaptadora</strong> sin pérdidas que hace que la línea «vea» \(Z_0\) (ROE = 1). La idea de todas las redes de este tema es la misma: <strong>fabricar una segunda reflexión que cancele la de la carga</strong>. Lo que cambia es cómo, y en qué ancho de banda.</p>
+
+<div class="objectives"><strong>Objetivos (programa y encuentros 2A–2C)</strong>
+<ul>
+  <li>Diseñar los principales dispositivos de acoplamiento: stubs simples y dobles, transformadores de \(\lambda/4\), exponenciales y de Chebyshev; conocer los simetrizadores (balun).</li>
+  <li>Acoplar impedancias con componente reactiva mediante el transformador de \(\lambda/4\) usando la carta de Smith; calcular su ancho de banda.</li>
+  <li>Valorar ventajas y desventajas de cada uno; calcular y simular con programas de baja y mediana complejidad.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">carta de Smith y línea en corto/abierto</span>
+<p>Hay que dominar: girar en la carta hacia el generador (\(\lambda/2\) por vuelta), pasar de impedancia a admitancia (punto opuesto), la circunferencia \(r=1\) (o \(g=1\)), y que un tramo en corto o en abierto es una reactancia pura: \(z=j\tan\beta l\) (corto), \(z=-j\cot\beta l\) (abierto). Para elementos en paralelo se suman admitancias.</p>
+$$y_{\text{total}}=y_1+y_2,\qquad Z_{in}^{\lambda/4}=\frac{Z_T^2}{Z_L},\qquad \Gamma\ \text{pequeño}:\ \Gamma\approx\tfrac12\ln\frac{Z_2}{Z_1}$$
+<p>Repaso: <a href="t1b-carta-smith.html#lectura">lectura de la carta (Tema I)</a> · <a href="t1-teoria-general.html#cc-ca">líneas en corto y abierto</a> · <a href="../../repaso/matematica.html#hiperbolicas">funciones hiperbólicas</a> (para Chebyshev) · <a href="../../repaso/circuitos.html#maxtrans">máxima transferencia</a>.</p></div>
+
+<h2 id="importancia">1. Por qué y cómo acoplar</h2>
+<ul>
+  <li>Se entrega la <strong>máxima potencia</strong> a la carga (suponiendo el generador acoplado) y se minimizan las pérdidas en la línea (con ROE alta, la corriente y la tensión de pico crecen).</li>
+  <li>Mejora la <strong>relación señal/ruido</strong> en el receptor (antena, amplificador de bajo ruido…).</li>
+  <li>En una red de distribución (por ejemplo, la alimentación de un arreglo de antenas) reduce los <strong>errores de amplitud y fase</strong>.</li>
+</ul>
+<p>Criterios para elegir la red: <strong>complejidad</strong> (la más simple que cumpla), <strong>ancho de banda</strong> (más banda exige más complejidad), <strong>ajuste</strong> (si la carga varía, la red debe poder sintonizarse) y <strong>construcción</strong> (según el tipo de línea: en microcinta, stubs abiertos; en coaxial o guía, en corto). Hay redes de parámetros concentrados (L, C) y distribuidos (tramos de línea); aquí vemos las distribuidas.</p>
+
+<h2 id="qw-compleja">2. Transformador de \(\lambda/4\) con cargas complejas y su ancho de banda</h2>
+<p>El transformador de \(\lambda/4\) (<a href="t1-teoria-general.html#lambda4">Tema I</a>) solo acopla resistencias. Para una carga compleja:</p>
+<div class="step"><span class="n">1</span><div><p>Desde la carga, moverse hacia el generador hasta encontrar un punto donde la impedancia sea real: un <strong>máximo de tensión</strong> (\(R_{\max}=\text{ROE}\cdot Z_0\), al cruzar el eje real derecho de la carta) o un <strong>mínimo</strong> (\(R_{\min}=Z_0/\text{ROE}\), eje real izquierdo).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Allí se intercala el tramo de \(\lambda/4\) con \(Z_T=\sqrt{Z_0R_{\max}}\) o \(Z_T=\sqrt{Z_0R_{\min}}\). Ejemplo resuelto: <a href="t1b-carta-smith.html#ejemplos">antena de 300 + j100 Ω (problema 5 de Smith)</a>.</p></div></div>
+<p><strong>Ancho de banda.</strong> Si \(\Gamma_m\) es el máximo \(|\Gamma|\) tolerable, con \(\theta=\beta l\) (\(\theta=\pi/2\) a \(f_0\)) y líneas TEM (Pozar 5.33):</p>
+<div class="eq key">$$\cos\theta_m=\frac{\Gamma_m}{\sqrt{1-\Gamma_m^2}}\,\frac{2\sqrt{Z_0Z_L}}{|Z_L-Z_0|},\qquad \frac{\Delta f}{f_0}=2-\frac{4\theta_m}{\pi}$$</div>
+<p>El ancho de banda crece a medida que \(Z_L\) se aproxima a \(Z_0\) (respuesta al trabajo independiente del encuentro 2B). <strong>Pozar, ej. 5.5</strong>: 10 Ω → 50 Ω a 3 GHz con ROE ≤ 1,5 (\(\Gamma_m=0{,}2\)): \(Z_T=\sqrt{500}=22{,}36\) Ω, \(l=\lambda/4\) a 3 GHz (2,5 cm en aire), \(\cos\theta_m=0{,}2/0{,}98\cdot2\sqrt{500}/40=0{,}228\Rightarrow\theta_m=76{,}8°\) ⇒ \(\Delta f/f_0=29\ \%\). El gráfico interactivo está en el <a href="t1-teoria-general.html#lambda4">Tema I §7</a>.</p>
+
+<h2 id="stub">3. Stub simple (rama correctora)</h2>
+<p>Un <strong>stub</strong> es un tramo de línea en corto o en abierto de longitud \(l\), conectado en paralelo (o en serie) a una distancia \(d\) de la carga. Funciona en dos pasos:</p>
+<div class="step"><span class="n">1</span><div><p><strong>Elegir \(d\)</strong> para que, en ese punto, la parte real de la admitancia vista sea la correcta: \(y_1=1+jb\). En la carta: se sitúa \(y_L\) y se gira hacia el generador a \(|\Gamma|\) constante hasta cortar la circunferencia \(g=1\). Hay <strong>dos</strong> cortes por cada media vuelta (dos soluciones) e infinitas soluciones sumando \(\lambda/2\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Elegir \(l\)</strong> para que el stub aporte \(-jb\) y cancele la susceptancia: \(y=1+jb-jb=1\). En la carta: se parte de \(y=\infty\) (corto) o \(y=0\) (abierto) y se gira por el borde (\(g=0\)) hacia el generador hasta \(-jb\).</p></div></div>
+<p>Con stub <strong>en serie</strong> es lo mismo pero con impedancias: se busca \(z_1=1+jx\) y el stub aporta \(-jx\). Recomendación del encuentro 2A: colocar el stub <strong>lo más cerca posible de la carga</strong> para ampliar el ancho de banda y reducir pérdidas por la ROE alta del tramo stub–carga.</p>
+<div class="sim" id="sim-st">
+  <div class="sim-title">Diseñador de stub simple, con la carta y \(|\Gamma(f)|\)</div>
+  <div class="controls">
+    <label>Z₀ (Ω) <input type="number" class="short" id="st-z0" value="50"></label>
+    <label>R_L (Ω) <input type="number" class="short" id="st-rl" value="15"></label>
+    <label>X_L (Ω) <input type="number" class="short" id="st-xl" value="10"></label>
+    <label>f₀ (GHz) <input type="number" class="short" id="st-f0" value="2" step="0.1"></label>
+    <label>Conexión <select id="st-conf"><option value="p">en paralelo</option><option value="s">en serie</option></select></label>
+    <label>Stub <select id="st-term"><option value="ca">en circuito abierto</option><option value="cc">en cortocircuito</option></select></label>
+    <label>Solución <select id="st-sol"><option value="0">1</option><option value="1">2</option></select></label>
+  </div>
+  <div class="smith-wrap"><canvas class="smith" id="st-sm" aria-label="Carta de Smith con la carga, el giro hasta g = 1 y el giro del stub"></canvas></div>
+  <div class="legend"><span style="--c: var(--s1)">carga</span><span style="--c: var(--s3)">giro d (hasta g=1 o r=1)</span><span style="--c: var(--s4)">stub l</span><span style="--c: var(--ok)">centro (acoplado)</span></div>
+  <canvas id="st-cv" aria-label="Módulo del coeficiente de reflexión frente a f/f0 para las dos soluciones"></canvas>
+  <div class="legend"><span style="--c: var(--s1)">solución 1</span><span style="--c: var(--s2)">solución 2</span></div>
+  <div class="readout" id="st-out"></div>
+</div>
+<div class="example">
+<h4>Ejemplo del encuentro 2A — Antena \(Z_{en}=15+j10\) Ω, línea de 50 Ω, 2 GHz, stub en paralelo en circuito abierto</h4>
+<div class="step"><span class="n">1</span><div><p>\(z_L=0{,}3+j0{,}2\) ⇒ en paralelo trabajamos con admitancias: \(y_L=1/z_L=2{,}31-j1{,}54\) (posición 0,284 en la escala WTG).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Girando hacia el generador se corta \(g=1\) en \(y_1=1-j1{,}33\) (posición 0,328) ⇒ \(d_1=0{,}328-0{,}284=0{,}044\lambda\); y en \(y_1'=1+j1{,}33\) (posición 0,171) ⇒ \(d_1'=(0{,}5-0{,}284)+0{,}171=0{,}387\lambda\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>El stub debe aportar \(+j1{,}33\) (solución 1) o \(-j1{,}33\) (solución 2). Desde \(y=0\) (abierto) por el borde hacia el generador: \(l_1=0{,}147\lambda\), \(l_1'=0{,}353\lambda\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p><strong>Análisis en frecuencia</strong> (1–3 GHz): la carga es R = 15 Ω en serie con \(L=X_L/\omega_0=10/(2\pi\cdot2\cdot10^9)=0{,}796\) nH. Al cambiar \(f\), cambia \(X_L=\omega L\) y las longitudes eléctricas \(d/\lambda\) y \(l/\lambda\) (las físicas son fijas). Con ROE ≤ 2 (\(|\Gamma|\le0{,}33\)), la solución 1 funciona de 0,73 a 1,15 \(f_0\) (≈ 43 %) y la 2 solo de 0,95 a 1,07 \(f_0\) (≈ 11 %): <strong>la solución con stub y distancia cortos tiene más ancho de banda</strong>.</p></div></div>
+</div>
+<div class="box idea"><span class="box-title">Trabajo independiente 1 del encuentro 2A (resultados para comprobar)</span>
+<p>(a) Stub en paralelo en cortocircuito: mismas \(d\) (0,044λ y 0,387λ), longitudes \(l=0{,}397\lambda\) y \(0{,}103\lambda\) (un corto es un abierto desplazado \(\lambda/4\)). (b) Stub en serie en circuito abierto: \(d=0{,}137\lambda\), \(l=0{,}103\lambda\) o \(d=0{,}294\lambda\), \(l=0{,}397\lambda\). (c) En coaxial de 50 Ω con \(\varepsilon_r=4\) a 2 GHz, \(\lambda=c/(f\sqrt{\varepsilon_r})=7{,}5\) cm: \(d=0{,}33\) cm y \(l=1{,}10\) cm (solución 1 en paralelo, abierto). Verifícalos con el diseñador.</p></div>
+<p><strong>Ventajas</strong>: acopla <em>cualquier</em> carga, alta eficiencia, cálculo relativamente simple. <strong>Desventajas</strong>: \(d\) y \(l\) cambian con la frecuencia (banda estrecha); si la carga cambia, hay que mover el punto de conexión (difícil en coaxial) — de ahí el stub doble.</p>
+
+<h2 id="doble">4. Stub doble</h2>
+<p>Dos stubs en paralelo en posiciones <strong>fijas</strong> (separados \(d\)); solo se ajustan sus longitudes. Útil cuando no se puede mover el punto de conexión (sintonizadores de laboratorio).</p>
+<p><strong>Procedimiento (caso \(d'=0\): primer stub en la carga)</strong>:</p>
+<div class="step"><span class="n">1</span><div><p>Normalizar \(Z_L\) e invertir 180° para obtener \(y_L\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Girar la circunferencia \(g=1\) una distancia \(d\) <strong>hacia la carga</strong> (contiene los puntos que, tras recorrer \(d\) hacia el generador, caerán en \(g=1\)).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Desde \(y_L\), moverse <strong>a parte real constante</strong> (el primer stub solo suma susceptancia) hasta cortar la circunferencia girada: \(y_1\) o \(y_1'\). Susceptancia del primer stub: \(b_1=\operatorname{Im}(y_1-y_L)\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p>Girar \(y_1\) una distancia \(d\) hacia el generador: cae en \(y_2=1\pm jb_2\). El segundo stub aporta \(\mp jb_2\).</p></div></div>
+<div class="step"><span class="n">5</span><div><p>Longitudes: desde \(y=\infty\) (corto) o \(y=0\) (abierto) hasta \(jb_1\) y \(-jb_2\) por el borde.</p></div></div>
+<p>Si el primer stub está a \(d'\) de la carga, primero se gira \(y_L\) esa distancia y luego se sigue igual. <strong>Desventaja: zona prohibida</strong>. Si \(y_L\) cae dentro de la circunferencia \(g\ge1+\cot^2\beta d\) (para \(d=\lambda/8\), \(g\gt 2\)), moverse a parte real constante nunca corta la circunferencia girada: no hay solución. Se reduce la zona disminuyendo \(d\), pero \(d\) cerca de 0 o de \(\lambda/2\) da redes muy sensibles a la frecuencia; se recomiendan \(d=\lambda/8\) o \(3\lambda/8\). Si se puede ajustar el tramo carga–primer stub, \(y_L\) siempre puede sacarse de la zona prohibida.</p>
+<div class="sim" id="sim-ds">
+  <div class="sim-title">Stub doble en paralelo</div>
+  <div class="controls">
+    <label>Z₀ (Ω) <input type="number" class="short" id="ds-z0" value="50"></label>
+    <label>R_L (Ω) <input type="number" class="short" id="ds-rl" value="60"></label>
+    <label>X_L (Ω) <input type="number" class="short" id="ds-xl" value="-80"></label>
+    <label>separación d/λ <input type="number" class="short" id="ds-d" value="0.125" step="0.005"></label>
+    <label>Stubs <select id="ds-term"><option value="cc">en cortocircuito</option><option value="ca">en circuito abierto</option></select></label>
+  </div>
+  <div class="smith-wrap"><canvas class="smith" id="ds-sm" aria-label="Carta de admitancias con la carga, la circunferencia g = 1 girada y la zona prohibida"></canvas></div>
+  <div class="legend"><span style="--c: var(--s1)">y_L</span><span style="--c: var(--s2)">g = 1 girada d hacia la carga</span><span style="--c: var(--warn)">zona prohibida</span><span style="--c: var(--s3)">solución 1</span><span style="--c: var(--s4)">solución 2</span></div>
+  <div class="readout" id="ds-out"></div>
+</div>
+<div class="example">
+<h4>Ejemplo 5.4 de Pozar (trabajo independiente del encuentro 2B) — \(Z_L=60-j80\) Ω, 50 Ω, stubs a \(\lambda/8\)</h4>
+<div class="step"><span class="n">1</span><div><p>\(y_L=0{,}3+j0{,}4\) (fuera de la zona prohibida \(g\gt 2\)).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Primer stub: \(b_1=-0{,}114\) o \(b_1=1{,}314\). Tras \(\lambda/8\): \(y_2=1+j1{,}38\) o \(y_2=1-j3{,}38\) ⇒ \(b_2=-1{,}38\) o \(3{,}38\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>En <strong>cortocircuito</strong> (como pide la conferencia): \(l_1=0{,}232\lambda,\ l_2=0{,}100\lambda\) o \(l_1=0{,}396\lambda,\ l_2=0{,}454\lambda\). En <strong>abierto</strong> (como resuelve Pozar): \(l_1=0{,}482\lambda,\ l_2=0{,}350\lambda\) o \(l_1=0{,}146\lambda,\ l_2=0{,}204\lambda\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p>Carga = R + C en serie a 2 GHz: \(C=1/(\omega\cdot80)=0{,}995\) pF. La solución con stubs más cortos tiene más ancho de banda (Pozar, fig. 5.9).</p></div></div>
+</div>
+
+<h2 id="pequenas">5. Teoría de las pequeñas reflexiones</h2>
+<p>Para ganar ancho de banda, en lugar de un salto brusco de impedancia se hacen <strong>muchos saltos pequeños</strong> (\(N\) secciones de \(\lambda/4\) con impedancias \(Z_1,\dots,Z_N\)) o una variación continua. Cada unión produce una reflexión parcial pequeña:</p>
+$$\Gamma_0=\frac{Z_1-Z_0}{Z_1+Z_0},\qquad \Gamma_n=\frac{Z_{n+1}-Z_n}{Z_{n+1}+Z_n}\approx\frac12\ln\frac{Z_{n+1}}{Z_n},\qquad \Gamma_N=\frac{Z_L-Z_N}{Z_L+Z_N}$$
+<p>Si las reflexiones son pequeñas se desprecian las múltiples y la reflexión total es la suma de las parciales, cada una retrasada \(2\theta\) por sección (\(\theta=\beta l\), \(=\pi/2\) a \(f_0\)):</p>
+<div class="eq key">$$\Gamma(\theta)\approx\Gamma_0+\Gamma_1e^{-2j\theta}+\Gamma_2e^{-4j\theta}+\dots+\Gamma_Ne^{-2jN\theta}$$</div>
+<p>Haciendo el transformador simétrico (\(\Gamma_0=\Gamma_N\), \(\Gamma_1=\Gamma_{N-1}\)…; no implica que las \(Z_n\) sean simétricas) queda una serie de Fourier finita en cosenos:</p>
+$$\Gamma(\theta)=2e^{-jN\theta}\left[\Gamma_0\cos N\theta+\Gamma_1\cos(N-2)\theta+\dots+\Gamma_n\cos(N-2n)\theta+\dots\right]$$
+<p>donde el último término es \(\tfrac12\Gamma_{N/2}\) si \(N\) es par o \(\Gamma_{(N-1)/2}\cos\theta\) si es impar. Diseñar el transformador = elegir los \(\Gamma_n\) para que este polinomio en \(\cos\theta\) sea pequeño en la banda. Se supone que \(Z_n\) crece (o decrece) monótonamente y que \(Z_0\), \(Z_L\) son reales, así que todos los \(\Gamma_n\) tienen el mismo signo.</p>
+
+<h2 id="binomial">6. Transformador binomial (máximamente plano)</h2>
+<p>Se impone \(\Gamma(\theta)=A(1+e^{-2j\theta})^N\): la respuesta es lo más plana posible en \(f_0\) (sin rizado). Entonces \(\Gamma_n=A\binom Nn\) con \(A=2^{-(N+1)}\ln(Z_L/Z_0)\), y \(\ln Z_{n+1}=\ln Z_n+2\Gamma_n\). Ancho de banda: \(\theta_m=\cos^{-1}\left[\tfrac12(\Gamma_m/|A|)^{1/N}\right]\). Ejemplo (Pozar 5.6): 50 → 100 Ω, \(N=3\), \(\Gamma_m=0{,}05\): \(Z_1=54{,}5\), \(Z_2=70{,}7\), \(Z_3=91{,}7\) Ω, \(\Delta f/f_0=70\ \%\).</p>
+
+<h2 id="chebyshev">7. Transformador de Chebyshev</h2>
+<p>Optimiza el ancho de banda <strong>a costa de un rizado</strong> en la banda de paso: \(|\Gamma|\) oscila entre 0 y \(\Gamma_m\) (equirrizado). Se aprovecha que los polinomios de Chebyshev \(T_N(x)\) oscilan entre −1 y 1 para \(|x|\le1\) y crecen rápidamente fuera. Con el cambio \(x=\sec\theta_m\cos\theta\), la banda \(\theta_m\lt \theta\lt \pi-\theta_m\) corresponde a \(|x|\le1\):</p>
+<div class="eq key">$$\Gamma(\theta)=Ae^{-jN\theta}\,T_N(\sec\theta_m\cos\theta),\qquad A=\Gamma_m,\qquad \sec\theta_m=\cosh\!\left[\frac1N\cosh^{-1}\!\left(\frac{\ln(Z_L/Z_0)}{2\Gamma_m}\right)\right]$$
+$$\frac{\Delta f}{f_0}=2-\frac{4\theta_m}{\pi}$$</div>
+<p>Polinomios reescritos (Pozar 5.60), suficientes para hasta 4 secciones:</p>
+$$T_1=\sec\theta_m\cos\theta,\quad T_2=\sec^2\theta_m(1+\cos2\theta)-1,\quad T_3=\sec^3\theta_m(\cos3\theta+3\cos\theta)-3\sec\theta_m\cos\theta$$
+$$T_4=\sec^4\theta_m(\cos4\theta+4\cos2\theta+3)-4\sec^2\theta_m(\cos2\theta+1)+1$$
+<p><strong>Método</strong>: igualar término a término la serie de Fourier de §5 con \(A\,T_N\), despejar los \(\Gamma_n\) y de ellos las \(Z_n\) con \(\Gamma_n\approx\tfrac12\ln(Z_{n+1}/Z_n)\). (En la diapositiva el \(T_4\) termina en \(-4\sec^2\theta_m\cos\theta\); la forma correcta, Pozar (5.60d), es la de arriba: compruébalo con \(T_4(x)=8x^4-8x^2+1\).)</p>
+<div class="example">
+<h4>Ejemplo del encuentro 2C — Chebyshev de 2 secciones: 120 Ω a una línea de 60 Ω, \(f_0=98\) MHz, ROE ≤ 1,105</h4>
+<div class="step"><span class="n">1</span><div><p>\(\Gamma_m=(1{,}105-1)/(1{,}105+1)=0{,}05\). \(Z_L/Z_0=2\) (\(\gt 1\), no hay que invertir).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>\(\sec\theta_m=\cosh\left[\tfrac12\cosh^{-1}\dfrac{\ln2}{0{,}1}\right]=1{,}991\Rightarrow\theta_m=59{,}9°\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Con \(N=2\): \(\Gamma(\theta)=2e^{-j2\theta}[\Gamma_0\cos2\theta+\tfrac12\Gamma_1]=Ae^{-j2\theta}[\sec^2\theta_m(1+\cos2\theta)-1]\). Igualando: \(\Gamma_0=\tfrac A2\sec^2\theta_m=0{,}0991\) y \(\Gamma_1=A(\sec^2\theta_m-1)=0{,}148\); por simetría \(\Gamma_2=\Gamma_0\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p>\(\ln Z_1=\ln60+2\cdot0{,}0991\Rightarrow Z_1=73{,}15\) Ω; \(\ln Z_2=\ln Z_1+2\cdot0{,}148\Rightarrow Z_2=98{,}4\) Ω.</p></div></div>
+<div class="step"><span class="n">5</span><div><p>\(\Delta f/f_0=2-4\cdot59{,}9°/180°=0{,}67\) ⇒ \(\Delta f=65{,}6\) MHz (de 65,2 a 130,8 MHz): cubre toda la banda de FM (88–108 MHz).</p></div></div>
+</div>
+<div class="sim" id="sim-mt">
+  <div class="sim-title">Transformadores multisección: binomial y Chebyshev</div>
+  <div class="controls">
+    <label>Tipo <select id="mt-type"><option value="cheb">Chebyshev</option><option value="bin">binomial</option></select></label>
+    <label>N <input type="number" class="short" id="mt-n" value="2" min="1" max="6"></label>
+    <label>Z₀ (Ω) <input type="number" class="short" id="mt-z0" value="60"></label>
+    <label>Z_L (Ω) <input type="number" class="short" id="mt-zl" value="120"></label>
+    <label>Γm <input type="number" class="short" id="mt-gm" value="0.05" step="0.005"></label>
+  </div>
+  <canvas id="mt-cv" aria-label="Coeficiente de reflexión exacto del transformador multisección frente a f/f0"></canvas>
+  <div class="legend"><span style="--c: var(--s1)">transformador diseñado (cálculo exacto en cascada)</span><span style="--c: var(--muted)">un solo λ/4</span></div>
+  <div class="readout" id="mt-out"></div>
+</div>
+<p>Prueba el ejemplo 5.7 de Pozar (50 → 100 Ω, \(N=3\), \(\Gamma_m=0{,}05\)): \(Z_1\approx57{,}5\), \(Z_2=70{,}7\), \(Z_3\approx87{,}0\) Ω y \(\Delta f/f_0\approx101\ \%\). La curva se calcula de forma exacta (cascada de líneas), así que se ve el pequeño error de la aproximación de pequeñas reflexiones.</p>
+
+<h2 id="exponencial">8. Transformador exponencial</h2>
+<p>Si \(N\to\infty\) las secciones se funden en una línea cuya \(Z_0\) varía de forma continua (línea <em>ahusada</em>). En la exponencial:</p>
+<div class="eq key">$$Z(z)=Z_0e^{az},\ 0\lt z\lt L,\qquad a=\frac1L\ln\frac{Z_L}{Z_0},\qquad \Gamma(\theta)=\frac12\ln\frac{Z_L}{Z_0}\,e^{-j\beta L}\,\frac{\sin\beta L}{\beta L}$$</div>
+<p>\(a\) es el <strong>factor de ahusamiento</strong> (cuánto cambia la sección transversal por metro). \(|\Gamma|\) cae como un \(|\operatorname{sinc}|\) al crecer \(\beta L\): el acoplamiento es malo a baja frecuencia (la línea es corta en longitudes de onda) y bueno por encima, sin límite superior. Criterio (Pozar): \(L\gt \lambda_{\max}/2\) (\(\beta L\gt \pi\)) para minimizar el desacoplo a la frecuencia más baja. Aplicaciones: antenas de hilo (rómbicas) y antenas impresas (espirales); en microcinta se hace variando el ancho de la pista. Ventaja principal: banda relativamente ancha.</p>
+<div class="sim" id="sim-ex">
+  <div class="sim-title">\(|\Gamma|\) del transformador exponencial frente a \(\beta L\)</div>
+  <div class="controls">
+    <label>Z₀ (Ω) <input type="number" class="short" id="ex-z0" value="50"></label>
+    <label>Z_L (Ω) <input type="number" class="short" id="ex-zl" value="100"></label>
+    <label>Γm <input type="number" class="short" id="ex-gm" value="0.05" step="0.005"></label>
+  </div>
+  <canvas id="ex-cv" aria-label="Módulo del coeficiente de reflexión del transformador exponencial frente a βL"></canvas>
+  <div class="readout" id="ex-out"></div>
+</div>
+<div class="example">
+<h4>Problema del encuentro 2C — Línea bifilar de 250 Ω a una antena rómbica de 600 Ω, 15–20 MHz</h4>
+<div class="step"><span class="n">1</span><div><p>\(600=250e^{aL}\Rightarrow aL=\ln2{,}4=0{,}875\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Criterio de la conferencia (variación lenta, \(a\ll4\pi/\lambda_{\max}\)): \(\lambda_{\max}=300/15=20\) m ⇒ \(a\ll0{,}628\) m⁻¹; tomando diez veces menos, \(a=0{,}0628\) m⁻¹ ⇒ \(L=13{,}9\) m. Criterio de Pozar: \(L\gt \lambda_{\max}/2=10\) m. Ambos cumplen con \(L\approx14\) m.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>\(|\Gamma|=\tfrac12\ln2{,}4\,|\sin\beta L/\beta L|=0{,}438\,|\sin\beta L/\beta L|\). <em>En la diapositiva aparece 0,87: falta el factor ½.</em> Con \(L=14\) m, a 15 MHz \(\beta L=4{,}40\) rad ⇒ \(|\Gamma|=0{,}095\); a 20 MHz, \(\beta L=5{,}86\) ⇒ \(|\Gamma|=0{,}03\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p>Mecánica: tres aisladores (uno en cada extremo y otro donde \(Z=\sqrt{Z_{\min}Z_{\max}}\)) o uno cada 20° eléctricos (18 aisladores por longitud de onda).</p></div></div>
+</div>
+<div class="example">
+<h4>Trabajo independiente 2/3 del encuentro 2C (Pozar 5.24) — 100 Ω a 50 Ω, \(|\Gamma|\le0{,}05\) en un 100 % de ancho de banda</h4>
+<div class="step"><span class="n">1</span><div><p>\(|\Gamma|=0{,}347|\sin\beta L/\beta L|\le0{,}05\) exige \(|\sin x/x|\le0{,}144\): se cumple para todo \(\beta L\ge x_1=5{,}39\) rad (la gráfica de la conferencia lee ≈ 5,5).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>100 % de ancho de banda: \(f_2=3f_1\) y \(f_0=2f_1\). A \(f_1\), \(\beta_1L=5{,}39\); a \(f_0\), \(\beta_0L=10{,}8\) ⇒ \(L=10{,}8/2\pi\,\lambda_0=1{,}72\lambda_0\) (la conferencia obtiene 1,75λ₀ leyendo la gráfica).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Chebyshev con las mismas especificaciones: \(\theta_m=45°\), \(\sec\theta_m=1{,}414\); \(N=\cosh^{-1}(\ln2/0{,}1)/\cosh^{-1}1{,}414=2{,}98\Rightarrow N=3\): longitud total \(3\lambda_0/4=0{,}75\lambda_0\), <strong>menos de la mitad</strong> que el exponencial. El exponencial no tiene límite superior de frecuencia, en cambio.</p></div></div>
+</div>
+
+<h2 id="balun">9. Simetrizadores (balun)</h2>
+<p>Un dipolo es una antena <strong>simétrica</strong> (balanceada): sus dos ramas deben recibir corrientes iguales y opuestas. El coaxial es <strong>asimétrico</strong>: la malla está a masa. Si se conecta directamente, parte de la corriente de la malla (\(I_3\)) se va por la <em>cara exterior</em> de la malla: las corrientes del dipolo quedan desequilibradas (\(I_1\ne I_2-I_3\)), el cable radia, se deforma el diagrama de radiación y cambia la impedancia. El circuito equivalente muestra una impedancia «de tierra» en paralelo con una de las ramas. La solución es un <strong>balun</strong> (<em>balanced–unbalanced</em>):</p>
+<ul>
+  <li><strong>Balun de funda o «bazooka»</strong> (1:1): un tubo conductor de \(\lambda/4\) rodea el coaxial y se suelda a la malla en el extremo lejano (cortocircuito). Visto desde la boca, el corto a \(\lambda/4\) es una impedancia infinita que bloquea la corriente por fuera de la malla. Banda estrecha. Variantes 1:1 con un tramo de \(\lambda/4\) en paralelo amplían algo la banda.</li>
+  <li><strong>Balun transformador 4:1 de media onda</strong>: un tramo de coaxial de \(\lambda/2\) (eléctrica: \(\lambda_0/(2\sqrt{\varepsilon_r})\)) une las dos ramas; invierte la fase, así que entre los terminales balanceados aparece \(V_1-(-V_1)=2V_1\). Igualando potencias \(V_1^2/Z_{en}=(2V_1)^2/Z_{sal}\Rightarrow Z_{sal}=4Z_{en}\): por ejemplo, 75 Ω desbalanceados → 300 Ω balanceados (la cinta de TV).</li>
+  <li><strong>Balun de parámetros concentrados / de ferrita</strong>: un transformador o una bobina de choque con núcleo de ferrita alrededor del coaxial; banda ancha a HF y VHF.</li>
+  <li><strong>Baluns impresos</strong>: transición de guía coplanar (CPW, desbalanceada) a líneas coplanares de tiras (CPS, balanceadas) con un stub radial y un transformador de Chebyshev para el cambio de impedancia; y el <strong>balun exponencial</strong> (ahusado).</li>
+</ul>
+
+<h2 id="comparacion">10. Comparación</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Dispositivo</th><th>Cargas</th><th>Banda</th><th>Ajuste</th><th>Observaciones</th></tr></thead>
+  <tbody>
+    <tr><td>\(\lambda/4\) simple</td><td>reales (o complejas en \(V_{\max}\)/\(V_{\min}\))</td><td>estrecha</td><td>no</td><td>el más simple; necesita una \(Z_T\) a medida</td></tr>
+    <tr><td>Stub simple</td><td>cualquiera</td><td>estrecha</td><td>moviendo \(d\)</td><td>cálculo simple, alta eficiencia</td></tr>
+    <tr><td>Stub doble</td><td>fuera de la zona prohibida</td><td>estrecha</td><td>solo longitudes</td><td>posiciones fijas, sintonizable</td></tr>
+    <tr><td>Binomial</td><td>reales</td><td>ancha, plana</td><td>no</td><td>sin rizado</td></tr>
+    <tr><td>Chebyshev</td><td>reales</td><td>la mayor para N dado</td><td>no</td><td>rizado ≤ Γm</td></tr>
+    <tr><td>Exponencial</td><td>reales</td><td>ancha (sin límite superior)</td><td>no</td><td>más largo; malo a baja frecuencia</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="ejercicios">11. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Diseñe un transformador de \(\lambda/4\) para acoplar 10 Ω a 50 Ω a 3 GHz y halle el ancho de banda para ROE ≤ 1,5 (encuentro 2B, Pozar 5.5).
+    <details class="sol"><summary>Solución</summary><div><p>\(Z_T=22{,}36\) Ω, \(l=2{,}5\) cm (aire), \(\Delta f/f_0=29\ \%\).</p></div></details></li>
+  <li>Diseñe un stub en paralelo en cortocircuito para \(Z_L=60-j80\) Ω en 50 Ω (Pozar 5.2).
+    <details class="sol"><summary>Solución</summary><div><p>\(d=0{,}110\lambda\), \(l=0{,}095\lambda\) o \(d=0{,}260\lambda\), \(l=0{,}405\lambda\) (\(y_1=1\pm j1{,}47\)).</p></div></details></li>
+  <li>Diseñe un Chebyshev de 3 secciones para 100 Ω → 50 Ω con \(\Gamma_m=0{,}05\) y compárelo con el binomial.
+    <details class="sol"><summary>Solución</summary><div><p>Chebyshev: \(Z\approx57{,}5;\ 70{,}7;\ 87{,}0\) Ω, \(\Delta f/f_0\approx101\ \%\). Binomial: 54,5; 70,7; 91,7 Ω, 70 %. Chebyshev da más banda con el mismo número de secciones a cambio del rizado.</p></div></details></li>
+  <li>¿Cuántas secciones de Chebyshev necesita para acoplar 25 Ω a 50 Ω con ROE ≤ 1,2 en el 80 % de banda?
+    <details class="sol"><summary>Solución</summary><div><p>\(\Gamma_m=0{,}0909\); \(\theta_m=\pi/2\,(1-0{,}4)=54°\), \(\sec\theta_m=1{,}701\); \(N\ge\cosh^{-1}(\ln2/0{,}182)/\cosh^{-1}1{,}701=2{,}01/1{,}127=1{,}79\Rightarrow N=2\).</p></div></details></li>
+  <li>¿Por qué el balun de media onda multiplica la impedancia por 4?
+    <details class="sol"><summary>Solución</summary><div><p>Porque entre los terminales balanceados hay el doble de tensión (\(V_1\) y \(-V_1\)) con la misma potencia: \(Z\propto V^2/P\).</p></div></details></li>
+</ol>
+
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<p class="meta">Las conferencias citan páginas de ediciones anteriores de Pozar (p. ej. «228–241», «243–246», «301–325»); abajo, las de la 4.ª edición de los materiales.</p>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>D. M. Pozar, <em>Microwave Engineering</em>, 4.ª ed., Wiley, 2012</td><td>5</td><td>5.1 Matching with Lumped Elements (introducción del capítulo: criterios de selección)</td><td>p. 228–229 (PDF 248–249)</td><td>Importancia y criterios</td></tr>
+    <tr><td>Pozar (ídem)</td><td>5</td><td>5.2 Single-Stub Tuning (ej. 5.2 paralelo, 5.3 serie)</td><td>pp. 234–241 (PDF 254–261)</td><td>Stub simple</td></tr>
+    <tr><td>Pozar (ídem)</td><td>5</td><td>5.3 Double-Stub Tuning (ej. 5.4, zona prohibida)</td><td>pp. 241–246 (PDF 261–266)</td><td>Stub doble</td></tr>
+    <tr><td>Pozar (ídem)</td><td>5</td><td>5.4 The Quarter-Wave Transformer (ej. 5.5, ec. 5.33)</td><td>pp. 246–250 (PDF 266–270)</td><td>Ancho de banda del λ/4</td></tr>
+    <tr><td>Pozar (ídem)</td><td>5</td><td>5.5 The Theory of Small Reflections · 5.6 Binomial · 5.7 Chebyshev Multisection Matching Transformers</td><td>pp. 250–261 (PDF 270–281)</td><td>Multisección (ec. 5.60, 5.63, ej. 5.6 y 5.7)</td></tr>
+    <tr><td>Pozar (ídem)</td><td>5</td><td>5.8 Tapered Lines (exponential taper, ec. 5.68–5.70, ej. 5.8)</td><td>pp. 261–266 (PDF 281–286)</td><td>Exponencial</td></tr>
+    <tr><td>Pozar (ídem)</td><td>12</td><td>Baluns (fig. 12.18: transformador y Marchand)</td><td>p. 594 (PDF 614)</td><td>Balun</td></tr>
+    <tr><td>S. J. Orfanidis, <em>Electromagnetic Waves and Antennas</em>, rev. 2016</td><td>13</td><td>13.2 Multisection Lines · 13.3 Quarter-Wavelength Chebyshev Transformers · 13.8 Single Stub Matching · 13.9 Balanced Stubs · 13.10 Double and Triple Stub Matching</td><td>pp. 616–622, 639–647 (PDF 653–659, 676–684)</td><td>La conferencia cita «639–643» y «645–646»</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="profundizar">13. Para profundizar</h2>
+<ul>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=L24aB89-m5w">«Lecture -- Impedance Matching on Smith Charts»</a> (EMPossible, en inglés). Redes de acoplamiento diseñadas en la carta.</li>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=aMuB0383NXc">«Lesson 15 - Chapter 14: Single Stub Matching»</a> (Smith Chart Mastery | RF Communications, en inglés). Stub simple en corto y en abierto, paso a paso.</li>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=_pJ8kh0i2u4">«Lecture07: Impedance Matching with the Smith Chart»</a> (Microwave Labcast, en inglés). Acoplamiento con elementos concentrados y con líneas.</li>
+</ul>
+
+<h2 id="faq">14. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué hay dos soluciones de stub y cuál elijo?</summary><div><p>La circunferencia de ROE corta la de \(g=1\) en dos puntos. Se elige normalmente la que da \(d\) y \(l\) más cortos (más ancho de banda, menos pérdidas) salvo que la construcción obligue a otra.</p></div></details>
+  <details><summary>¿Stub en corto o en abierto?</summary><div><p>En microcinta, abierto (no hace falta taladrar hasta la masa). En coaxial y guía, en corto: un extremo abierto en un coaxial grueso puede radiar y el stub deja de ser una reactancia pura.</p></div></details>
+  <details><summary>¿Chebyshev siempre es mejor que binomial?</summary><div><p>Da más banda para el mismo \(N\) y \(\Gamma_m\), pero tiene rizado y su respuesta de fase es menos lineal. Si se quiere la mínima reflexión justo en \(f_0\) y una banda moderada, el binomial es suficiente y más sencillo de calcular.</p></div></details>
+  <details><summary>¿Se puede acoplar en una banda arbitrariamente ancha?</summary><div><p>No: el criterio de Bode–Fano (Pozar 5.9) pone un límite al producto ancho de banda × calidad del acoplamiento para cargas con reactancia. Más secciones acercan al límite pero no lo superan.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Encuentro 2A «Stub simple y adaptación de impedancias», 2B «Stub doble y balun» y 2C «Chebyshev y exponencial» (Prof. Juan J. Justo Morales, CUJAE). Todos los números se recalcularon con <a href="../#software">ltx</a> y los diseñadores de esta página; las discrepancias con las diapositivas se señalan en el texto. Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Líneas de Transmisión y Antenas · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

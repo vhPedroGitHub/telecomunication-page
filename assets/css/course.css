@@ -117,7 +117,7 @@ td.mono, th.mono { font-family: var(--font-mono); }
 
 /* ---------- Interactivos ---------- */
 .sim { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); padding: 14px 16px; margin: 22px 0; }
-.sim > .sim-title { font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.sim > .sim-title { font-weight: 600; margin-bottom: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .sim > .sim-title::before { content: "▶"; color: var(--accent); font-size: .8rem; }
 .sim .controls { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 10px 0; align-items: center; }
 .sim label { font-size: .9rem; display: flex; align-items: center; gap: 8px; }

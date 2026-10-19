@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema II · Líneas planares — LTyA</title>
+  <meta name="description" content="Líneas de Transmisión y Antenas, Tema II: líneas planares. Microcinta: campo cuasi-TEM, permitividad efectiva, impedancia característica, análisis y síntesis, microcinta ancha y estrecha, dispersión, espesor del conductor, pérdidas. Guía coplanar por transformación conforme.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/lta.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/lta.js"></script>
+  <style>body { --accent: var(--c-lta); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Líneas de Transmisión y Antenas</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="t1-teoria-general.html">I · Teoría</a><a href="t1b-carta-smith.html">I · Smith</a><a href="t2-guias-de-onda.html">II · Guías</a><a href="t2b-lineas-planares.html" aria-current="page">II · Planares</a><a href="t3-acoplamiento.html">III · Acoplamiento</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema II · Líneas planares (programa de la asignatura; aún sin conferencia en los materiales)</p>
+<h1>Líneas planares: microcinta y guía coplanar</h1>
+<p class="lead">Casi todos los circuitos de RF modernos (teléfonos, routers Wi-Fi, receptores GPS, radares de automóvil) están hechos de <strong>pistas en una placa de circuito impreso</strong>. Una pista sobre un plano de masa es una línea de transmisión: la <strong>microcinta</strong>. Su impedancia depende solo de la geometría (ancho de la pista, espesor y permitividad del sustrato), así que diseñarla es resolver dos problemas: dadas las dimensiones, ¿qué \(Z_0\) tiene? (<em>análisis</em>) y dada la \(Z_0\), ¿qué ancho debo dibujar? (<em>síntesis</em>).</p>
+
+<div class="objectives"><strong>Objetivos (programa de la asignatura)</strong>
+<ul>
+  <li>Analizar la estructura del campo; definir y calcular la permitividad efectiva y la impedancia característica.</li>
+  <li>Diseñar con ecuaciones estáticas y dinámicas; métodos de análisis y de síntesis; microcintas anchas y estrechas.</li>
+  <li>Determinar la influencia del grosor del conductor y de la permitividad del dieléctrico sobre \(Z_0\).</li>
+  <li>Medir \(\lambda\), \(Z_L\), ROE y pérdidas de retorno en una microcinta; usar y desarrollar software libre para estos cálculos.</li>
+  <li>Conocer la guía coplanar (CPW).</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">línea TEM y capacidad</span>
+<p>En una línea TEM, \(v_p=1/\sqrt{LC}=c/\sqrt{\varepsilon_r}\) y \(Z_0=\sqrt{L/C}\). Si se conoce la capacidad por unidad de longitud con el dieléctrico (\(C\)) y en el vacío (\(C_0\)), la inductancia no cambia (el dieléctrico no es magnético), y</p>
+$$\varepsilon_{\text{eff}}=\frac{C}{C_0},\qquad Z_0=\frac{1}{c\sqrt{CC_0}}$$
+<p>Repaso: <a href="t1-teoria-general.html#casos">línea sin pérdidas (Tema I)</a> · <a href="../../repaso/fisica-em.html#frontera">condiciones de frontera</a> · <a href="../../repaso/matematica.html#logaritmos">logaritmos</a>.</p></div>
+
+<h2 id="geometria">1. Geometría y campo</h2>
+<svg class="diagram" viewBox="0 0 640 200" role="img" aria-label="Sección transversal de una microcinta: pista de ancho W y espesor t sobre un sustrato de espesor h y permitividad εr con plano de masa">
+  <rect x="60" y="150" width="520" height="12" class="accf"/><text x="590" y="160">masa</text>
+  <rect x="60" y="90" width="520" height="60" class="box-s"/><text x="470" y="128">εr, tan δ</text>
+  <rect x="270" y="80" width="100" height="10" class="accf"/><text x="305" y="72">W</text>
+  <text x="380" y="88">t</text>
+  <line class="stroke" x1="40" y1="90" x2="40" y2="150"/><text x="14" y="125">h</text>
+  <path class="acc" d="M290 90 q-10 30 -6 60"/><path class="acc" d="M320 90 v60"/><path class="acc" d="M350 90 q10 30 6 60"/>
+  <path class="acc" d="M270 85 q-60 -10 -70 65"/><path class="acc" d="M370 85 q60 -10 70 65"/>
+</svg>
+<p>Una pista de ancho \(W\) y espesor \(t\), sobre un sustrato de espesor \(h\) (en Pozar, \(d\)) y permitividad \(\varepsilon_r\), con un plano de masa debajo. Las líneas de \(\vec E\) van de la pista a la masa: la mayoría por dentro del dieléctrico, pero una parte <strong>por el aire</strong>, por encima y por los lados. Como la onda tiene que viajar a la vez en dos medios con velocidades distintas, no puede ser una TEM pura: es <strong>cuasi-TEM</strong> (tiene pequeñas componentes longitudinales que crecen con la frecuencia). A frecuencias bajas se trata como TEM en un medio homogéneo equivalente de permitividad \(\varepsilon_{\text{eff}}\), con \(1\lt \varepsilon_{\text{eff}}\lt \varepsilon_r\).</p>
+
+<h2 id="estaticas">2. Ecuaciones estáticas (análisis y síntesis)</h2>
+<p>Las fórmulas de diseño son ajustes de curvas a soluciones cuasiestáticas rigurosas (Hammerstad; Pozar 3.8):</p>
+<div class="eq key">$$\varepsilon_{\text{eff}}=\frac{\varepsilon_r+1}{2}+\frac{\varepsilon_r-1}{2}\,\frac{1}{\sqrt{1+12h/W}}$$
+$$Z_0=\begin{cases}\dfrac{60}{\sqrt{\varepsilon_{\text{eff}}}}\ln\!\left(\dfrac{8h}{W}+\dfrac{W}{4h}\right), & W/h\le1\ \text{(cinta estrecha)}\\[2ex]\dfrac{120\pi}{\sqrt{\varepsilon_{\text{eff}}}\,\left[W/h+1{,}393+0{,}667\ln(W/h+1{,}444)\right]}, & W/h\ge1\ \text{(cinta ancha)}\end{cases}$$</div>
+<p><strong>Síntesis</strong> (dada \(Z_0\), hallar \(W/h\)):</p>
+<div class="eq key">$$\frac Wh=\begin{cases}\dfrac{8e^A}{e^{2A}-2}, & W/h\lt 2\\[2ex]\dfrac2\pi\left[B-1-\ln(2B-1)+\dfrac{\varepsilon_r-1}{2\varepsilon_r}\left(\ln(B-1)+0{,}39-\dfrac{0{,}61}{\varepsilon_r}\right)\right], & W/h\gt 2\end{cases}$$
+$$A=\frac{Z_0}{60}\sqrt{\frac{\varepsilon_r+1}{2}}+\frac{\varepsilon_r-1}{\varepsilon_r+1}\left(0{,}23+\frac{0{,}11}{\varepsilon_r}\right),\qquad B=\frac{377\pi}{2Z_0\sqrt{\varepsilon_r}}$$</div>
+<p>Procedimiento: se supone \(W/h\lt 2\), se calcula; si el resultado sale mayor que 2, se repite con la otra fórmula. Después se halla \(\varepsilon_{\text{eff}}\) y la longitud física: \(\lambda_g=\lambda_0/\sqrt{\varepsilon_{\text{eff}}}\), \(\beta=k_0\sqrt{\varepsilon_{\text{eff}}}\).</p>
+<p><strong>Tendencias que hay que entender</strong> (mira la gráfica del simulador): \(Z_0\) <em>baja</em> si la pista se ensancha (más capacidad) o si \(\varepsilon_r\) sube; las líneas de alta impedancia son estrechas (difíciles de fabricar por encima de ~120 Ω) y las de baja impedancia, anchas (por debajo de ~20 Ω empiezan a aparecer modos transversales).</p>
+
+<h2 id="dinamicas">3. Ecuaciones dinámicas: dispersión</h2>
+<p>A medida que sube la frecuencia, el campo se concentra más en el dieléctrico y \(\varepsilon_{\text{eff}}\) crece hacia \(\varepsilon_r\) (la microcinta es <em>dispersiva</em>). Un modelo habitual (Pozar 3.200):</p>
+$$\varepsilon_{\text{eff}}(f)=\varepsilon_r-\frac{\varepsilon_r-\varepsilon_{\text{eff}}(0)}{1+G(f)},\qquad G=g\left(\frac{f}{f_p}\right)^2,\quad g=0{,}6+0{,}009Z_0,\quad f_p=\frac{Z_0}{8\pi h}$$
+<p>(\(f\) en GHz, \(h\) en cm, \(Z_0\) en Ω.) A frecuencias altas también se excitan ondas de superficie; el umbral aproximado del acoplamiento al modo TM₀ es \(f_{T}\approx\frac{c}{2\pi h}\sqrt{\frac{2}{\varepsilon_r-1}}\tan^{-1}\varepsilon_r\).</p>
+
+<h2 id="espesor">4. Influencia del espesor del conductor</h2>
+<p>Las fórmulas anteriores suponen \(t=0\). Una pista real (cobre de 35 µm en FR4) tiene más capacidad lateral, como si fuera más ancha. Wheeler propone un <strong>ancho efectivo</strong> (Di Paolo, ec. 2.4.15–2.4.17):</p>
+$$W_e=W+\frac12\left(1+\frac1{\varepsilon_r}\right)\Delta W,\qquad \Delta W=\frac t\pi\ln\frac{4e}{\sqrt{(t/h)^2+\left[\pi(W/t+1{,}1)\right]^{-2}}}$$
+<p>Se calcula \(Z_0\) con \(W_e\) en lugar de \(W\). El efecto es pequeño en líneas anchas sobre sustrato grueso (FR4, 50 Ω: \(\Delta W\approx0{,}07\) mm, \(Z_0\) baja 0,4 Ω) y apreciable en líneas estrechas sobre sustratos finos.</p>
+
+<h2 id="perdidas">5. Pérdidas</h2>
+<div class="eq key">$$\alpha_d=\frac{k_0\,\varepsilon_r(\varepsilon_{\text{eff}}-1)\tan\delta}{2\sqrt{\varepsilon_{\text{eff}}}(\varepsilon_r-1)}\ \text{Np/m},\qquad \alpha_c\approx\frac{R_s}{Z_0W}\ \text{Np/m},\qquad R_s=\sqrt{\frac{\omega\mu_0}{2\sigma}}$$</div>
+<p>El factor \(\varepsilon_r(\varepsilon_{\text{eff}}-1)/[\varepsilon_{\text{eff}}(\varepsilon_r-1)]\) es el «factor de llenado»: la fracción del campo que está en el dieléctrico con pérdidas. En la mayoría de sustratos de microondas dominan las pérdidas en el conductor; en FR4 (\(\tan\delta\approx0{,}02\)) dominan las del dieléctrico.</p>
+
+<div class="sim" id="sim-ms">
+  <div class="sim-title">Calculadora de microcinta: análisis y síntesis</div>
+  <div class="controls">
+    <label>εr <input type="number" class="short" id="ms-er" value="4.4" step="0.1"></label>
+    <label>h (mm) <input type="number" class="short" id="ms-h" value="1.6" step="0.01"></label>
+    <label>W (mm) <input type="number" class="short" id="ms-w" value="3" step="0.01"></label>
+    <label>f (GHz) <input type="number" class="short" id="ms-f" value="2.4" step="0.1"></label>
+    <label>tan δ <input type="number" class="short" id="ms-tand" value="0.02" step="0.001"></label>
+    <label>Z₀ deseada (Ω) <input type="number" class="short" id="ms-z" value="50"></label>
+  </div>
+  <canvas id="ms-cv" aria-label="Impedancia característica de la microcinta frente a W/h para varios valores de εr"></canvas>
+  <div class="legend"><span style="--c: var(--muted)">εr = 1</span><span style="--c: var(--s2)">2,2</span><span style="--c: var(--s1)">4,4</span><span style="--c: var(--s3)">10</span><span style="--c: var(--s4)">εr elegido</span></div>
+  <div class="readout" id="ms-out"></div>
+</div>
+
+<h2 id="cpw">6. Guía coplanar (CPW)</h2>
+<p>En la <strong>guía coplanar</strong> (C. P. Wen, 1969) la pista central (ancho \(S\)) y dos planos de masa laterales están en la <em>misma cara</em> del sustrato, separados por ranuras de ancho \(W\). Ventajas: los componentes en paralelo se conectan a masa sin taladros (vías), hay menos dispersión y se pueden lograr distintas \(Z_0\) con el mismo ancho total. Se usa mucho en circuitos integrados de microondas (MMIC) y en los baluns impresos del Tema III. Por transformación conforme (Simons, 2.2.3), para un sustrato de espesor \(h\):</p>
+<div class="eq key">$$k_1=\frac{S}{S+2W},\quad k_2=\frac{\sinh(\pi S/4h)}{\sinh[\pi(S+2W)/4h]},\quad k'=\sqrt{1-k^2}$$
+$$\varepsilon_{\text{eff}}=1+\frac{\varepsilon_r-1}{2}\,\frac{K(k_2)\,K(k_1')}{K(k_2')\,K(k_1)},\qquad Z_0=\frac{30\pi}{\sqrt{\varepsilon_{\text{eff}}}}\,\frac{K(k_1')}{K(k_1)}$$</div>
+<p>\(K\) es la integral elíptica completa de primera especie (el simulador la calcula con la media aritmético-geométrica). Si \(h\) es muy grande, \(\varepsilon_{\text{eff}}\to(\varepsilon_r+1)/2\): la mitad del campo en aire, la mitad en el dieléctrico.</p>
+<div class="sim" id="sim-cp">
+  <div class="sim-title">Calculadora de guía coplanar</div>
+  <div class="controls">
+    <label>εr <input type="number" class="short" id="cp-er" value="9.8" step="0.1"></label>
+    <label>S (mm) <input type="number" class="short" id="cp-s" value="0.25" step="0.01"></label>
+    <label>W, ranura (mm) <input type="number" class="short" id="cp-w" value="0.1" step="0.01"></label>
+    <label>h (mm) <input type="number" class="short" id="cp-h" value="0.635" step="0.01"></label>
+  </div>
+  <div class="readout" id="cp-out"></div>
+</div>
+
+<h2 id="ejemplos">7. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 1 — Línea de 50 Ω en FR4 (\(\varepsilon_r=4{,}4\), \(h=1{,}6\) mm) a 2,4 GHz</h4>
+<div class="step"><span class="n">1</span><div><p>Síntesis suponiendo \(W/h\lt 2\): \(A=\frac{50}{60}\sqrt{2{,}7}+\frac{3{,}4}{5{,}4}(0{,}23+0{,}025)=1{,}530\) ⇒ \(W/h=8e^{A}/(e^{2A}-2)=1{,}912\) (&lt; 2, vale). \(W=3{,}06\) mm.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>\(\varepsilon_{\text{eff}}=2{,}7+1{,}7/\sqrt{1+12/1{,}912}=3{,}33\); comprobación: \(Z_0=50{,}2\) Ω (fórmula de cinta ancha).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>\(\lambda_g=\lambda_0/\sqrt{3{,}33}=68{,}5\) mm ⇒ un tramo de \(\lambda/4\) mide <strong>17,1 mm</strong>. Con dispersión, a 2,4 GHz \(\varepsilon_{\text{eff}}\approx3{,}37\) (1 % de diferencia).</p></div></div>
+<div class="step"><span class="n">4</span><div><p>Pérdidas: \(\alpha_d\approx7{,}2\) dB/m y \(\alpha_c\approx0{,}72\) dB/m: en FR4 dominan las del dieléctrico. Para comparar: con 25 Ω, \(W=8{,}4\) mm; con 100 Ω, \(W=0{,}71\) mm.</p></div></div>
+</div>
+<div class="example">
+<h4>Ejemplo 2 — Pozar, ej. 3.7: 50 Ω sobre alúmina de 0,5 mm (\(\varepsilon_r=9{,}9\), \(\tan\delta=0{,}001\)), desfase de 270° a 10 GHz</h4>
+<div class="step"><span class="n">1</span><div><p>\(A=2{,}142\), \(W/h=0{,}9654\) ⇒ \(W=0{,}483\) mm; \(\varepsilon_{\text{eff}}=6{,}665\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>\(k_0=209{,}4\) m⁻¹; \(l=\dfrac{270°\cdot\pi/180°}{\sqrt{\varepsilon_{\text{eff}}}k_0}=8{,}72\) mm.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>\(\alpha_d=0{,}022\) dB/cm, \(\alpha_c=0{,}094\) dB/cm ⇒ pérdida total 0,101 dB. Un programa CAD da \(W=0{,}478\) mm y \(\varepsilon_{\text{eff}}=6{,}83\): las fórmulas aciertan a pocos por ciento (salvo \(\alpha_c\)).</p></div></div>
+</div>
+
+<h2 id="medidas">8. Medidas en microcinta</h2>
+<p>En la práctica no hay líneas ranuradas para microcinta: se mide con un <strong>analizador vectorial de redes</strong> (VNA) conectado mediante transiciones coaxial–microcinta calibradas. \(|S_{11}|\) en dB da las pérdidas de retorno (y la ROE); la fase de \(S_{21}\) de una línea de longitud conocida da \(\beta\) y, por tanto, \(\varepsilon_{\text{eff}}\) y \(\lambda_g\); la carta de Smith del VNA muestra directamente \(Z_L\). Un método clásico para \(\varepsilon_{\text{eff}}\): un resonador de microcinta (tramo abierto en ambos extremos) resuena cuando mide \(n\lambda_g/2\).</p>
+
+<h2 id="ejercicios">9. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Diseñe una línea de 50 Ω en un sustrato RT/duroid de \(\varepsilon_r=2{,}2\) y \(h=0{,}787\) mm. ¿Cuánto mide \(\lambda_g/4\) a 5 GHz?
+    <details class="sol"><summary>Solución</summary><div><p>\(W/h=3{,}08\) (fórmula de \(W/h\gt 2\)) ⇒ \(W=2{,}42\) mm; \(\varepsilon_{\text{eff}}\approx1{,}87\); \(\lambda_g/4=15\ \text{mm}/\sqrt{1{,}87}=10{,}97\) mm.</p></div></details></li>
+  <li>¿Por qué \(\varepsilon_{\text{eff}}\) se acerca a \(\varepsilon_r\) cuando la pista es muy ancha?
+    <details class="sol"><summary>Solución</summary><div><p>Porque la pista ancha se parece a un condensador de placas paralelas: casi todo el campo queda entre la pista y la masa, dentro del dieléctrico; la fracción en aire (bordes) es despreciable.</p></div></details></li>
+  <li>Una microcinta de 75 Ω y otra de 30 Ω en el mismo sustrato: ¿cuál es más ancha y cuál tiene mayor \(\varepsilon_{\text{eff}}\)?
+    <details class="sol"><summary>Solución</summary><div><p>La de 30 Ω es más ancha y tiene mayor \(\varepsilon_{\text{eff}}\) (más campo en el dieléctrico), por tanto, menor \(\lambda_g\).</p></div></details></li>
+</ol>
+
+<h2 id="biblio">10. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>D. M. Pozar, <em>Microwave Engineering</em>, 4.ª ed., Wiley, 2012</td><td>3</td><td>3.8 Microstrip Line (fórmulas (3.195)–(3.201), ej. 3.7, efectos dependientes de la frecuencia)</td><td>pp. 147–153 (PDF 167–173)</td><td>Toda la microcinta</td></tr>
+    <tr><td>F. Di Paolo, <em>Networks and Devices Using Planar Transmission Lines</em>, CRC Press, 2000</td><td>2</td><td>2.1–2.4 geometría, campo, métodos cuasiestáticos (espesor: ec. 2.4.15–2.4.17) · 2.7 Design Equations · 2.8 Attenuation · 2.9 Practical Considerations</td><td>PDF 86–106 (el libro no trae paginación impresa)</td><td>Ecuaciones estáticas y dinámicas, espesor, pérdidas</td></tr>
+    <tr><td>Di Paolo (ídem)</td><td>10</td><td>10.1–10.5 Coplanar Waveguides (fórmulas cerradas de \(Z_0\) y atenuación)</td><td>PDF 364–375</td><td>CPW</td></tr>
+    <tr><td>R. N. Simons, <em>Coplanar Waveguide Circuits, Components, and Systems</em>, Wiley, 2001</td><td>2</td><td>2.2.1 Quasi-static Conformal Mapping · 2.2.3 CPW on a Dielectric Substrate of Finite Thickness</td><td>pp. 12–21 (PDF 32–41)</td><td>\(\varepsilon_{\text{eff}}\) y \(Z_0\) de la CPW, ec. (2.37)–(2.38)</td></tr>
+    <tr><td>S. J. Orfanidis, <em>Electromagnetic Waves and Antennas</em>, rev. 2016</td><td>11</td><td>11.3 Microstrip Lines</td><td>pp. 542–546 (PDF 579–583)</td><td>Fórmulas de Hammerstad, síntesis</td></tr>
+  </tbody>
+</table></div>
+<p class="meta">En los materiales hay también Gupta et al., <em>Microstrip Lines and Slotlines</em> (2.ª ed., 1996) y Wadell, <em>Transmission Line Design Handbook</em>; son PDF escaneados sin texto, por lo que no se citan páginas.</p>
+
+<h2 id="profundizar">11. Para profundizar</h2>
+<ul>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=1Ehlxp98eCc">«L4.3 Example 8.8 Matching with Microstrip Lines using Smith Chart»</a> (Mark C Watson, en inglés). Diseño de un acoplador en microcinta con la carta de Smith.</li>
+</ul>
+
+<h2 id="faq">12. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué todo el mundo usa 50 Ω?</summary><div><p>Es un compromiso histórico del coaxial con aire: la mínima atenuación está hacia 77 Ω y la máxima potencia hacia 30 Ω; 50 Ω queda entre ambas. Los equipos de medida se normalizaron a 50 Ω y el resto lo siguió. La TV usa 75 Ω (mínimas pérdidas).</p></div></details>
+  <details><summary>¿La microcinta radia?</summary><div><p>Sí, en las discontinuidades (extremos abiertos, codos, cambios de ancho), tanto más cuanto más grueso es el sustrato y menor su \(\varepsilon_r\). Las antenas de parche aprovechan justamente eso.</p></div></details>
+  <details><summary>¿Fórmulas o simulador electromagnético?</summary><div><p>Las fórmulas sirven para el primer diseño y para entender tendencias (y para la tarea de software). Para fabricar se ajusta con un simulador (o con CAD de RF, como mostraba Pozar en el ej. 3.7), sobre todo por encima de unos 10 GHz.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> objetivos del Tema II «Líneas planares» del programa de la asignatura (00-Generalidades). No hay todavía conferencia de este tema en los materiales; el contenido se elaboró a partir de la bibliografía de la asignatura (Pozar, Di Paolo, Simons). Cálculos verificados con <a href="../#software">ltx</a>.</p>
+</main></div>
+<footer class="site wrap">Líneas de Transmisión y Antenas · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

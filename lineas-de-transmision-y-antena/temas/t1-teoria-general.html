@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema I · Teoría general de las líneas — LTyA</title>
+  <meta name="description" content="Líneas de Transmisión y Antenas, Tema I: tipos de líneas y de ondas (TEM, TE, TM), modelo de parámetros distribuidos, ecuaciones del telegrafista, constante de propagación e impedancia característica, coeficiente de reflexión, pérdidas de retorno, ROE, impedancia de entrada, líneas en corto y en abierto y transformador de cuarto de onda.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/lta.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/lta.js"></script>
+  <style>body { --accent: var(--c-lta); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Líneas de Transmisión y Antenas</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="t1-teoria-general.html" aria-current="page">I · Teoría</a><a href="t1b-carta-smith.html">I · Smith</a><a href="t2-guias-de-onda.html">II · Guías</a><a href="t2b-lineas-planares.html">II · Planares</a><a href="t3-acoplamiento.html">III · Acoplamiento</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema I · Conferencia 1 «Problema teórico fundamental» · Trabajos independientes 1–6 · 1.ª Evaluación</p>
+<h1>Teoría general de las líneas de transmisión</h1>
+<p class="lead">Una línea de transmisión lleva la potencia del transmisor a la antena (o de la antena al receptor). Cuando la línea es <strong>corta</strong> frente a la longitud de onda, es un simple par de cables. Cuando es <strong>larga</strong> —y a frecuencias de radio casi siempre lo es— la tensión y la corriente se convierten en <em>ondas</em> que viajan, se reflejan en la carga y se superponen. Todo este tema responde a una pregunta: <strong>¿qué tensión y qué corriente hay en cada punto de la línea, y cuánta potencia llega de verdad a la carga?</strong></p>
+
+<div class="objectives"><strong>Objetivos (programa de la asignatura y Conferencia 1)</strong>
+<ul>
+  <li>Obtener las expresiones generales de las ondas en la línea, en términos de \(V\) e \(I\) (o de \(\vec E\) y \(\vec H\)), y definir los tipos de onda que pueden existir (TEM, TE, TM).</li>
+  <li>Formular los parámetros de la onda en la línea (\(\gamma\), \(Z_0\), \(\lambda\), \(v_p\)) y sus relaciones.</li>
+  <li>Analizar la distribución de tensión y corriente para distintos regímenes de trabajo: coeficiente de reflexión, pérdidas de retorno y razón de onda estacionaria.</li>
+  <li>Calcular la impedancia de entrada; caracterizar la línea en cortocircuito, en circuito abierto y el transformador de \(\lambda/4\).</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">fasores, complejos e hiperbólicas</span>
+<p>Toda la teoría se hace en régimen sinusoidal permanente con <strong>fasores</strong>: \(v(t)=\operatorname{Re}\{V e^{j\omega t}\}\), así que derivar respecto al tiempo es multiplicar por \(j\omega\), una bobina es \(j\omega L\) y un condensador \(1/(j\omega C)\). Hay que manejar complejos en forma binómica y polar (\(z=|z|e^{j\theta}\)) y la tangente hiperbólica, que aparece en líneas con pérdidas:</p>
+$$e^{j\theta}=\cos\theta+j\sin\theta,\qquad \tanh(jx)=j\tan x,\qquad P=\tfrac12\operatorname{Re}\{VI^*\}$$
+<p>Repaso: <a href="../../repaso/matematica.html#complejos">complejos y Euler</a> · <a href="../../repaso/matematica.html#hiperbolicas">funciones hiperbólicas</a> · <a href="../../repaso/circuitos.html#fasores">fasores e impedancia</a> · <a href="../../repaso/circuitos.html#maxtrans">máxima transferencia de potencia</a> · <a href="../../repaso/matematica.html#logaritmos">decibelios</a> · <a href="../../repaso/fisica-em.html#ondas">ondas planas</a>.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="tipos">1. Qué es una línea de transmisión</h2>
+<p>Las ondas electromagnéticas (OEM) viajan por dos soportes: el <strong>espacio libre</strong> (ondas no guiadas, el terreno de las antenas y la radiopropagación) y las <strong>líneas de transmisión</strong> (ondas guiadas).</p>
+<div class="box def"><span class="box-title">Definición</span>
+<p>Una línea de transmisión es un sistema director de ondas electromagnéticas caracterizado por una <strong>constante de propagación</strong> \(\gamma\), una <strong>impedancia característica</strong> \(Z_0\) y una <strong>geometría regular</strong> (la sección transversal no cambia) a lo largo del eje de propagación.</p></div>
+<p>Tipos: <strong>bifilar</strong> (dos hilos paralelos o trenzados, como la «cinta de TV» de 300 Ω), <strong>cable coaxial</strong> (50 o 75 Ω), <strong>guías de onda</strong> (un solo conductor hueco, Tema II), <strong>cintas y microcintas</strong> (impresas en circuitos, Tema II) y <strong>fibra óptica</strong> (dieléctrica, se estudia en Redes 3).</p>
+<p>¿Cuál es la mejor? No hay una «mejor» en abstracto; se elige según:</p>
+<ul>
+  <li><strong>la frecuencia</strong>, porque fija las pérdidas aceptables (el coaxial flexible es muy cómodo a 100 MHz y muy malo a 30 GHz);</li>
+  <li>el <strong>ancho de banda</strong> necesario;</li>
+  <li>la <strong>potencia</strong> a manejar (una guía soporta kilovatios; una microcinta, vatios);</li>
+  <li>los <strong>niveles de impedancia</strong> del transmisor, la antena y el receptor;</li>
+  <li>el <strong>costo</strong>.</li>
+</ul>
+
+<h2 id="ondas">2. Tipos de onda: TEM, TE y TM</h2>
+<p>Se clasifican según tengan o no componente de campo en la dirección de propagación \(z\) (componente <em>longitudinal</em>):</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Onda</th><th>\(E_z\)</th><th>\(H_z\)</th><th>Dónde aparece</th></tr></thead>
+  <tbody>
+    <tr><td><strong>TEM</strong> (transversal electromagnética)</td><td>0</td><td>0</td><td>Líneas de <strong>dos o más conductores</strong>: bifilar, coaxial, stripline. No tiene frecuencia de corte: se propaga desde continua.</td></tr>
+    <tr><td><strong>TE</strong> (transversal eléctrica, «modos H»)</td><td>0</td><td>≠ 0</td><td>Guías de onda (modo dominante TE₁₀ en la rectangular, TE₁₁ en la circular).</td></tr>
+    <tr><td><strong>TM</strong> (transversal magnética, «modos E»)</td><td>≠ 0</td><td>0</td><td>Guías de onda (TM₁₁, TM₀₁…).</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Intuición</strong>: en una onda TEM los campos son exactamente los de un problema de electrostática/magnetostática en el plano transversal (líneas de \(\vec E\) de un conductor al otro, líneas de \(\vec H\) rodeándolos), que «avanzan» a la velocidad de la luz en el medio. Por eso hacen falta <em>dos</em> conductores: entre ellos puede existir una diferencia de potencial y, por tanto, tiene sentido hablar de \(V\) e \(I\). En una guía hueca no hay un segundo conductor, no puede haber TEM y la onda necesita componente longitudinal (TE o TM). La microcinta es «casi TEM» (cuasi-TEM) porque el campo está parte en aire y parte en el dieléctrico.</p>
+
+<h2 id="problema">3. El problema teórico fundamental</h2>
+<div class="box def"><span class="box-title">Problema fundamental</span>
+<p>Obtener las expresiones generales de las ondas electromagnéticas que se establecen en la línea, en términos de \(\vec E\) y \(\vec H\), o de \(V\) e \(I\).</p></div>
+<p>Hay dos vías: <strong>resolver las ecuaciones de Maxwell</strong> con las condiciones de contorno de la línea (la usaremos en las guías de onda, Tema II) o <strong>extender la teoría de circuitos</strong> (la que usamos ahora, válida para líneas TEM).</p>
+<p>¿Por qué no basta la teoría de circuitos de siempre? Porque la teoría de circuitos supone que la señal llega <em>instantáneamente</em> a todos los puntos: la tensión es la misma a lo largo de un cable. Eso es cierto solo si el circuito es <strong>eléctricamente pequeño</strong>:</p>
+<ul>
+  <li>\(\Delta z\ll\lambda\): análisis circuital clásico. Ejemplo: un cable de 1 m a 50 Hz (\(\lambda=6000\) km).</li>
+  <li>\(\Delta z\approx\lambda\) o \(\Delta z\gt \lambda\): teoría de líneas. Se ven variaciones de <em>fase y amplitud</em> de \(V\) e \(I\) a lo largo del sistema. Ejemplo: 1 m de coaxial a 1 GHz (\(\lambda\approx20\) cm dentro del cable): ¡cinco longitudes de onda!</li>
+</ul>
+<p>La salida es ingeniosa: se corta la línea en trocitos de longitud \(\Delta z\ll\lambda\), cada trocito <em>sí</em> es un circuito concentrado, y luego se hace \(\Delta z\to0\).</p>
+
+<h2 id="rlgc">4. Modelo de parámetros distribuidos y ecuaciones del telegrafista</h2>
+<svg class="diagram" viewBox="0 0 640 190" role="img" aria-label="Circuito equivalente de un tramo Δz de línea: resistencia RΔz e inductancia LΔz en serie, conductancia GΔz y capacidad CΔz en paralelo">
+  <line class="stroke" x1="40" y1="40" x2="140" y2="40"/><rect class="box-s" x="140" y="28" width="70" height="24"/><text x="152" y="22">R Δz</text>
+  <path class="stroke" d="M210 40 q12 -22 24 0 q12 -22 24 0 q12 -22 24 0 q12 -22 24 0"/><text x="232" y="16">L Δz</text>
+  <line class="stroke" x1="306" y1="40" x2="600" y2="40"/>
+  <line class="stroke" x1="40" y1="150" x2="600" y2="150"/>
+  <line class="stroke" x1="400" y1="40" x2="400" y2="70"/><rect class="box-s" x="388" y="70" width="24" height="50"/><line class="stroke" x1="400" y1="120" x2="400" y2="150"/><text x="420" y="100">G Δz</text>
+  <line class="stroke" x1="500" y1="40" x2="500" y2="88"/><line class="stroke" x1="480" y1="88" x2="520" y2="88"/><line class="stroke" x1="480" y1="100" x2="520" y2="100"/><line class="stroke" x1="500" y1="100" x2="500" y2="150"/><text x="528" y="100">C Δz</text>
+  <text x="20" y="100">v(z,t)</text><text x="560" y="100">v(z+Δz,t)</text>
+  <text x="56" y="32">i(z,t) →</text><text x="530" y="32">i(z+Δz,t) →</text>
+  <line class="stroke" x1="40" y1="175" x2="600" y2="175"/><text x="305" y="170">Δz</text>
+</svg>
+<p>Los cuatro <strong>parámetros por unidad de longitud</strong> resumen la física de la línea:</p>
+<ul>
+  <li>\(R\) (Ω/m): resistencia en serie de <em>ambos</em> conductores (pérdidas óhmicas; crece con \(\sqrt f\) por efecto pelicular).</li>
+  <li>\(L\) (H/m): inductancia en serie (el campo magnético que rodea la corriente almacena energía).</li>
+  <li>\(G\) (S/m): conductancia en paralelo (pérdidas en el dieléctrico que separa los conductores).</li>
+  <li>\(C\) (F/m): capacidad en paralelo (el campo eléctrico entre conductores almacena energía).</li>
+</ul>
+<p>Aplicando Kirchhoff al tramo, dividiendo entre \(\Delta z\) y haciendo \(\Delta z\to0\), en régimen sinusoidal (fasores) se obtienen las <strong>ecuaciones del telegrafista</strong>:</p>
+<div class="eq key">$$\frac{dV(z)}{dz}=-(R+j\omega L)\,I(z),\qquad \frac{dI(z)}{dz}=-(G+j\omega C)\,V(z)$$</div>
+<p>Se leen así: la tensión cae a lo largo de la línea por la impedancia serie que atraviesa la corriente, y la corriente disminuye porque una parte «se escapa» por la admitancia en paralelo. Derivando una y sustituyendo la otra se desacoplan en dos <strong>ecuaciones de onda</strong>:</p>
+$$\frac{d^2V}{dz^2}-\gamma^2V=0,\qquad \frac{d^2I}{dz^2}-\gamma^2I=0,\qquad \gamma=\alpha+j\beta=\sqrt{(R+j\omega L)(G+j\omega C)}$$
+<p>\(\gamma\) es la <strong>constante de propagación</strong>: \(\alpha\) (Np/m) es la atenuación y \(\beta\) (rad/m) la constante de fase. ¡Es función de la frecuencia! La solución general es la suma de una onda que viaja hacia \(+z\) (hacia la carga, <em>incidente</em>) y otra hacia \(-z\) (hacia el generador, <em>reflejada</em>):</p>
+<div class="eq key">$$V(z)=V_0^+e^{-\gamma z}+V_0^-e^{\gamma z},\qquad I(z)=\frac{V_0^+}{Z_0}e^{-\gamma z}-\frac{V_0^-}{Z_0}e^{\gamma z}$$</div>
+<p>Al sustituir \(V(z)\) en la primera ecuación del telegrafista aparece el cociente entre la tensión y la corriente de <em>cada onda por separado</em>: la <strong>impedancia característica</strong></p>
+<div class="eq key">$$Z_0=\frac{V_0^+}{I_0^+}=\sqrt{\frac{R+j\omega L}{G+j\omega C}}$$</div>
+<p>Fíjate en el signo menos de la onda reflejada en \(I(z)\): la corriente reflejada viaja en sentido contrario. \(Z_0\) <strong>no es</strong> la impedancia «que se mide» en la línea (esa depende de la carga), sino la relación \(V/I\) de una onda viajera: es la impedancia que vería el generador en una línea infinitamente larga, donde no hay reflexión.</p>
+
+<h3 id="casos">4.1 Línea sin pérdidas y con pocas pérdidas</h3>
+<div class="table-wrap"><table class="formula-table">
+  <thead><tr><th>Caso</th><th>\(\alpha\)</th><th>\(\beta\)</th><th>\(Z_0\)</th></tr></thead>
+  <tbody>
+    <tr><td>Sin pérdidas (\(R=G=0\))</td><td>\(0\)</td><td>\(\omega\sqrt{LC}\)</td><td>\(\sqrt{L/C}\) (real)</td></tr>
+    <tr><td>Pocas pérdidas (\(R\ll\omega L,\ G\ll\omega C\))</td><td>\(\dfrac12\left(\dfrac{R}{Z_0}+GZ_0\right)\)</td><td>\(\approx\omega\sqrt{LC}\)</td><td>\(\approx\sqrt{L/C}\)</td></tr>
+  </tbody>
+</table></div>
+<p>En la línea sin pérdidas:</p>
+$$\lambda=\frac{2\pi}{\beta},\qquad v_p=\frac{\omega}{\beta}=\frac{1}{\sqrt{LC}}=\frac{c}{\sqrt{\varepsilon_r}}$$
+<p>La última igualdad (válida para cualquier línea TEM) dice que la onda viaja a la velocidad de la luz <em>en el dieléctrico</em>: en un coaxial de polietileno (\(\varepsilon_r=2{,}25\)), a \(2\cdot10^8\) m/s, y la longitud de onda en el cable es 2/3 de la del vacío (el «factor de velocidad» 0,66 de los catálogos).</p>
+<div class="sim" id="sim-gz">
+  <div class="sim-title">Calculadora de \(\gamma\) y \(Z_0\) a partir de \(R, L, G, C\) (cargada con el trabajo independiente 4)</div>
+  <div class="controls">
+    <label>R (Ω/m) <input type="number" class="short" id="gz-R" value="5" step="0.1"></label>
+    <label>L (µH/m) <input type="number" class="short" id="gz-L" value="0.2" step="0.01"></label>
+    <label>G (S/m) <input type="number" class="short" id="gz-G" value="0.01" step="0.001"></label>
+    <label>C (pF/m) <input type="number" class="short" id="gz-C" value="300" step="1"></label>
+    <label>f (MHz) <input type="number" class="short" id="gz-f" value="500" step="1"></label>
+  </div>
+  <div class="readout" id="gz-out"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="reflexion">5. Línea cargada: coeficiente de reflexión, pérdidas de retorno y ROE</h2>
+<p>Pongamos la carga \(Z_L\) en \(z=0\) (la línea ocupa \(z\lt 0\)). En la carga, la tensión y la corriente totales deben cumplir la ley de Ohm de la carga, \(V(0)/I(0)=Z_L\). Si \(Z_L\ne Z_0\), una sola onda incidente <em>no puede</em> cumplirlo (su cociente \(V/I\) es \(Z_0\)), así que la naturaleza «fabrica» una onda reflejada con la amplitud justa. Imponiendo la condición se obtiene el <strong>coeficiente de reflexión de tensión</strong> en la carga:</p>
+<div class="eq key">$$\Gamma_L=\frac{V_0^-}{V_0^+}=\frac{Z_L-Z_0}{Z_L+Z_0}$$</div>
+<ul>
+  <li><strong>No hay reflexión</strong> (\(\Gamma=0\)) solo si \(Z_L=Z_0\): carga <strong>acoplada</strong> (adaptada).</li>
+  <li>Cortocircuito: \(\Gamma=-1\) (la onda reflejada anula la tensión en la carga). Circuito abierto: \(\Gamma=+1\). Carga reactiva pura: \(|\Gamma|=1\) con cualquier fase. En todos estos casos <strong>toda</strong> la potencia vuelve.</li>
+  <li>Carga pasiva cualquiera: \(0\le|\Gamma|\le1\).</li>
+</ul>
+<p>Como la potencia de una onda es proporcional a \(|V|^2\), la fracción de potencia reflejada es \(|\Gamma|^2\) y la entregada a la carga, \(1-|\Gamma|^2\). Dos formas de expresar el desacoplo que usan los equipos de medida:</p>
+<div class="eq key">$$RL=-20\log_{10}|\Gamma|\ \text{dB},\qquad \text{ROE}=\frac{|V|_{\max}}{|V|_{\min}}=\frac{1+|\Gamma|}{1-|\Gamma|},\qquad |\Gamma|=\frac{\text{ROE}-1}{\text{ROE}+1}$$</div>
+<p>Las <strong>pérdidas de retorno</strong> (<em>return loss</em>) dicen cuántos dB por debajo de la incidente vuelve la onda reflejada: carga acoplada, \(RL=\infty\) dB; reflexión total, \(RL=0\) dB. Un analizador vectorial de redes (VNA) las muestra como \(|S_{11}|\) en dB (\(S_{11}=\Gamma\), con signo cambiado en dB: \(|S_{11}|_{\text{dB}}=-RL\)). La <strong>razón de onda estacionaria</strong> (ROE, VSWR) va de 1 (acoplado) a \(\infty\) (reflexión total) y se mide con una línea ranurada o un medidor de ROE.</p>
+<div class="sim" id="sim-conv">
+  <div class="sim-title">Conversor \(|\Gamma|\leftrightarrow\) ROE \(\leftrightarrow\) RL (escribe en cualquiera)</div>
+  <div class="controls">
+    <label>|Γ| <input type="text" class="short" id="cv-g"></label>
+    <label>ROE <input type="text" class="short" id="cv-s"></label>
+    <label>RL (dB) <input type="text" class="short" id="cv-rl"></label>
+  </div>
+  <div class="readout" id="cv-out"></div>
+</div>
+
+<h3 id="estacionaria">5.1 La onda estacionaria</h3>
+<p>Con reflexión, la tensión total en la línea sin pérdidas es</p>
+$$V(z)=V_0^+\left(e^{-j\beta z}+\Gamma_Le^{j\beta z}\right),\qquad |V(z)|=|V_0^+|\,\bigl|1+|\Gamma_L|e^{j(\theta_\Gamma-2\beta l)}\bigr|,\quad l=-z$$
+<p>La onda incidente y la reflejada se suman en fase en unos puntos (máximo: \(|V_0^+|(1+|\Gamma|)\)) y en contrafase en otros (mínimo: \(|V_0^+|(1-|\Gamma|)\)). El patrón \(|V(z)|\) <em>no se mueve</em>: es una <strong>onda estacionaria</strong>. Como la fase relativa cambia \(2\beta l\), el patrón se repite cada \(2\beta l=2\pi\Rightarrow l=\lambda/2\): <strong>dos máximos consecutivos están a \(\lambda/2\) y un máximo y el mínimo siguiente, a \(\lambda/4\)</strong>. Observa en la animación cómo, al acoplar, el patrón se vuelve plano (onda viajera pura) y cómo con un cortocircuito aparecen nodos de tensión cero.</p>
+<div class="sim" id="sim-sw">
+  <div class="sim-title">Onda incidente, reflejada y total en la línea</div>
+  <div class="controls">
+    <label>Carga <select id="sw-pre"><option value="">— elegir —</option><option value="acop">acoplada Z_L = Z₀</option><option value="cc">cortocircuito</option><option value="ca">circuito abierto</option><option value="r2">Z_L = 2Z₀</option><option value="r13">Z_L = Z₀/3</option><option value="react">reactiva pura j50 Ω</option><option value="comp">30 + j100 Ω</option></select></label>
+    <label>Z₀ (Ω) <input type="number" class="short" id="sw-z0" value="50"></label>
+    <label>R_L (Ω, «inf» = abierto) <input type="text" class="short" id="sw-rl" value="100"></label>
+    <label>X_L (Ω) <input type="number" class="short" id="sw-xl" value="0"></label>
+    <label>Pérdidas <input type="range" id="sw-a" min="0" max="3" step="0.1" value="0"></label>
+    <label>Velocidad <input type="range" id="sw-v" min="0.2" max="3" step="0.1" value="1"></label>
+    <button class="btn ghost" type="button" id="sw-play">Pausar</button>
+  </div>
+  <div class="controls">
+    <label><input type="checkbox" id="sw-i" checked> incidente</label>
+    <label><input type="checkbox" id="sw-r" checked> reflejada</label>
+    <label><input type="checkbox" id="sw-t" checked> total</label>
+    <label><input type="checkbox" id="sw-e" checked> envolvente |V(z)|</label>
+  </div>
+  <canvas id="sw-cv" aria-label="Tensión instantánea a lo largo de la línea: ondas incidente, reflejada, total y envolvente"></canvas>
+  <div class="legend"><span style="--c: var(--s2)">incidente</span><span style="--c: var(--s3)">reflejada</span><span style="--c: var(--s1)">total</span><span style="--c: var(--muted)">envolvente</span></div>
+  <div class="readout" id="sw-out"></div>
+</div>
+<p>Con pérdidas (deslizador), la onda reflejada llega cada vez más débil al generador: la ROE medida cerca del generador es <em>menor</em> que en la carga. Una línea con muchas pérdidas «disimula» un desacoplo: por eso la ROE se mide lo más cerca posible de la antena.</p>
+<p><strong>¿Dónde está el primer máximo?</strong> Hay máximo cuando \(\theta_\Gamma-2\beta l=0\), o sea a \(l_{\max}=\theta_\Gamma\lambda/(4\pi)\) de la carga, y el primer mínimo a \(\lambda/4\) de él. En el máximo de tensión la impedancia es real y vale \(R_{\max}=\text{ROE}\cdot Z_0\); en el mínimo, \(R_{\min}=Z_0/\text{ROE}\). Esto se usa para <em>medir</em> cargas desconocidas (ROE + posición del mínimo) y para colocar transformadores de \(\lambda/4\).</p>
+
+<!-- ============================================================ -->
+<h2 id="zin">6. Impedancia de entrada</h2>
+<p>¿Qué impedancia «ve» el generador al principio de una línea de longitud \(l\) terminada en \(Z_L\)? Dividiendo \(V(-l)\) entre \(I(-l)\):</p>
+<div class="eq key">$$Z_{in}=Z_0\,\frac{Z_L+jZ_0\tan\beta l}{Z_0+jZ_L\tan\beta l}\qquad\text{(sin pérdidas)},\qquad Z_{in}=Z_0\,\frac{Z_L+Z_0\tanh\gamma l}{Z_0+Z_L\tanh\gamma l}\qquad\text{(con pérdidas)}$$</div>
+<p>La línea <strong>transforma</strong> la impedancia: un tramo de cable no es «transparente». Consecuencias directas (trabajo independiente 3):</p>
+<ul>
+  <li>Si \(Z_L=Z_0\): \(Z_{in}=Z_0\) en cualquier punto (línea acoplada).</li>
+  <li>Si \(l=n\lambda/2\): \(\tan\beta l=0\Rightarrow Z_{in}=Z_L\). La impedancia se repite cada media longitud de onda.</li>
+  <li>Línea infinitamente larga (o con pérdidas suficientes para que la reflejada no vuelva): \(Z_{in}=Z_0\).</li>
+</ul>
+
+<h3 id="cc-ca">6.1 Línea en cortocircuito y en circuito abierto</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th></th><th>Cortocircuito (\(Z_L=0\))</th><th>Circuito abierto (\(Z_L=\infty\))</th></tr></thead>
+  <tbody>
+    <tr><td>\(\Gamma_L\), ROE</td><td>\(-1\), \(\infty\)</td><td>\(+1\), \(\infty\)</td></tr>
+    <tr><td>\(Z_{in}\)</td><td>\(jZ_0\tan\beta l\)</td><td>\(-jZ_0\cot\beta l\)</td></tr>
+    <tr><td>\(l=0\)</td><td>\(0\)</td><td>\(\infty\)</td></tr>
+    <tr><td>\(l\lt \lambda/4\)</td><td>inductiva</td><td>capacitiva</td></tr>
+    <tr><td>\(l=\lambda/4\)</td><td>\(\infty\) (¡se ve un abierto!)</td><td>\(0\) (¡se ve un corto!)</td></tr>
+    <tr><td>Periodicidad</td><td colspan="2">imaginaria pura para cualquier \(l\); recorre todos los valores entre \(-j\infty\) y \(+j\infty\); se repite cada \(\lambda/2\)</td></tr>
+  </tbody>
+</table></div>
+<p>Dos ideas que hay que tener «en los dedos» porque resuelven muchos problemas sin hacer cuentas: <strong>un tramo de \(\lambda/4\) convierte un corto en un abierto y viceversa</strong>, y un tramo en corto o en abierto es un <strong>reactor ajustable</strong> (bobina o condensador según su longitud) que no disipa potencia. De aquí salen los stubs del Tema III.</p>
+<div class="sim" id="sim-zi">
+  <div class="sim-title">\(z_{in}=Z_{in}/Z_0\) en función de la longitud de la línea</div>
+  <div class="controls">
+    <label>Carga <select id="zi-pre"><option value="">— elegir —</option><option value="cc">cortocircuito</option><option value="ca">circuito abierto</option><option value="acop">acoplada</option><option value="r2">R_L = 100 Ω</option><option value="comp">30 + j100 Ω</option></select></label>
+    <label>Z₀ (Ω) <input type="number" class="short" id="zi-z0" value="50"></label>
+    <label>R_L (Ω, «inf» = abierto) <input type="text" class="short" id="zi-rl" value="0"></label>
+    <label>X_L (Ω) <input type="number" class="short" id="zi-xl" value="0"></label>
+    <label>l/λ <input type="range" id="zi-l" min="0" max="1" step="0.005" value="0.25"></label>
+  </div>
+  <canvas id="zi-cv" aria-label="Parte real e imaginaria de la impedancia de entrada normalizada frente a l/λ"></canvas>
+  <div class="legend"><span style="--c: var(--s1)">r = Re{z_in}</span><span style="--c: var(--s2)">x = Im{z_in}</span></div>
+  <div class="readout" id="zi-out"></div>
+</div>
+
+<h3 id="evaluacion">6.2 Guía de la 1.ª Evaluación: ¿a qué antena alimenta el transmisor?</h3>
+<p><strong>Enunciado</strong> (1.ª Evaluación, se entrega por escrito en el 1.er encuentro): en el esquema, \(Z_A=Z_B\) son las impedancias de las antenas A y B, iguales a la \(Z_0\) de la línea. ¿A qué antena alimenta el Tx con (1) S1 cerrado y S2 abierto, (2) S1 y S2 abiertos, (3) S1 y S2 cerrados, (4) S1 abierto y S2 cerrado? <em>(En el enunciado original el caso 4 repite el 2; aquí se resuelve la combinación que falta.)</em></p>
+<p><strong>Interpretación del esquema</strong>: en los puntos a–b y a′–b′, situados a \(\lambda/4\) del Tx, se conecta en paralelo un stub de \(\lambda/4\); el interruptor está en el extremo lejano del stub: cerrado = stub en cortocircuito, abierto = stub en circuito abierto.</p>
+<div class="sim" id="sim-ev">
+  <div class="sim-title">Toca los interruptores</div>
+  <svg class="diagram" id="ev-svg" viewBox="0 0 640 270" role="img" aria-label="Transmisor en el centro, dos líneas de λ/4 hacia las antenas B (izquierda) y A (derecha), con stubs de λ/4 en paralelo terminados en los interruptores S1 y S2">
+    <rect id="ev-B" class="ant" x="22" y="70" width="18" height="70" rx="3"/><text x="10" y="165">Z_B</text>
+    <rect id="ev-A" class="ant" x="600" y="70" width="18" height="70" rx="3"/><text x="596" y="165">Z_A</text>
+    <line class="rail" x1="40" y1="70" x2="600" y2="70"/><line class="rail" x1="40" y1="140" x2="600" y2="140"/>
+    <circle class="box-s" cx="320" cy="105" r="18"/><text x="309" y="110">Tx</text>
+    <line class="rail" x1="320" y1="70" x2="320" y2="87"/><line class="rail" x1="320" y1="123" x2="320" y2="140"/>
+    <text x="236" y="60">λ/4</text><text x="386" y="60">λ/4</text>
+    <text x="150" y="62">a</text><text x="476" y="62">a′</text><text x="182" y="156">b</text><text x="440" y="156">b′</text>
+    <!-- stub izquierdo -->
+    <line class="rail" x1="160" y1="70" x2="160" y2="134"/><path class="rail" d="M160 134 a6 6 0 0 1 0 12"/><line class="rail" x1="160" y1="146" x2="160" y2="240"/>
+    <line class="rail" x1="190" y1="140" x2="190" y2="240"/>
+    <g transform="translate(160,240)"><line class="blade sw1" x1="0" y1="0" x2="30" y2="0"/></g>
+    <text x="120" y="262">S1 · stub λ/4</text>
+    <!-- stub derecho -->
+    <line class="rail" x1="480" y1="70" x2="480" y2="134"/><path class="rail" d="M480 134 a6 6 0 0 1 0 12"/><line class="rail" x1="480" y1="146" x2="480" y2="240"/>
+    <line class="rail" x1="450" y1="140" x2="450" y2="240"/>
+    <g transform="translate(450,240)"><line class="blade sw2" x1="0" y1="0" x2="30" y2="0"/></g>
+    <text x="440" y="262">S2 · stub λ/4</text>
+  </svg>
+  <div class="controls"><button class="btn ghost" type="button" id="ev-s1" aria-pressed="false">S1</button><button class="btn ghost" type="button" id="ev-s2" aria-pressed="false">S2</button></div>
+  <div class="readout" id="ev-out"></div>
+</div>
+<p><strong>Cómo razonarlo</strong> (recomendación del profesor: de la carga hacia el Tx, sin fórmulas):</p>
+<div class="step"><span class="n">1</span><div><p>En a–b se ve \(Z_B=Z_0\): una línea acoplada «ve» \(Z_0\) en todos sus puntos.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>El stub: un corto a \(\lambda/4\) se ve como \(\infty\) (no carga la línea); un abierto a \(\lambda/4\) se ve como 0 (cortocircuita la línea en a–b).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Paralelo en a–b: \(Z_0\parallel\infty=Z_0\) o \(Z_0\parallel0=0\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p>El tramo de \(\lambda/4\) hasta el Tx: \(Z_0\) sigue siendo \(Z_0\); 0 se convierte en \(\infty\) (rama desconectada).</p></div></div>
+<div class="table-wrap"><table>
+  <thead><tr><th>Caso</th><th>S1</th><th>S2</th><th>El Tx ve</th><th>Alimenta a</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>cerrado</td><td>abierto</td><td>\(Z_0\parallel\infty=Z_0\)</td><td>B</td></tr>
+    <tr><td>2</td><td>abierto</td><td>abierto</td><td>\(\infty\parallel\infty=\infty\)</td><td>ninguna</td></tr>
+    <tr><td>3</td><td>cerrado</td><td>cerrado</td><td>\(Z_0\parallel Z_0=Z_0/2\) (ROE = 2)</td><td>A y B</td></tr>
+    <tr><td>4</td><td>abierto</td><td>cerrado</td><td>\(Z_0\)</td><td>A</td></tr>
+  </tbody>
+</table></div>
+<div class="box warn"><span class="box-title">Si interpretas el esquema de otra forma</span><p>Si el interruptor, al cerrarse, cortocircuitara directamente la línea en a–b (sin stub), todo se invierte: S cerrado desconectaría su rama. Lo importante es justificar la interpretación y aplicar bien las dos reglas del paso 2 y del paso 4.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="lambda4">7. El transformador de cuarto de onda</h2>
+<p>Si \(l=\lambda/4\), \(\beta l=\pi/2\) y \(\tan\beta l\to\infty\). Dividiendo numerador y denominador de \(Z_{in}\) entre \(\tan\beta l\) y tomando el límite, con un tramo de impedancia característica \(Z_T\):</p>
+<div class="eq key">$$Z_{in}=\frac{Z_T^2}{Z_L}\qquad\Longrightarrow\qquad Z_{in}=Z_0\ \text{ si }\ Z_T=\sqrt{Z_0R_L}$$</div>
+<p>El tramo de \(\lambda/4\) «invierte» la impedancia normalizada. Con \(Z_T\) igual a la media geométrica de \(Z_0\) y \(R_L\), la carga queda acoplada. <strong>Limitaciones</strong>: (1) solo acopla cargas <em>reales</em> (si la carga es compleja, el transformador se coloca donde la línea ve una resistencia: en un máximo, \(R_{\max}=\text{ROE}\,Z_0\), o en un mínimo de tensión, \(R_{\min}=Z_0/\text{ROE}\); se desarrolla en el <a href="t3-acoplamiento.html#qw-compleja">Tema III</a>); (2) es exacto solo a la frecuencia de diseño \(f_0\): a otras frecuencias el tramo ya no mide \(\lambda/4\).</p>
+<p><strong>¿Por qué funciona?</strong> En la entrada del tramo hay dos reflexiones: la de la unión \(Z_0\)–\(Z_T\) y la que vuelve de la carga tras recorrer \(\lambda/4\) de ida y \(\lambda/4\) de vuelta (media longitud de onda: 180° de desfase). Con \(Z_T=\sqrt{Z_0R_L}\) las dos tienen la misma amplitud y se cancelan. Por eso el acoplamiento es selectivo en frecuencia.</p>
+<div class="sim" id="sim-qw">
+  <div class="sim-title">Ancho de banda del transformador de \(\lambda/4\)</div>
+  <div class="controls">
+    <label>Z₀ (Ω) <input type="number" class="short" id="qw-z0" value="50"></label>
+    <label>R_L (Ω) <input type="number" class="short" id="qw-rl" value="10"></label>
+    <label>Γm tolerable <input type="number" class="short" id="qw-gm" value="0.2" step="0.01" min="0.01" max="0.9"></label>
+  </div>
+  <canvas id="qw-cv" aria-label="Módulo del coeficiente de reflexión del transformador de cuarto de onda frente a f/f0"></canvas>
+  <div class="readout" id="qw-out"></div>
+</div>
+<p>Valores iniciales: Pozar, ej. 5.5 (10 Ω → 50 Ω, ROE ≤ 1,5 ⇒ \(\Gamma_m=0{,}2\)): \(Z_T=22{,}36\) Ω y \(\Delta f/f_0=29\ \%\). Cuanto más se parece \(R_L\) a \(Z_0\), mayor es el ancho de banda.</p>
+
+<!-- ============================================================ -->
+<h2 id="ejemplos">8. Ejemplos resueltos (trabajos independientes de la Conferencia 1)</h2>
+<div class="example">
+<h4>Ejemplo 1 — \(\gamma\) y \(Z_0\) de una línea con pérdidas (TI 4)</h4>
+<p>\(L=0{,}2\ \mu\)H/m, \(C=300\) pF/m, \(R=5\) Ω/m, \(G=0{,}01\) S/m, \(f=500\) MHz. (En la diapositiva aparece «0.2 H/m»: falta el prefijo µ; con 0,2 H/m la línea tendría \(Z_0\approx26\) kΩ, absurda.)</p>
+<div class="step"><span class="n">1</span><div><p>\(\omega=2\pi\cdot5\cdot10^8=3{,}14\cdot10^9\) rad/s. \(R+j\omega L=5+j628{,}3\) Ω/m; \(G+j\omega C=0{,}01+j0{,}942\) S/m.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>\(\gamma=\sqrt{(5+j628{,}3)(0{,}01+j0{,}942)}=0{,}226+j24{,}33\ \text{m}^{-1}\): \(\alpha=0{,}226\) Np/m (1,96 dB/m), \(\beta=24{,}33\) rad/m (\(\lambda=25{,}8\) cm).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>\(Z_0=\sqrt{(5+j628{,}3)/(0{,}01+j0{,}942)}=25{,}82+j0{,}034\) Ω.</p></div></div>
+<div class="step"><span class="n">4</span><div><p>Sin pérdidas: \(\gamma=j\omega\sqrt{LC}=j24{,}33\) m⁻¹ y \(Z_0=\sqrt{L/C}=25{,}82\) Ω. Las pérdidas apenas cambian \(\beta\) y \(Z_0\) (porque \(R\ll\omega L\) y \(G\ll\omega C\)), pero sí introducen \(\alpha\): comprueba que \(\tfrac12(R/Z_0+GZ_0)=0{,}226\) Np/m.</p></div></div>
+</div>
+<div class="example">
+<h4>Ejemplo 2 — Potencia que llega al televisor (TI 5)</h4>
+<p>Una antena Yagi alimenta un TV con una línea bifilar; en el canal 27 se mide ROE = 3. ¿Qué porcentaje de la potencia que capta la antena llega al receptor?</p>
+<div class="step"><span class="n">1</span><div><p>\(|\Gamma|=(3-1)/(3+1)=0{,}5\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Potencia reflejada \(|\Gamma|^2=25\ \%\) ⇒ llega al TV el <strong>75 %</strong> (pérdida por desacoplo \(-10\log0{,}75=1{,}25\) dB).</p></div></div>
+</div>
+<div class="example">
+<h4>Ejemplo 3 — Frecuencia a partir del patrón de onda estacionaria (TI 6.2)</h4>
+<p>Entre un máximo y el mínimo consecutivo de tensión hay 25 cm. Entre máximo y mínimo hay \(\lambda/4\) ⇒ \(\lambda=1\) m. En una línea con aire, \(f=c/\lambda=300\) MHz (en un coaxial con \(\varepsilon_r=2{,}25\), \(f=c/(\lambda\sqrt{\varepsilon_r})=200\) MHz).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 4 — Dos posibles \(Z_0\) (Pozar, ej. 3.8 de la conferencia)</h4>
+<p>Una carga de 100 Ω produce ROE = 1,5 en una línea sin pérdidas. Como la carga es real, el desacoplo puede ser «por exceso» o «por defecto»: \(Z_L/Z_0=1{,}5\Rightarrow Z_0=66{,}7\) Ω, o \(Z_0/Z_L=1{,}5\Rightarrow Z_0=150\) Ω.</p>
+</div>
+
+<h2 id="ejercicios">9. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Un coaxial tiene \(a=10\) mm y \(b=20\) mm, conductores perfectos y aire. Calcule \(L\), \(C\) y \(Z_0\) con \(L=\frac{\mu}{2\pi}\ln\frac ba\) y \(C=\frac{2\pi\varepsilon}{\ln(b/a)}\).
+    <details class="sol"><summary>Solución</summary><div><p>\(\ln2=0{,}693\): \(L=0{,}139\ \mu\)H/m, \(C=80{,}3\) pF/m, \(Z_0=\sqrt{L/C}=\frac{60}{\sqrt{\varepsilon_r}}\ln\frac ba=41{,}6\) Ω, \(v_p=c\). Con polietileno (\(\varepsilon_r=2{,}25\)), \(C\) se multiplica por 2,25 y \(Z_0=27{,}7\) Ω.</p></div></details></li>
+  <li>¿Cuál es la distancia entre dos máximos de tensión? ¿Entre qué valores oscilan \(|\Gamma|\) y la ROE? ¿Qué valores indican acoplamiento? (TI 2–3)
+    <details class="sol"><summary>Solución</summary><div><p>\(\lambda/2\). \(0\le|\Gamma|\le1\) y \(1\le\text{ROE}\le\infty\) (cargas pasivas). Acoplamiento: \(\Gamma=0\), ROE = 1. \(|\Gamma|\) es la amplitud relativa de la onda reflejada; la ROE, el cociente entre el máximo y el mínimo del patrón de tensión.</p></div></details></li>
+  <li>¿Qué pasa en \(Z_{in}\) si \(l=\lambda/4\)? (TI 1)
+    <details class="sol"><summary>Solución</summary><div><p>\(Z_{in}=Z_0^2/Z_L\): la línea invierte la impedancia normalizada (\(z_{in}=1/z_L\)). Un corto se ve abierto, un abierto se ve corto, una inductancia se ve capacitancia.</p></div></details></li>
+  <li>Una carga \(Z_L=25-j50\) Ω termina una línea de 50 Ω. Halle \(\Gamma_L\), RL, ROE y la potencia entregada si la incidente es 10 W.
+    <details class="sol"><summary>Solución</summary><div><p>\(\Gamma_L=(-25-j50)/(75-j50)=0{,}62\angle-82{,}9°\); \(RL=4{,}15\) dB; ROE = 4,27; potencia reflejada \(0{,}385\cdot10=3{,}85\) W ⇒ entregada 6,15 W.</p></div></details></li>
+  <li>¿Qué longitud debe tener un stub en cortocircuito de 50 Ω para presentar una inductancia de 10 nH a 1 GHz (aire)?
+    <details class="sol"><summary>Solución</summary><div><p>\(X=\omega L=62{,}8\) Ω \(=50\tan\beta l\Rightarrow\beta l=51{,}5°\Rightarrow l=0{,}143\lambda=4{,}29\) cm.</p></div></details></li>
+  <li>Una línea de 75 Ω y \(\lambda/8\) termina en un circuito abierto. ¿Qué ve el generador?
+    <details class="sol"><summary>Solución</summary><div><p>\(Z_{in}=-j75\cot45°=-j75\) Ω: un condensador de reactancia 75 Ω.</p></div></details></li>
+</ol>
+<div class="quiz">
+  <div class="q"><p>Una línea sin pérdidas mide exactamente \(\lambda/2\) y termina en 30 + j40 Ω. ¿Qué impedancia ve el generador?</p>
+    <div class="opts"><button class="opt" type="button" data-ok>30 + j40 Ω</button><button class="opt" type="button">30 − j40 Ω</button><button class="opt" type="button">Z₀²/Z_L</button></div>
+    <p class="why">Con \(l=\lambda/2\), \(\tan\beta l=0\) y \(Z_{in}=Z_L\): la impedancia se repite cada media longitud de onda.</p></div>
+  <div class="q"><p>Se mide RL = 20 dB en la entrada de una antena. ¿Qué fracción de potencia se refleja?</p>
+    <div class="opts"><button class="opt" type="button">10 %</button><button class="opt" type="button" data-ok>1 %</button><button class="opt" type="button">20 %</button></div>
+    <p class="why">\(|\Gamma|=10^{-20/20}=0{,}1\), \(|\Gamma|^2=0{,}01\). (ROE = 1,22.)</p></div>
+  <div class="q"><p>¿Por qué una guía de onda hueca no puede propagar una onda TEM?</p>
+    <div class="opts"><button class="opt" type="button">Porque sus pérdidas son muy grandes</button><button class="opt" type="button" data-ok>Porque tiene un solo conductor: no puede haber diferencia de potencial transversal</button><button class="opt" type="button">Porque la frecuencia es muy alta</button></div>
+    <p class="why">El campo transversal de una onda TEM es un campo electrostático en el plano transversal; dentro de un único conductor cerrado ese campo es nulo.</p></div>
+</div>
+
+<h2 id="biblio">10. Dónde estudiarlo</h2>
+<p class="meta">Páginas impresas; entre paréntesis, la página del visor PDF del archivo de <code>05-Bibliografia</code>. La conferencia cita «Pozar 67–70» y numera las ecuaciones como la 4.ª edición: (2.35) Γ, (2.38) RL, (2.41) ROE, (2.44) Z_in.</p>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>D. M. Pozar, <em>Microwave Engineering</em>, 4.ª ed., Wiley, 2012</td><td>2</td><td>2.1 The Lumped-Element Circuit Model for a Transmission Line · 2.2 Field Analysis of Transmission Lines</td><td>pp. 48–56 (PDF 68–76)</td><td>R, L, G, C; telegrafista; γ, Z₀; coaxial (ej. 2.1)</td></tr>
+    <tr><td>Pozar (ídem)</td><td>2</td><td>2.3 The Terminated Lossless Transmission Line</td><td>pp. 56–63 (PDF 76–83)</td><td>Γ, RL, ROE, Z_in, cortocircuito, abierto, λ/2 y λ/4</td></tr>
+    <tr><td>Pozar (ídem)</td><td>2</td><td>2.5 The Quarter-Wave Transformer · 2.6 Generator and Load Mismatches · 2.7 Lossy Transmission Lines</td><td>pp. 72–85 (PDF 92–105)</td><td>λ/4 (ej. 2.5, respuesta en frecuencia), pocas pérdidas</td></tr>
+    <tr><td>Pozar (ídem)</td><td>3</td><td>3.1 General Solutions for TEM, TE, and TM Waves</td><td>pp. 96–102 (PDF 116–122)</td><td>Tipos de onda</td></tr>
+    <tr><td>S. J. Orfanidis, <em>Electromagnetic Waves and Antennas</em>, rev. 1-ago-2016, Rutgers</td><td>11</td><td>11.1 General Properties of TEM Transmission Lines · 11.4 Coaxial Lines · 11.5 Two-Wire Lines · 11.6 Distributed Circuit Model · 11.7 Wave Impedance and Reflection Response · 11.9 Terminated Lines · 11.11 Open- and Short-Circuited Lines · 11.12 Standing Wave Ratio · 11.13 Determining an Unknown Load</td><td>pp. 535–572 (PDF 572–609)</td><td>Todo el tema, con otro enfoque (ondas en lugar de circuitos)</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="profundizar">11. Para profundizar</h2>
+<ul>
+  <li>El libro de Orfanidis es de distribución gratuita para uso educativo (lo publica el autor en su página de Rutgers University, junto con funciones MATLAB/Octave de los ejemplos); el PDF ya está en los materiales de la asignatura.</li>
+  <li>MIT OCW, <em>6.013 Electromagnetics and Applications</em>: <a href="https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/">ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009</a> (capítulo 7, líneas TEM).</li>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=BijMGKbT0Wk">«Understanding VSWR and Return Loss»</a> (Rohde &amp; Schwarz, en inglés). ROE y pérdidas de retorno tal como las mide un analizador de redes.</li>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=Hoaxi1ML_o4">«Standing Wave in Transmission Line: Concept, VSWR, Derivation»</a> (R K Classes, en inglés). Deducción de la onda estacionaria y de la ROE, igual que en §5.1.</li>
+</ul>
+
+<h2 id="faq">12. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>Si la línea no tiene pérdidas, ¿a dónde va la potencia reflejada?</summary><div><p>Vuelve al generador. Si el generador está adaptado a la línea, la absorbe (se calienta); si no, se vuelve a reflejar. En un transmisor real, una ROE alta puede destruir el amplificador de salida: por eso muchos transmisores reducen potencia automáticamente si la ROE supera ~2.</p></div></details>
+  <details><summary>¿Por qué \(Z_0\) es real si es un cociente de impedancias complejas?</summary><div><p>Sin pérdidas, \(Z_0=\sqrt{j\omega L/(j\omega C)}=\sqrt{L/C}\): las \(j\omega\) se cancelan. Una línea sin pérdidas infinitamente larga se comporta como una resistencia pura de \(\sqrt{L/C}\) ohmios aunque esté hecha solo de inductancias y capacidades: la energía no se disipa, se aleja para siempre.</p></div></details>
+  <details><summary>¿Para qué sirven los neperios?</summary><div><p>Son la unidad natural de \(\alpha\) porque la amplitud decae como \(e^{-\alpha z}\). Para pasar a dB: 1 Np = 8,686 dB (\(20\log_{10}e\)).</p></div></details>
+  <details><summary>¿ROE o pérdidas de retorno?</summary><div><p>Dicen lo mismo. La ROE es la tradicional (se medía con línea ranurada); RL es la que entrega un analizador vectorial. Referencia útil: ROE 1,5 ↔ RL 14 dB ↔ 4 % reflejado; ROE 2 ↔ RL 9,5 dB ↔ 11 %.</p></div></details>
+  <details><summary>¿Por qué \(\Gamma\) es «de tensión»? ¿Hay uno de corriente?</summary><div><p>Sí: el de corriente es \(-\Gamma\) (la corriente reflejada viaja en sentido contrario). Por eso donde hay un máximo de tensión hay un mínimo de corriente, y la impedancia allí es máxima y real.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencia 1 «Problema teórico fundamental» (Prof. Juan J. Justo Morales, CUJAE, 2026-27) y su resumen, trabajos independientes 1–6, 1.ª Evaluación. Los resultados numéricos se comprobaron con el paquete <a href="../#software">ltx</a>. Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Líneas de Transmisión y Antenas · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

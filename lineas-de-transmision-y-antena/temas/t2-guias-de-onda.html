@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema II · Guías de onda — LTyA</title>
+  <meta name="description" content="Líneas de Transmisión y Antenas, Tema II: guías de onda rectangulares y circulares, modos TE y TM, frecuencia de corte, modo dominante TE10 y TE11, longitud de onda en la guía, velocidades de fase y de grupo, impedancia de onda, atenuación, guías comerciales WR y tarea resuelta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/lta.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/lta.js"></script>
+  <style>body { --accent: var(--c-lta); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Líneas de Transmisión y Antenas</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="t1-teoria-general.html">I · Teoría</a><a href="t1b-carta-smith.html">I · Smith</a><a href="t2-guias-de-onda.html" aria-current="page">II · Guías</a><a href="t2b-lineas-planares.html">II · Planares</a><a href="t3-acoplamiento.html">III · Acoplamiento</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema II · Clase «Guías de ondas» · 1.ª Tarea (guías de onda)</p>
+<h1>Guías de onda</h1>
+<p class="lead">Por encima de unos pocos gigahercios el coaxial pierde mucho y aguanta poca potencia. La solución clásica es un <strong>tubo metálico hueco</strong>: la onda viaja dentro rebotando en las paredes, casi sin pérdidas y con capacidad para kilovatios. A cambio aparece algo nuevo: la guía solo deja pasar frecuencias <strong>por encima de un corte</strong>, y a cada frecuencia puede propagar varias «formas» de campo (<strong>modos</strong>). Diseñar con guías es, sobre todo, elegir las dimensiones para que viaje <em>un solo</em> modo.</p>
+
+<div class="objectives"><strong>Objetivos (programa y clase de guías)</strong>
+<ul>
+  <li>Fundamentar la estructura de los modos TE y TM en guías rectangulares y circulares; obtener sus expresiones y la frecuencia de corte.</li>
+  <li>Describir el modo dominante (TE₁₀ y TE₁₁) y la condición de propagación única (ancho de banda de la guía).</li>
+  <li>Calcular los parámetros principales: \(\beta\), \(\lambda_g\), \(v_p\), \(v_g\), \(Z_{TE}\), atenuación.</li>
+  <li>Seleccionar una guía comercial (nomenclatura WR) a partir de la banda necesaria y programar estos cálculos en software libre.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">Maxwell, Helmholtz y separación de variables</span>
+<p>En una región sin fuentes y en régimen sinusoidal, las ecuaciones de Maxwell \(\nabla\times\vec E=-j\omega\mu\vec H\), \(\nabla\times\vec H=j\omega\varepsilon\vec E\) llevan a la <strong>ecuación de Helmholtz</strong> \(\nabla^2\psi+k^2\psi=0\), con \(k=\omega\sqrt{\mu\varepsilon}=2\pi/\lambda\). En un conductor perfecto el \(\vec E\) tangencial es nulo. La ecuación \(X''+k_x^2X=0\) tiene solución \(A\cos k_xx+B\sin k_xx\). En la guía circular aparecen las <strong>funciones de Bessel</strong> \(J_n\), que juegan el papel de senos y cosenos en coordenadas cilíndricas.</p>
+$$\nabla^2\psi+k^2\psi=0,\qquad \vec E_{\tan}=0\ \text{en las paredes},\qquad \eta=\sqrt{\mu/\varepsilon}$$
+<p>Repaso: <a href="../../repaso/fisica-em.html#maxwell">ecuaciones de Maxwell</a> · <a href="../../repaso/fisica-em.html#frontera">condiciones de frontera</a> · <a href="../../repaso/fisica-em.html#pelicular">efecto pelicular</a> · <a href="t1-teoria-general.html#ondas">tipos de onda TEM/TE/TM (Tema I)</a>.</p></div>
+
+<h2 id="generalidades">1. Generalidades</h2>
+<ul>
+  <li>Se usan para llevar potencia de microondas (300 MHz – 300 GHz) de un punto a otro; son el componente básico de los sistemas de microondas de alta potencia, de ondas milimétricas y de medidas de precisión. Comercialmente, de ~1 a 220 GHz, con toda una familia de componentes: cortocircuitos ajustables, atenuadores, mezcladores, aisladores, T mágicas, acopladores, detectores, transiciones…</li>
+  <li>Tienen <strong>un solo conductor</strong>: soportan ondas TE y TM (con componente longitudinal), <strong>no TEM</strong>.</li>
+  <li>El concepto de impedancia característica <strong>no tiene una definición única</strong> (no hay dos conductores entre los que medir una tensión); se usa la <strong>impedancia de onda</strong> \(E_t/H_t\).</li>
+</ul>
+
+<h2 id="general">2. Solución general para ondas TE y TM</h2>
+<p>Hipótesis de la clase: guía ideal (\(\sigma_c=\infty\), \(\sigma_d=0\)), sin fuentes, uniforme a lo largo de \(z\) e infinita. Se buscan ondas que viajan en \(+z\):</p>
+$$\vec E(x,y,z)=\left[\vec e(x,y)+\hat z\,e_z(x,y)\right]e^{-j\beta z},\qquad \vec H(x,y,z)=\left[\vec h(x,y)+\hat z\,h_z(x,y)\right]e^{-j\beta z}$$
+<p>Desarrollando los rotacionales de Maxwell, las seis ecuaciones permiten escribir <strong>las cuatro componentes transversales en función de las dos longitudinales</strong> \(E_z\) y \(H_z\):</p>
+<div class="eq key">$$H_x=\frac{j}{k_c^2}\Big(\omega\varepsilon\frac{\partial E_z}{\partial y}-\beta\frac{\partial H_z}{\partial x}\Big),\quad H_y=\frac{-j}{k_c^2}\Big(\omega\varepsilon\frac{\partial E_z}{\partial x}+\beta\frac{\partial H_z}{\partial y}\Big)$$
+$$E_x=\frac{-j}{k_c^2}\Big(\beta\frac{\partial E_z}{\partial x}+\omega\mu\frac{\partial H_z}{\partial y}\Big),\quad E_y=\frac{j}{k_c^2}\Big(-\beta\frac{\partial E_z}{\partial y}+\omega\mu\frac{\partial H_z}{\partial x}\Big),\qquad k_c^2=k^2-\beta^2$$</div>
+<p>\(k_c\) es el <strong>número de onda de corte</strong>. Consecuencias: si \(E_z=H_z=0\) (TEM), las componentes transversales solo pueden ser no nulas con \(k_c=0\); para TE basta conocer \(H_z\); para TM, \(E_z\). Así el problema 3D se reduce a resolver <em>una</em> ecuación de Helmholtz <em>bidimensional</em>:</p>
+$$\left(\frac{\partial^2}{\partial x^2}+\frac{\partial^2}{\partial y^2}+k_c^2\right)h_z(x,y)=0\qquad\text{(TE; para TM, la misma con }e_z)$$
+<p>Si el dieléctrico tiene pérdidas se usa \(\varepsilon=\varepsilon_0\varepsilon_r(1-j\tan\delta)\).</p>
+
+<h2 id="rectangular">3. Guía rectangular</h2>
+<p>Sección \(a\times b\) con \(a\gt b\) (el lado ancho \(a\) en \(x\)).</p>
+<h3 id="te-rect">3.1 Modos TE<sub>mn</sub></h3>
+<p>Por separación de variables, \(h_z=(A\cos k_xx+B\sin k_xx)(C\cos k_yy+D\sin k_yy)\). Las condiciones de contorno (\(E_x=0\) en \(y=0,b\); \(E_y=0\) en \(x=0,a\)) imponen \(B=D=0\), \(k_x=m\pi/a\), \(k_y=n\pi/b\):</p>
+<div class="eq key">$$H_z=A_{mn}\cos\frac{m\pi x}{a}\cos\frac{n\pi y}{b}\,e^{-j\beta z},\qquad k_c=\sqrt{\Big(\frac{m\pi}{a}\Big)^2+\Big(\frac{n\pi}{b}\Big)^2},\qquad \beta=\sqrt{k^2-k_c^2}$$</div>
+<p>Las transversales salen derivando (\(E_x=\frac{j\omega\mu n\pi}{k_c^2b}A\cos\frac{m\pi x}a\sin\frac{n\pi y}b e^{-j\beta z}\), \(E_y=\frac{-j\omega\mu m\pi}{k_c^2a}A\sin\frac{m\pi x}a\cos\frac{n\pi y}b e^{-j\beta z}\), etc.; tabla 3.2 de Pozar). <strong>\(m\) y \(n\) cuentan los semiciclos</strong> del campo a lo ancho y a lo alto. Para TE vale cualquier \(m,n\ge0\) salvo \(m=n=0\).</p>
+<h3 id="tm-rect">3.2 Modos TM<sub>mn</sub></h3>
+<p>\(E_z=B_{mn}\sin\frac{m\pi x}{a}\sin\frac{n\pi y}{b}e^{-j\beta z}\): se anula si \(m\) o \(n\) es cero, así que <strong>no existen TM₀₁ ni TM₁₀</strong>; el primero es el TM₁₁. Mismas \(k_c\) y \(f_c\) que el TE con iguales índices (modos <em>degenerados</em>).</p>
+<h3 id="corte">3.3 Frecuencia de corte y condición de propagación</h3>
+<p>Con \(\gamma=\alpha+j\beta=\sqrt{k_c^2-k^2}\):</p>
+<ul>
+  <li>\(k\gt k_c\) (\(f\gt f_c\)): \(\beta\) real, el modo <strong>se propaga</strong>.</li>
+  <li>\(k\lt k_c\) (\(f\lt f_c\)): \(\gamma\) real, el modo es <strong>evanescente</strong>: decae como \(e^{-\alpha z}\) sin llevar potencia (no es una pérdida: es reactivo).</li>
+</ul>
+<div class="eq key">$$f_{c,mn}=\frac{1}{2\pi\sqrt{\mu\varepsilon}}\sqrt{\Big(\frac{m\pi}{a}\Big)^2+\Big(\frac{n\pi}{b}\Big)^2}=\frac{c}{2\sqrt{\varepsilon_r}}\sqrt{\Big(\frac{m}{a}\Big)^2+\Big(\frac{n}{b}\Big)^2},\qquad \lambda_c=\frac{2\pi}{k_c}$$</div>
+<p><strong>Intuición</strong>: la onda dentro de la guía es la suma de dos ondas planas que rebotan entre las paredes en zigzag. Para que el campo se anule en ambas paredes, en el ancho \(a\) tiene que caber al menos media longitud de onda transversal. Si la frecuencia baja, el zigzag se hace cada vez más «vertical» hasta que, en \(f_c\), las ondas rebotan perpendicularmente y no avanzan.</p>
+
+<h3 id="dominante">3.4 El modo dominante TE<sub>10</sub></h3>
+<p>El modo de menor \(f_c\) (con \(a\gt b\)) es el TE₁₀:</p>
+<div class="eq key">$$f_{c10}=\frac{c}{2a\sqrt{\varepsilon_r}},\qquad \lambda_{c10}=2a$$
+$$H_z=A_{10}\cos\frac{\pi x}{a}e^{-j\beta z},\quad E_y=\frac{-j\omega\mu a}{\pi}A_{10}\sin\frac{\pi x}{a}e^{-j\beta z},\quad H_x=\frac{j\beta a}{\pi}A_{10}\sin\frac{\pi x}{a}e^{-j\beta z},\quad E_x=E_z=H_y=0$$</div>
+<p>El campo eléctrico es vertical, máximo en el centro (\(x=a/2\)) y nulo en las paredes laterales; no depende de \(y\). Conviene que se propague <strong>solo</strong> el dominante porque: es el más fácil de excitar, concentra la energía en un solo modo (no hay potencia repartida entre modos con distinta velocidad, que distorsionarían la señal) y se conoce la estructura del campo en el receptor.</p>
+<div class="box def"><span class="box-title">Condición de propagación única (ancho de banda de la guía)</span>
+<p>\(f_{c,\text{dominante}}\lt f\lt f_{c,\text{siguiente}}\). En la rectangular el siguiente es el TE₂₀ (\(c/a\)) o el TE₀₁ (\(c/2b\)), el menor de los dos. Con \(a=2b\) (proporción habitual) ambos coinciden y la guía es monomodo en una octava: \(f_{c10}\lt f\lt 2f_{c10}\). En la práctica se usa entre \(\approx1{,}25f_{c10}\) y \(\approx0{,}95f_{c,\text{sig}}\) para alejarse del corte, donde la atenuación y la dispersión son grandes.</p></div>
+<div class="sim" id="sim-md">
+  <div class="sim-title">Diagrama de modos de una guía rectangular</div>
+  <div class="controls">
+    <label>Guía comercial <select id="md-wr"><option value="">— elegir —</option><option value="7.214,3.404">WR-284 (banda S)</option><option value="4.755,2.215">WR-187</option><option value="3.485,1.58">WR-137 (C)</option><option value="2.85,1.262">WR-112</option><option value="2.286,1.016">WR-90 (X)</option><option value="1.58,0.79">WR-62 (Ku)</option><option value="1.07,0.43">WR-42 (K)</option></select></label>
+    <label>a (cm) <input type="number" class="short" id="md-a" value="2.286" step="0.01"></label>
+    <label>b (cm) <input type="number" class="short" id="md-b" value="1.016" step="0.01"></label>
+    <label>εr <input type="number" class="short" id="md-er" value="1" step="0.01"></label>
+    <label>f (GHz) <input type="number" class="short" id="md-f" value="10" step="0.1"></label>
+  </div>
+  <canvas id="md-cv" aria-label="Frecuencias de corte de los primeros modos y banda monomodo"></canvas>
+  <p class="meta">Banda verde: solo se propaga el TE₁₀. Barras de color: modos que se propagan a la frecuencia f.</p>
+  <canvas id="md-cv2" aria-label="Velocidad de fase y de grupo del TE10 normalizadas, frente a la frecuencia"></canvas>
+  <div class="legend"><span style="--c: var(--s1)">v_p·√εr/c = λ_g/λ = Z_TE/η</span><span style="--c: var(--s2)">v_g·√εr/c</span></div>
+  <div class="readout" id="md-out"></div>
+</div>
+
+<h3 id="campos">3.5 Estructura del campo</h3>
+<div class="sim" id="sim-fd">
+  <div class="sim-title">Campo transversal de los modos TE<sub>mn</sub> y TM<sub>mn</sub></div>
+  <div class="controls">
+    <label>Tipo <select id="fd-t"><option>TE</option><option>TM</option></select></label>
+    <label>m <input type="number" class="short" id="fd-m" value="1" min="0" max="4"></label>
+    <label>n <input type="number" class="short" id="fd-n" value="0" min="0" max="4"></label>
+    <label><input type="checkbox" id="fd-h"> mostrar H transversal</label>
+  </div>
+  <canvas id="fd-cv" aria-label="Sección transversal de la guía con las líneas de campo eléctrico del modo elegido"></canvas>
+  <div class="readout" id="fd-out"></div>
+</div>
+
+<h3 id="parametros">3.6 Longitud de onda en la guía, velocidades e impedancia de onda</h3>
+<div class="eq key">$$\beta=k\sqrt{1-(f_c/f)^2},\qquad \lambda_g=\frac{2\pi}{\beta}=\frac{\lambda}{\sqrt{1-(f_c/f)^2}}\gt \lambda$$
+$$v_p=\frac{\omega}{\beta}=\frac{v}{\sqrt{1-(f_c/f)^2}}\gt v,\qquad v_g=\frac{d\omega}{d\beta}=v\sqrt{1-(f_c/f)^2}\lt v,\qquad v_pv_g=v^2=\frac{c^2}{\varepsilon_r}$$
+$$Z_{TE}=\frac{E_x}{H_y}=-\frac{E_y}{H_x}=\frac{k\eta}{\beta}=\frac{\eta}{\sqrt{1-(f_c/f)^2}},\qquad Z_{TM}=\frac{\beta\eta}{k}=\eta\sqrt{1-(f_c/f)^2}$$</div>
+<p>\(\lambda_g\) es la distancia entre dos planos de igual fase a lo largo del eje: es la que se mide con una línea ranurada (mínimos de la onda estacionaria separados \(\lambda_g/2\)). \(Z_{TE}\) es real si el modo se propaga e imaginaria si es evanescente; depende de la frecuencia.</p>
+<div class="box idea"><span class="box-title">¿Cómo puede \(v_p\) ser mayor que la velocidad de la luz?</span>
+<p>Porque \(v_p\) es la velocidad a la que avanza un <em>punto de fase constante</em> a lo largo del eje, no la de la energía. Con el modelo de ondas planas en zigzag: cada onda viaja a \(v\) formando un ángulo \(\theta\) con el eje; sus frentes de onda cortan el eje en puntos que avanzan a \(v/\cos\theta\) (como el punto de contacto de una ola que llega oblicua a la playa, que corre por la orilla más rápido que la ola). La energía avanza solo con la componente axial, \(v\cos\theta=v_g\lt v\). No se viola la relatividad: ninguna información viaja a \(v_p\).</p></div>
+
+<h2 id="circular">4. Guía circular</h2>
+<p>En coordenadas cilíndricas \((\rho,\phi,z)\) con radio \(a\), la solución de Helmholtz es \(h_z=(A\sin n\phi+B\cos n\phi)J_n(k_c\rho)\). La condición \(E_\phi=0\) en \(\rho=a\) exige \(J_n'(k_ca)=0\) para TE, y \(E_z=0\) exige \(J_n(k_ca)=0\) para TM:</p>
+<div class="eq key">$$\text{TE}_{nm}:\ k_c=\frac{p'_{nm}}{a},\qquad \text{TM}_{nm}:\ k_c=\frac{p_{nm}}{a},\qquad f_{c}=\frac{p\,c}{2\pi a\sqrt{\varepsilon_r}}$$</div>
+<div class="table-wrap"><table>
+  <thead><tr><th>\(n\)</th><th>\(p'_{n1}\) (TE)</th><th>\(p'_{n2}\)</th><th>\(p_{n1}\) (TM)</th><th>\(p_{n2}\)</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>3,832</td><td>7,016</td><td>2,405</td><td>5,520</td></tr>
+    <tr><td>1</td><td><strong>1,841</strong></td><td>5,331</td><td>3,832</td><td>7,016</td></tr>
+    <tr><td>2</td><td>3,054</td><td>6,706</td><td>5,135</td><td>8,417</td></tr>
+  </tbody>
+</table></div>
+<p class="meta">Tablas 3.3 y 3.4 de Pozar. En la diapositiva de la clase aparece «30.54» para \(p'_{21}\): es 3,054.</p>
+<p>El <strong>dominante es el TE₁₁</strong> (\(p'_{11}=1{,}841\), \(\lambda_c=3{,}41a\)); el siguiente, el <strong>TM₀₁</strong> (\(p_{01}=2{,}405\), \(\lambda_c=2{,}61a\)). Banda monomodo:</p>
+$$f_{c,TE_{11}}\lt f\lt f_{c,TM_{01}}\quad\Longleftrightarrow\quad 2{,}61a\lt \lambda\lt 3{,}41a$$
+<p>Es más estrecha que la de la rectangular (relación 1,31 frente a 2). La circular se usa en juntas rotatorias y para el modo TE₀₁, cuya atenuación disminuye al aumentar la frecuencia.</p>
+<div class="sim" id="sim-ci">
+  <div class="sim-title">Frecuencias de corte de la guía circular</div>
+  <div class="controls">
+    <label>radio a (cm) <input type="number" class="short" id="ci-r" value="1.2" step="0.01"></label>
+    <label>εr <input type="number" class="short" id="ci-er" value="1" step="0.01"></label>
+  </div>
+  <div class="readout" id="ci-out"></div>
+</div>
+
+<h2 id="atenuacion">5. Atenuación</h2>
+<p>Dos causas: el dieléctrico que llena la guía y la conductividad finita de las paredes (corrientes superficiales en una capa del espesor pelicular, con resistencia superficial \(R_s=\sqrt{\omega\mu_0/2\sigma}\)).</p>
+<div class="eq key">$$\alpha_d=\frac{k^2\tan\delta}{2\beta}\ \text{Np/m},\qquad \alpha_{c,TE_{10}}=\frac{R_s}{a^3b\beta k\eta}\left(2b\pi^2+a^3k^2\right)\ \text{Np/m}$$</div>
+<p>\(\alpha_c\) es muy grande cerca del corte (\(\beta\to0\)), tiene un mínimo y luego crece lentamente: otra razón para no trabajar pegado a \(f_c\). Conductividades (Pozar, ap. F): cobre \(5{,}813\cdot10^7\), latón (<em>brass</em>) \(2{,}564\cdot10^7\), aluminio \(3{,}816\cdot10^7\) S/m. Para pasar a dB: × 8,686.</p>
+
+<h2 id="comerciales">6. Guías comerciales (nomenclatura WR)</h2>
+<p>La designación EIA <strong>WR-XX</strong> (<em>Waveguide Rectangular</em>) indica el lado ancho interior en centésimas de pulgada: WR-90 → \(a=0{,}900''=2{,}286\) cm. Extracto del apéndice I de Pozar:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Banda</th><th>Uso recomendado (GHz)</th><th>\(f_{c10}\) (GHz)</th><th>EIA</th><th>Interior (cm)</th></tr></thead>
+  <tbody>
+    <tr><td>S</td><td>2,60–3,95</td><td>2,078</td><td>WR-284</td><td>7,214 × 3,404</td></tr>
+    <tr><td>H (G)</td><td>3,95–5,85</td><td>3,152</td><td>WR-187</td><td>4,755 × 2,215</td></tr>
+    <tr><td>C (J)</td><td>5,85–8,20</td><td>4,301</td><td>WR-137</td><td>3,485 × 1,580</td></tr>
+    <tr><td>W (H)</td><td>7,05–10,0</td><td>5,259</td><td>WR-112</td><td>2,850 × 1,262</td></tr>
+    <tr><td>X</td><td>8,20–12,4</td><td>6,557</td><td>WR-90</td><td>2,286 × 1,016</td></tr>
+    <tr><td>Ku (P)</td><td>12,4–18,0</td><td>9,486</td><td>WR-62</td><td>1,580 × 0,790</td></tr>
+    <tr><td>K</td><td>18,0–26,5</td><td>14,047</td><td>WR-42</td><td>1,07 × 0,43</td></tr>
+    <tr><td>Ka (R)</td><td>26,5–40,0</td><td>21,081</td><td>WR-28</td><td>0,711 × 0,356</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Excitación</strong>: con una <em>sonda</em> (el conductor central de un coaxial prolongado como monopolo, paralelo a \(\vec E\), a \(\lambda_g/4\) de una pared en corto y en \(x=a/2\) para el TE₁₀), con un <em>lazo</em> (acopla al \(\vec H\)) o con una <em>ranura</em> o abertura. <strong>Medidas</strong>: con una línea ranurada y un detector se recorre la onda estacionaria: la distancia entre mínimos da \(\lambda_g/2\), el cociente máx/mín la ROE y la posición del mínimo, la carga (como en el <a href="t1b-carta-smith.html#ejemplos">problema 4 de Smith</a>).</p>
+
+<h2 id="tarea">7. Guía de la 1.ª Tarea (guías de onda)</h2>
+<p>La tarea se entrega en el 2.º encuentro y pide, además de una introducción (historia, aplicaciones, tipos, modos, ¿TEM?, ¿\(v_p\gt c\)?, expresiones de los modos y de \(f_c\), modo dominante y ancho de banda de la rectangular y la circular, nomenclatura, atenuación y excitación —todo está arriba—), tres problemas. Se recomienda verificar con PCAAD o con el software de la asignatura.</p>
+<div class="example">
+<h4>Problema 1 — \(a=1\) cm, \(b=0{,}5\) cm; se conoce \(H_z=H_0\cos(200\pi x)\cos(\omega t-\beta z)\)</h4>
+<div class="step"><span class="n">1</span><div><p>Hay \(H_z\) ⇒ modo TE. Comparando con \(\cos\frac{m\pi x}{a}\cos\frac{n\pi y}{b}\): \(m\pi/a=200\pi\Rightarrow m=200\cdot0{,}01=2\); no depende de \(y\) ⇒ \(n=0\). <strong>Modo TE₂₀</strong> (\(f_c=c/a=30\) GHz: la onda tiene \(f\gt 30\) GHz).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Con \(k_c=2\pi/a=200\pi\) y las fórmulas de la tabla, en fasores \(E_y=\frac{-j\omega\mu}{k_c}H_0\sin(200\pi x)e^{-j\beta z}\), \(H_x=\frac{j\beta}{k_c}H_0\sin(200\pi x)e^{-j\beta z}\), \(E_x=H_y=E_z=0\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>En el tiempo (\(\operatorname{Re}\{-je^{j\varphi}\}=\sin\varphi\)):</p>
+$$E_y=\frac{\omega\mu}{200\pi}H_0\sin(200\pi x)\sin(\omega t-\beta z),\qquad H_x=-\frac{\beta}{200\pi}H_0\sin(200\pi x)\sin(\omega t-\beta z)$$</div></div>
+</div>
+<div class="example">
+<h4>Problema 2 — Cuatro guías con aire: (1) 4 × 2 cm, (2) 2,4 × 1,3 cm, (3) 2,4 × 1,19 cm, (4) circular de radio 1,2 cm</h4>
+<div class="step"><span class="n">1</span><div><p>Bandas monomodo:</p>
+<div class="table-wrap"><table><thead><tr><th>Guía</th><th>dominante</th><th>siguiente</th><th>banda (GHz)</th></tr></thead><tbody>
+<tr><td>1</td><td>TE₁₀: \(c/2a=3{,}75\)</td><td>TE₂₀ y TE₀₁: 7,49</td><td>3,75 – 7,49</td></tr>
+<tr><td>2</td><td>TE₁₀: 6,25</td><td>TE₀₁: \(c/2b=11{,}53\)</td><td>6,25 – 11,53</td></tr>
+<tr><td>3</td><td>TE₁₀: 6,25</td><td>TE₂₀: 12,49 (TE₀₁ a 12,60)</td><td>6,25 – 12,49</td></tr>
+<tr><td>4</td><td>TE₁₁: \(1{,}841c/2\pi a=7{,}32\)</td><td>TM₀₁: 9,56</td><td>7,32 – 9,56</td></tr>
+</tbody></table></div></div></div>
+<div class="step"><span class="n">2</span><div><p>Un diagrama de frecuencias (dibuja las cuatro bandas en un eje) muestra que <strong>8–9 GHz</strong> cabe en las guías 2, 3 y 4; la 1 es multimodo ahí.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Comercial: <strong>WR-90</strong> (banda X, uso 8,2–12,4 GHz, \(a\times b=2{,}286\times1{,}016\) cm, \(f_{c10}=6{,}56\) GHz). Latón (\(\sigma=2{,}564\cdot10^7\) S/m) a 9 GHz: \(R_s=0{,}0372\) Ω, \(\beta=129{,}2\) rad/m y \(\alpha_c=0{,}0209\) Np/m = <strong>0,18 dB/m</strong> (\(\lambda_g=4{,}86\) cm).</p></div></div>
+</div>
+<div class="example">
+<h4>Problema 3 — Guía de cobre, banda K, rellena de teflón, \(a=1{,}07\) cm, \(b=0{,}43\) cm (Pozar, ej. 3.1)</h4>
+<div class="step"><span class="n">1</span><div><p>Teflón: \(\varepsilon_r=2{,}08\), \(\tan\delta=0{,}0004\). \(f_c=\frac{c}{2\sqrt{2{,}08}}\sqrt{(m/a)^2+(n/b)^2}\): TE₁₀ 9,72 GHz; TE₂₀ 19,44 GHz; TE₀₁ 24,19 GHz (siguen TE₁₁/TM₁₁ a 26,07).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>A 15 GHz solo se propaga el TE₁₀: \(k=453{,}1\) m⁻¹, \(\beta=\sqrt{k^2-(\pi/a)^2}=345{,}1\) m⁻¹.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>\(\alpha_d=k^2\tan\delta/2\beta=0{,}119\) Np/m = <strong>1,03 dB/m</strong>; \(R_s=0{,}032\) Ω y \(\alpha_c=0{,}050\) Np/m = <strong>0,434 dB/m</strong>. (El dieléctrico pierde más que las paredes: rellenar una guía tiene un precio.)</p></div></div>
+</div>
+
+<h2 id="ejercicios">8. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>¿Qué dimensión \(a\) debe tener una guía con aire y \(a=2b\) para que 10 GHz esté en el centro de su banda monomodo?
+    <details class="sol"><summary>Solución</summary><div><p>Banda \(f_{c}\)…\(2f_c\), centro \(1{,}5f_c=10\) GHz ⇒ \(f_c=6{,}67\) GHz ⇒ \(a=c/2f_c=2{,}25\) cm (casi la WR-90).</p></div></details></li>
+  <li>En una WR-90 a 10 GHz, halle \(\lambda_g\), \(v_p\), \(v_g\) y \(Z_{TE}\).
+    <details class="sol"><summary>Solución</summary><div><p>\(f_c=6{,}557\) GHz, \(\sqrt{1-(f_c/f)^2}=0{,}755\): \(\lambda=3\) cm, \(\lambda_g=3{,}97\) cm, \(v_p=1{,}32c\), \(v_g=0{,}755c\), \(Z_{TE}=499\) Ω.</p></div></details></li>
+  <li>Una señal de 5 GHz entra en una WR-90. ¿Qué pasa? ¿Cuánto se atenúa en 10 cm?
+    <details class="sol"><summary>Solución</summary><div><p>Está por debajo del corte (6,56 GHz): es evanescente, \(\alpha=\sqrt{(\pi/a)^2-k^2}=88{,}9\) Np/m ⇒ en 10 cm, 8,89 Np = 77 dB. Así funcionan los atenuadores «bajo el corte» y las rejillas de las puertas de los microondas.</p></div></details></li>
+  <li>¿Puede propagarse una onda TEM dentro de una guía? Justifique.
+    <details class="sol"><summary>Solución</summary><div><p>No: con \(E_z=H_z=0\) habría que tener \(k_c=0\) y un campo transversal que fuera solución de Laplace en 2D con potencial constante en el único contorno; esa solución es nula. Hacen falta al menos dos conductores (como en el coaxial).</p></div></details></li>
+</ol>
+
+<h2 id="biblio">9. Dónde estudiarlo</h2>
+<p class="meta">La clase cita «Pozar 126–132, 141–151», que son páginas de una edición anterior; en la 4.ª edición el mismo contenido está en las páginas indicadas.</p>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>D. M. Pozar, <em>Microwave Engineering</em>, 4.ª ed., Wiley, 2012</td><td>3</td><td>3.1 General Solutions for TEM, TE, and TM Waves</td><td>pp. 96–102 (PDF 116–122)</td><td>Transversales en función de \(E_z\), \(H_z\); \(Z_{TE}\), \(Z_{TM}\); pérdidas en el dieléctrico (3.29)</td></tr>
+    <tr><td>Pozar (ídem)</td><td>3</td><td>3.3 Rectangular Waveguide (TE, TM, tabla 3.2, fig. 3.9 de líneas de campo, ej. 3.1)</td><td>pp. 110–121 (PDF 130–141)</td><td>Guía rectangular, TE₁₀, \(\alpha_c\) (3.96)</td></tr>
+    <tr><td>Pozar (ídem)</td><td>3</td><td>3.4 Circular Waveguide (tablas 3.3 y 3.4)</td><td>pp. 121–130 (PDF 141–150)</td><td>TE₁₁, TM₀₁, \(\alpha_c\) del TE₁₁ (3.133)</td></tr>
+    <tr><td>Pozar (ídem)</td><td>3</td><td>3.10 Wave Velocities and Dispersion · 3.11 Summary</td><td>pp. 154–158 (PDF 174–178)</td><td>Velocidades de fase y de grupo</td></tr>
+    <tr><td>Pozar (ídem)</td><td>Ap.</td><td>F Conductivities · G Dielectric Constants · I Standard Rectangular Waveguide Data</td><td>pp. 719–720 (PDF 739–740)</td><td>σ, εr, tan δ, guías WR</td></tr>
+    <tr><td>S. J. Orfanidis, <em>Electromagnetic Waves and Antennas</em>, rev. 2016</td><td>9</td><td>9.1–9.3 descomposición, potencia, TEM/TE/TM · 9.4 Rectangular Waveguides · 9.6 Operating Bandwidth · 9.8 Power Attenuation · 9.9 Reflection Model of Waveguide Propagation</td><td>pp. 363–386 (PDF 400–423)</td><td>Con el modelo de ondas en zigzag (\(v_p\gt c\))</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="profundizar">10. Para profundizar</h2>
+<ul>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=y4ReaugNtsk">«Lecture -- Rectangular waveguide»</a> (EMPossible, en inglés). Modos TE/TM con visualizaciones del campo.</li>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=gLlSMpK5ass">«Lecture 54 - Rectangular waveguides»</a> (Applied Electromagnetics For Engineers, en inglés). Procedimiento de análisis, modos y parámetros (corte, λg, impedancia de onda).</li>
+</ul>
+
+<h2 id="faq">11. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué el lado \(b\) suele ser la mitad de \(a\)?</summary><div><p>Porque con \(b\le a/2\) el TE₀₁ no corta antes que el TE₂₀ y la banda monomodo es la máxima (una octava). Hacer \(b\) más pequeño reduce la potencia máxima (el campo de ruptura se alcanza antes) y aumenta las pérdidas; \(a/2\) es el compromiso.</p></div></details>
+  <details><summary>¿Un modo evanescente pierde potencia?</summary><div><p>No la disipa: la energía queda almacenada cerca de la discontinuidad y vuelve (\(Z_{TE}\) imaginaria). Por eso los modos superiores excitados en codos, sondas o diafragmas se comportan como reactancias locales.</p></div></details>
+  <details><summary>¿Qué es la dispersión en la guía?</summary><div><p>\(v_g\) depende de la frecuencia: las componentes de un pulso llegan en momentos distintos y el pulso se ensancha. Es mayor cerca del corte.</p></div></details>
+  <details><summary>¿Rectangular o circular?</summary><div><p>La rectangular tiene más banda monomodo y la polarización fija (el TE₁₀ no rota). La circular sirve para juntas rotatorias (radar) y para transportar dos polarizaciones; su TE₁₁ puede girar la polarización con imperfecciones.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> clase «Guías de ondas» y su resumen (Prof. Juan J. Justo Morales, CUJAE, 2026); 1.ª Tarea de Líneas de Transmisión. Cálculos verificados con <a href="../#software">ltx</a> y con el ej. 3.1 de Pozar. Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Líneas de Transmisión y Antenas · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

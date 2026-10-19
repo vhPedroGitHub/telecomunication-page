@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repaso · Física electromagnética</title>
+
+  <meta name="description" content="Fichas de repaso: ecuaciones de Maxwell en forma fasorial, ondas planas, impedancia intrínseca, vector de Poynting, condiciones de frontera, efecto pelicular y resistencia superficial.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <script src="../assets/js/theme.js"></script>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-repaso); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../">← Portal</a><span class="title">Repaso de prerrequisitos</span>
+  <nav class="tabs" aria-label="Fichas"><a href="./">Índice</a><a href="matematica.html">Matemática</a><a href="probabilidad.html">Probabilidad</a><a href="circuitos.html">Circuitos</a><a href="electronica-digital.html">Electrónica digital</a><a href="electronica-analogica.html">Electrónica analógica</a><a href="fisica-em.html" aria-current="page">Física EM</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice de fichas"><h2>Fichas</h2><ol data-auto></ol></nav>
+<main class="content">
+<h1>Física electromagnética para líneas y guías</h1>
+<p class="lead">Lo que Líneas de Transmisión y Antenas da por sabido de Teoría del Campo Electromagnético: Maxwell en régimen sinusoidal, la onda plana, la potencia que lleva una onda, qué pasa en la frontera con un conductor y por qué los conductores reales pierden más a alta frecuencia.</p>
+
+<h2 id="maxwell">Ecuaciones de Maxwell en forma fasorial</h2>
+<p>Con campos sinusoidales \(\vec{\mathcal E}(t)=\operatorname{Re}\{\vec E e^{j\omega t}\}\), \(\partial/\partial t\to j\omega\). En un medio lineal (\(\vec D=\varepsilon\vec E\), \(\vec B=\mu\vec H\)) y sin fuentes:</p>
+<div class="eq key">$$\nabla\times\vec E=-j\omega\mu\vec H,\qquad \nabla\times\vec H=j\omega\varepsilon\vec E+\sigma\vec E,\qquad \nabla\cdot\vec D=\rho,\qquad \nabla\cdot\vec B=0$$</div>
+<p>Un campo eléctrico variable crea un magnético que lo rodea y viceversa: esa realimentación es la onda. Las pérdidas del dieléctrico se incluyen con una permitividad compleja \(\varepsilon=\varepsilon_0\varepsilon_r(1-j\tan\delta)\) (\(\tan\delta\): tangente de pérdidas). Tomando el rotacional de la primera y sustituyendo la segunda se obtiene la <strong>ecuación de Helmholtz</strong>:</p>
+$$\nabla^2\vec E+k^2\vec E=0,\qquad k=\omega\sqrt{\mu\varepsilon}=\frac{2\pi}{\lambda}$$
+<p class="meta">Dónde estudiarlo: Pozar, <em>Microwave Engineering</em>, 4.ª ed., 2012: 1.2 «Maxwell's Equations», pp. 6–10 (PDF 26–30); 1.4 «The Wave Equation and Basic Plane Wave Solutions», p. 15 (PDF 35).</p>
+
+<h2 id="ondas">Ondas planas</h2>
+<p>La solución más simple de Helmholtz viaja en \(z\) con \(\vec E\) y \(\vec H\) perpendiculares entre sí y a la dirección de propagación (onda TEM):</p>
+<div class="eq key">$$E_x=E_0e^{-jkz},\qquad H_y=\frac{E_0}{\eta}e^{-jkz},\qquad \eta=\sqrt{\frac{\mu}{\varepsilon}}=\frac{\eta_0}{\sqrt{\varepsilon_r}},\quad \eta_0=377\ \Omega,\qquad v_p=\frac{c}{\sqrt{\varepsilon_r}}$$</div>
+<p>\(\eta\) es la <strong>impedancia intrínseca</strong> del medio: la relación \(E/H\) de la onda (no confundir con la \(Z_0=V/I\) de una línea). En un medio con pérdidas, \(jk\to\gamma=\alpha+j\beta\) y la amplitud decae como \(e^{-\alpha z}\).</p>
+<p class="meta">Dónde estudiarlo: Pozar, 4.ª ed.: 1.4, pp. 15–20 (PDF 35–40) y 1.5 «General Plane Wave Solutions», pp. 20–25 (PDF 40–45).</p>
+
+<h2 id="poynting">Potencia: vector de Poynting</h2>
+<div class="eq key">$$\vec S=\tfrac12\,\vec E\times\vec H^*,\qquad P=\operatorname{Re}\iint_S\vec S\cdot d\vec s,\qquad \text{onda plana: } S_{\text{med}}=\frac{|E_0|^2}{2\eta}$$</div>
+<p>La potencia fluye en la dirección de \(\vec E\times\vec H\). En una línea, integrando \(\vec S\) sobre la sección transversal se recupera \(P=\tfrac12\operatorname{Re}\{VI^*\}\); en una guía, así se calcula la potencia de cada modo.</p>
+<p class="meta">Dónde estudiarlo: Pozar, 4.ª ed.: 1.6 «Energy and Power», pp. 25–28 (PDF 45–48).</p>
+
+<h2 id="frontera">Condiciones de frontera</h2>
+<p>En la superficie entre dos medios, las componentes tangenciales de \(\vec E\) son continuas, igual que las de \(\vec H\) si no hay corriente superficial. En un <strong>conductor perfecto</strong> los campos internos son nulos, así que:</p>
+<div class="eq key">$$\hat n\times\vec E=0\ \ (E_{\tan}=0),\qquad \hat n\cdot\vec B=0,\qquad \hat n\times\vec H=\vec J_s$$</div>
+<p>Es la condición que determina los modos de una guía de onda (el \(\vec E\) debe llegar perpendicular a las paredes) y las corrientes superficiales que causan sus pérdidas. En la frontera entre dos dieléctricos una onda plana se refleja con \(\Gamma=(\eta_2-\eta_1)/(\eta_2+\eta_1)\): la misma fórmula que en una línea con \(Z\to\eta\).</p>
+<p class="meta">Dónde estudiarlo: Pozar, 4.ª ed.: 1.3 «Fields in Media and Boundary Conditions», pp. 10–15 (PDF 30–35); 1.7 «Plane Wave Reflection from a Media Interface», pp. 28–35 (PDF 48–55).</p>
+
+<h2 id="pelicular">Efecto pelicular y resistencia superficial</h2>
+<p>En un buen conductor (\(\sigma\gg\omega\varepsilon\)) la onda se atenúa muy rápido: la corriente se concentra en una capa de espesor</p>
+<div class="eq key">$$\delta_s=\sqrt{\frac{2}{\omega\mu\sigma}},\qquad R_s=\frac{1}{\sigma\delta_s}=\sqrt{\frac{\omega\mu_0}{2\sigma}}\ \ (\Omega)$$</div>
+<p>Ejemplo: cobre (\(\sigma=5{,}8\cdot10^7\) S/m) a 10 GHz: \(\delta_s=0{,}66\ \mu\)m, \(R_s=0{,}026\) Ω. Como \(R_s\propto\sqrt f\), la resistencia \(R\) por unidad de longitud de una línea y la atenuación por conductor crecen con la raíz de la frecuencia. Por eso un plateado de pocas micras basta para mejorar una guía.</p>
+<p class="meta">Dónde estudiarlo: Pozar, 4.ª ed.: 1.4, «skin depth» y ej. 1.2, p. 19 (PDF 39). Apéndice F: conductividades, p. 719 (PDF 739).</p>
+
+<p class="source-note">Fichas de repaso de elaboración propia. Bibliografía: Pozar, 4.ª ed. (en los materiales de Líneas de Transmisión y Antenas). Más profundidad: curso de Teoría del Campo Electromagnético (cursos/10-TC).</p>
+
+</main></div>
+<footer class="site wrap">Repaso de prerrequisitos · <a href="./">Índice de fichas</a></footer>
+</body>
+</html>

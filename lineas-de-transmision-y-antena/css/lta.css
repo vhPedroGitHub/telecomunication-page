@@ -1,0 +1,10 @@
+/* Estilos propios de Líneas de Transmisión y Antenas */
+.sim canvas.smith { width: auto; max-width: 100%; margin: 0 auto; background: var(--bg); }
+.sim .smith-wrap { display: flex; justify-content: center; }
+.sim input.short { width: 76px; }
+svg.diagram .rail { stroke: var(--text); stroke-width: 2; fill: none; }
+svg.diagram .ant { fill: var(--muted); }
+svg.diagram .ant.on { fill: var(--accent); }
+svg.diagram .blade { stroke: var(--accent); stroke-width: 3; stroke-linecap: round; transition: transform .25s; }
+.btn[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.formula-table td:first-child { white-space: nowrap; }

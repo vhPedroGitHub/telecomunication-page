@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema I · Carta de Smith — LTyA</title>
+  <meta name="description" content="Líneas de Transmisión y Antenas, Conferencia 2: conformación de la carta de Smith a partir de la transformación bilineal entre z y Γ, lectura de Γ, ROE y pérdidas de retorno, giro hacia el generador, admitancias, máximos y mínimos de tensión, problemas resueltos.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/lta.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/lta.js"></script>
+  <style>body { --accent: var(--c-lta); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Líneas de Transmisión y Antenas</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="t1-teoria-general.html">I · Teoría</a><a href="t1b-carta-smith.html" aria-current="page">I · Smith</a><a href="t2-guias-de-onda.html">II · Guías</a><a href="t2b-lineas-planares.html">II · Planares</a><a href="t3-acoplamiento.html">III · Acoplamiento</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema I · Conferencia 2 «Carta de Smith: conformación y parámetros fundamentales» · problemas 1–5 · TI 2</p>
+<h1>La carta de Smith</h1>
+<p class="lead">La fórmula de \(Z_{in}\) obliga a hacer aritmética compleja con tangentes cada vez que movemos un punto por la línea. Phillip Smith (Bell Labs, 1939) encontró un dibujo en el que <strong>moverse por la línea es simplemente girar</strong> alrededor del centro. La carta de Smith es el plano del coeficiente de reflexión \(\Gamma\) con las impedancias dibujadas encima: con ella se convierte \(Z\) en \(\Gamma\) y al revés, se lee la ROE, se pasa de impedancia a admitancia y se diseñan los acopladores del Tema III. Y, sobre todo, da <strong>intuición</strong>.</p>
+
+<div class="objectives"><strong>Objetivos (Conferencia 2)</strong>
+<ul>
+  <li>Conocer cómo se conforma la carta de Smith a partir de \(\Gamma\) y \(z_L\).</li>
+  <li>Calcular con ella los parámetros fundamentales: \(\Gamma\), RL, ROE, \(Z_{in}\), posiciones de máximos y mínimos, admitancias.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">el plano complejo y la circunferencia</span>
+<p>Un complejo \(\Gamma=\Gamma_r+j\Gamma_i\) es un punto del plano; multiplicar por \(e^{-j\phi}\) lo <strong>gira</strong> un ángulo \(\phi\) en sentido horario sin cambiar su módulo. La ecuación \((x-x_0)^2+(y-y_0)^2=\rho^2\) es una circunferencia de centro \((x_0,y_0)\) y radio \(\rho\).</p>
+$$\Gamma(l)=\Gamma_Le^{-j2\beta l}\qquad\text{(moverse }l\text{ hacia el generador = girar }2\beta l=4\pi l/\lambda\text{)}$$
+<p>Repaso: <a href="../../repaso/matematica.html#complejos">complejos, forma polar y giros</a> · <a href="t1-teoria-general.html#reflexion">Γ, RL y ROE (Tema I)</a>.</p></div>
+
+<h2 id="normalizar">1. Primer paso: normalizar</h2>
+<p>La carta sirve para cualquier línea porque trabaja con impedancias <strong>normalizadas</strong> a \(Z_0\):</p>
+<div class="eq key">$$z=\frac{Z}{Z_0}=r+jx,\qquad \Gamma=\frac{z-1}{z+1}\quad\Longleftrightarrow\quad z=\frac{1+\Gamma}{1-\Gamma}$$</div>
+<p>\(r\) es la resistencia normalizada y \(x\) la reactancia normalizada. Al final, para volver a ohmios, se multiplica por \(Z_0\) («desnormalizar»).</p>
+
+<h2 id="bilineal">2. Conformación: la transformación bilineal</h2>
+<p>La relación \(z=(1+\Gamma)/(1-\Gamma)\) es una <strong>transformación bilineal</strong> (de Möbius): lleva rectas y circunferencias del plano \(z\) a rectas y circunferencias del plano \(\Gamma\). Separando parte real e imaginaria (\(\Gamma=\Gamma_r+j\Gamma_i\)) y reordenando se llega a dos familias:</p>
+<div class="eq key">$$\left(\Gamma_r-\frac{r}{1+r}\right)^2+\Gamma_i^2=\left(\frac{1}{1+r}\right)^2,\qquad (\Gamma_r-1)^2+\left(\Gamma_i-\frac1x\right)^2=\left(\frac1x\right)^2$$</div>
+<ul>
+  <li>Cada recta vertical \(r=\) cte del plano \(z\) se convierte en una <strong>circunferencia de resistencia constante</strong>, con centro \((\tfrac{r}{1+r},0)\) y radio \(\tfrac{1}{1+r}\). Todas pasan por \(\Gamma=1\). Ejemplos de la conferencia: \(r=0\) → centro (0, 0), radio 1 (el borde de la carta); \(r=1\) → centro (0,5; 0), radio 0,5; \(r\to\infty\) → el punto (1, 0).</li>
+  <li>Cada recta horizontal \(x=\) cte se convierte en un <strong>arco de reactancia constante</strong>, con centro \((1,\tfrac1x)\) y radio \(\tfrac{1}{|x|}\). Arriba del eje real, \(x\gt 0\) (inductiva); abajo, \(x\lt 0\) (capacitiva); el eje real es \(x=0\).</li>
+  <li>Las cargas pasivas (\(r\ge0\)) caen <strong>dentro</strong> del círculo unidad \(|\Gamma|\le1\). Todo el semiplano derecho de \(z\), infinito, cabe en un círculo.</li>
+</ul>
+<div class="sim" id="sim-bil">
+  <div class="sim-title">De \(z\) a \(\Gamma\): mueve \(r\) y \(x\) y mira sus curvas</div>
+  <div class="controls">
+    <label>r <input type="range" id="bil-r" min="0" max="5" step="0.05" value="1" data-out="bil-ro"><output id="bil-ro"></output></label>
+    <label>x <input type="range" id="bil-x" min="-5" max="5" step="0.05" value="1" data-out="bil-xo"><output id="bil-xo"></output></label>
+  </div>
+  <div class="smith-wrap"><canvas class="smith" id="bil-cv" aria-label="Carta de Smith con la circunferencia r constante y el arco x constante del punto elegido"></canvas></div>
+  <div class="legend"><span style="--c: var(--s2)">r = cte</span><span style="--c: var(--s3)">x = cte</span><span style="--c: var(--s1)">punto z</span></div>
+  <div class="readout" id="bil-out"></div>
+</div>
+<p><strong>Puntos notables</strong>: el centro es \(z=1\) (carga acoplada, \(\Gamma=0\)); el extremo izquierdo, \(z=0\) (cortocircuito, \(\Gamma=-1\)); el derecho, \(z=\infty\) (abierto, \(\Gamma=+1\)); el borde, cargas reactivas puras (\(|\Gamma|=1\)).</p>
+
+<h2 id="lectura">3. Qué se lee en la carta</h2>
+<div class="step"><span class="n">1</span><div><p><strong>\(\Gamma\)</strong>: la distancia del punto al centro, dividida por el radio de la carta, es \(|\Gamma|\); el ángulo respecto al semieje real positivo, \(\theta_\Gamma\) (escala «angle of reflection coefficient» del borde).</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Circunferencia de ROE</strong>: la circunferencia de centro en el origen que pasa por \(z_L\) contiene todas las impedancias que se ven a lo largo de la línea (\(|\Gamma|\) no cambia sin pérdidas). Donde corta el eje real a la derecha del centro se lee \(r=\text{ROE}\) (ese punto es el máximo de tensión); donde lo corta a la izquierda, \(r=1/\text{ROE}\) (mínimo de tensión).</p></div></div>
+<div class="step"><span class="n">3</span><div><p><strong>Moverse por la línea</strong>: hacia el generador se gira en sentido <strong>horario</strong>; hacia la carga, antihorario. Una vuelta completa son \(\lambda/2\) (porque el ángulo girado es \(2\beta l\)). Las escalas exteriores «wavelengths toward generator» (WTG) y «toward load» (WTL) dan la distancia directamente en fracciones de \(\lambda\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p><strong>Admitancia</strong>: \(y=1/z\) es el punto diametralmente opuesto (giro de 180° = \(\lambda/4\), justo lo que hace un transformador de cuarto de onda). La misma carta, leída como admitancias, sirve para trabajar con elementos en paralelo.</p></div></div>
+<div class="step"><span class="n">5</span><div><p><strong>Pérdidas de retorno</strong>: \(RL=-20\log|\Gamma|\) (escala radial inferior de la carta impresa).</p></div></div>
+<div class="sim" id="sim-sm">
+  <div class="sim-title">Carta de Smith interactiva</div>
+  <div class="controls">
+    <label>Z₀ (Ω) <input type="number" class="short" id="sm-z0" value="50"></label>
+    <label>R_L (Ω) <input type="number" class="short" id="sm-rl" value="30"></label>
+    <label>X_L (Ω) <input type="number" class="short" id="sm-xl" value="100"></label>
+    <label>l/λ hacia el generador <input type="range" id="sm-l" min="0" max="0.5" step="0.001" value="0" data-out="sm-lo"><output id="sm-lo"></output></label>
+    <label><input type="checkbox" id="sm-adm"> mostrar y_L</label>
+  </div>
+  <div class="smith-wrap"><canvas class="smith" id="sm-cv" aria-label="Carta de Smith con la carga, la circunferencia de ROE y el giro hacia el generador"></canvas></div>
+  <div class="legend"><span style="--c: var(--s1)">z_L</span><span style="--c: var(--s2)">circunferencia de |Γ| (ROE)</span><span style="--c: var(--s3)">giro hacia el generador</span><span style="--c: var(--s4)">y_L</span></div>
+  <div class="readout" id="sm-out"></div>
+</div>
+<p>Para practicar con papel, imprime la carta oficial (en los materiales de la asignatura: «Carta Smith para imprimir»): los ejercicios de la evaluación se hacen a mano.</p>
+
+<h2 id="ejemplos">4. Problemas resueltos de la conferencia</h2>
+<div class="example">
+<h4>Ejemplo de clase — \(Z_0=50\) Ω, \(Z_L=30+j100\) Ω: \(\Gamma_L\), RL y ROE</h4>
+<div class="step"><span class="n">1</span><div><p>Normalizar: \(z_L=0{,}6+j2\). Se sitúa en la intersección de la circunferencia \(r=0{,}6\) con el arco \(x=2\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Medir: \(|\Gamma_L|=0{,}796\), \(\theta=50°\) ⇒ \(\Gamma_L=0{,}796\angle50°\) (analíticamente: \((-20+j100)/(80+j100)\)).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Circunferencia de ROE: corta el eje real derecho en \(r=8{,}8\) ⇒ ROE = 8,82. \(RL=-20\log0{,}796=1{,}98\) dB: casi todo se refleja (63 %).</p></div></div>
+</div>
+<div class="example">
+<h4>Problema 2 — Coaxial de 75 Ω, 2 cm, \(\varepsilon_r=2{,}56\), 3 GHz, \(Z_L=37{,}5+j75\) Ω</h4>
+<div class="step"><span class="n">1</span><div><p>Longitud eléctrica: \(\lambda=\dfrac{c}{f\sqrt{\varepsilon_r}}=\dfrac{3\cdot10^8}{3\cdot10^9\cdot1{,}6}=6{,}25\) cm ⇒ \(l=2/6{,}25=0{,}32\lambda\) (\(\beta l=115{,}2°\)). <em>Error típico: usar la \(\lambda\) del vacío.</em></p></div></div>
+<div class="step"><span class="n">2</span><div><p>\(z_L=0{,}5+j1\); \(\Gamma_L=0{,}62\angle82{,}9°\); ROE = 4,27.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Girar \(0{,}32\lambda\) hacia el generador (\(2\beta l=230{,}4°\) en sentido horario): \(\Gamma_{in}=0{,}62\angle-147{,}5°\), se lee \(z_{in}=0{,}253-j0{,}274\) ⇒ \(Z_{in}=18{,}98-j20{,}55\) Ω. La ROE es la misma en toda la línea.</p></div></div>
+</div>
+<div class="example">
+<h4>Problema 3 — \(l=0{,}2\lambda\), \(Z_0=200\) Ω, \(Z_L=200+j400\) Ω</h4>
+<div class="step"><span class="n">1</span><div><p>\(z_L=1+j2\); \(\Gamma_L=(j2)/(2+j2)=0{,}707\angle45°\); ROE = 5,83.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Girar \(0{,}2\lambda\) (144°) hacia el generador: \(\Gamma_{in}=0{,}707\angle-99°\), \(z_{in}=0{,}29-j0{,}81\) ⇒ \(Z_{in}=58{,}1-j162{,}3\) Ω.</p></div></div>
+</div>
+<div class="example">
+<h4>Problema 4 — Carga desconocida a partir de la ROE y del mínimo (\(Z_0=100\) Ω, ROE = 4, mínimo a \(0{,}3611\lambda\))</h4>
+<div class="step"><span class="n">1</span><div><p>\(|\Gamma|=(4-1)/(4+1)=0{,}6\). En el mínimo, \(\Gamma=-0{,}6\) (punto \(r=1/4\) del eje real izquierdo).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Desde el mínimo se gira \(0{,}3611\lambda\) <strong>hacia la carga</strong> (antihorario, \(260°\)): \(\theta_\Gamma=-180°+260°=80°\) ⇒ \(\Gamma_L=0{,}6\angle80°\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Se lee \(z_L=0{,}556+j1{,}026\) ⇒ \(Z_L=55{,}6+j102{,}6\) Ω.</p></div></div>
+<div class="step"><span class="n">4</span><div><p>El primer máximo está \(\lambda/4\) antes del mínimo: a \(0{,}3611-0{,}25=0{,}111\lambda\) de la carga, y allí \(Z_{\max}=\text{ROE}\cdot Z_0=400\) Ω.</p></div></div>
+</div>
+<div class="example">
+<h4>Problema 5 — Antena de 300 + j100 Ω y línea bifilar desnuda de 550 Ω (cobre, Ø 4 mm) a 25 MHz con un transformador de \(\lambda/4\)</h4>
+<div class="step"><span class="n">1</span><div><p>\(\lambda=12\) m ⇒ el transformador mide \(\lambda/4=3\) m. \(z_L=0{,}545+j0{,}182\); \(\Gamma_L=0{,}315\angle151{,}5°\); ROE = 1,92.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>La carga es compleja: el transformador se coloca donde la línea ve una resistencia. Máximo de tensión a \(d_{\max}=151{,}5°/720°\cdot\lambda=0{,}2104\lambda=2{,}52\) m: \(R_{\max}=1{,}92\cdot550=1055\) Ω y \(Z_T=\sqrt{550\cdot1055}=762\) Ω. Mínimo a \(0{,}4604\lambda=5{,}52\) m: \(R_{\min}=550/1{,}92=287\) Ω y \(Z_T=\sqrt{550\cdot287}=397\) Ω.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Separación de los hilos (largo de los aisladores) para la \(Z_T\) necesaria, con \(Z_0=\dfrac{120}{\sqrt{\varepsilon_r}}\cosh^{-1}\dfrac Dd\approx\dfrac{276}{\sqrt{\varepsilon_r}}\log_{10}\dfrac{2D}{d}\): para 397 Ω, \(D=4\cosh(397/120)=5{,}5\) cm; para 762 Ω, \(D\approx1{,}14\) m.</p></div></div>
+<div class="step"><span class="n">4</span><div><p><strong>Mejor opción</strong>: en el mínimo (397 Ω): separación de 5,5 cm, fácil de construir; 1,14 m es impracticable. Con un dieléctrico \(\varepsilon_r=4\) las longitudes se reducen a la mitad (\(\lambda=6\) m, transformador de 1,5 m) pero, para la misma \(Z_T\), la separación crecería muchísimo (\(Z_0\) baja con \(\sqrt{\varepsilon_r}\)).</p></div></div>
+</div>
+
+<h2 id="ejercicios">5. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>(TI 2) \(Z_0=300\) Ω, \(Z_L=75+j42{,}5\) Ω. Halle \(\Gamma_L\), RL y ROE con la carta.
+    <details class="sol"><summary>Solución</summary><div><p>\(z_L=0{,}25+j0{,}142\); \(\Gamma_L=0{,}607\angle162{,}8°\); RL = 4,34 dB; ROE = 4,09.</p></div></details></li>
+  <li>Problema 1 de la conferencia (mismo procedimiento): halle \(\Gamma\), RL y ROE de \(Z_L=100-j50\) Ω en una línea de 50 Ω.
+    <details class="sol"><summary>Solución</summary><div><p>\(z_L=2-j1\); \(\Gamma_L=(1-j)/(3-j)=0{,}447\angle-26{,}6°\); ROE = 2,62; RL = 7,0 dB.</p></div></details></li>
+  <li>Una carga \(z_L=2\) está al final de una línea de \(\lambda/8\). ¿Qué \(z_{in}\) se ve? ¿Y la admitancia de la carga?
+    <details class="sol"><summary>Solución</summary><div><p>Giro de 90°: \(\Gamma_L=1/3\), \(\Gamma_{in}=\tfrac13\angle-90°\), \(z_{in}=0{,}8-j0{,}6\). \(y_L=0{,}5\) (punto opuesto).</p></div></details></li>
+  <li>¿Por qué una vuelta completa de la carta es \(\lambda/2\) y no \(\lambda\)?
+    <details class="sol"><summary>Solución</summary><div><p>Porque \(\Gamma(l)=\Gamma_Le^{-j2\beta l}\): la onda reflejada hace el camino de ida y de vuelta, y el desfase relativo es el doble de \(\beta l\). \(2\beta l=2\pi\Rightarrow l=\lambda/2\).</p></div></details></li>
+  <li>(Ej. de la conferencia, similar a Pozar 3.7) Una línea de \(0{,}3\lambda\) tiene en la carga \(\Gamma_L=0{,}4612\angle150°\). Halle la ROE, \(\Gamma_{in}\) y \(z_{in}\).
+    <details class="sol"><summary>Solución</summary><div><p>ROE = 1,4612/0,5388 = 2,71 (coincide con la solución de la diapositiva). \(\Gamma_{in}=0{,}4612\angle(150°-216°)=0{,}4612\angle-66°\); \(z_{in}=(1+\Gamma_{in})/(1-\Gamma_{in})\approx0{,}94-j1{,}01\) (la carga era \(z_L\approx0{,}39+j0{,}23\)).</p></div></details></li>
+</ol>
+
+<h2 id="biblio">6. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>D. M. Pozar, <em>Microwave Engineering</em>, 4.ª ed., Wiley, 2012</td><td>2</td><td>2.4 The Smith Chart (The Combined Impedance-Admittance Smith Chart; The Slotted Line)</td><td>pp. 63–72 (PDF 83–92)</td><td>Conformación, ej. 2.2 (operaciones básicas), 2.3 (admitancias), 2.4 (medida con línea ranurada) — la conferencia cita «Pozar 63–72»</td></tr>
+    <tr><td>S. J. Orfanidis, <em>Electromagnetic Waves and Antennas</em>, rev. 2016</td><td>11</td><td>11.13 Determining an Unknown Load Impedance · 11.14 Smith Chart</td><td>pp. 568–576 (PDF 605–613)</td><td>Medida de cargas, construcción de la carta</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="profundizar">7. Para profundizar</h2>
+<ul>
+  <li>Vídeo: <a href="https://www.youtube.com/watch?v=pQzEjFo3Sfg">«Lecture -- Impedance and Admittance on Smith Charts»</a> (EMPossible, en inglés). Construcción de la carta, impedancias y admitancias.</li>
+</ul>
+
+<h2 id="faq">8. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Hacia qué lado giro?</summary><div><p>Hacia el generador (alejándose de la carga): horario. Truco: una carga inductiva vista desde un poco más lejos se vuelve menos inductiva y luego capacitiva, como una línea en corto corta se ve inductiva: el giro baja del semiplano superior al inferior pasando por el eje real derecho.</p></div></details>
+  <details><summary>¿La carta sirve con pérdidas?</summary><div><p>Sí, pero el punto no gira en una circunferencia: describe una espiral hacia el centro porque \(|\Gamma(l)|=|\Gamma_L|e^{-2\alpha l}\). Por eso la ROE cerca del generador es menor.</p></div></details>
+  <details><summary>Si tengo calculadora, ¿para qué la carta?</summary><div><p>Para entender y diseñar: en la carta se <em>ve</em> qué stub o qué tramo de línea lleva la carga al centro. Los programas de RF (y los analizadores vectoriales) muestran sus resultados sobre una carta de Smith.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencia 2 «Carta de Smith» (Prof. Juan J. Justo Morales, CUJAE, 2026) y su resumen; problemas 1–5 y TI 2. Cálculos verificados con <a href="../#software">ltx</a>. Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Líneas de Transmisión y Antenas · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

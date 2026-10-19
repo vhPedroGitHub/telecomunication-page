@@ -50,7 +50,8 @@ las asignaturas enlacen de forma estable. **No cambiar los `id` una vez publicad
 | `circuitos.html` | ✅ fasores · potencia · maxtrans · rc · filtros (+ Bode) |
 | `electronica-digital.html` | ✅ numeracion · secuencial · tristate · memorias |
 | `electronica-analogica.html` | ✅ transistor · niveles |
-| `fisica-em.html`, `redes.html` | ⬜ |
+| `fisica-em.html` | ✅ maxwell · ondas · poynting · frontera · pelicular (Pozar cap. 1, +20) |
+| `redes.html` | ⬜ |
 
 Bibliografía verificada: Stewart (el PDF «…9naEd» es en realidad *Cálculo. Trascendentes tempranas*, 8ª ed., 2018; PDF = impresa + 31), Walpole 9ª 2012 (+22),
 Hayt 8ª (+17), Tocci 10ª (+28), Boylestad 10ª (+19).

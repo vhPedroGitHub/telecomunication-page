@@ -49,20 +49,21 @@
 - Circuitos en régimen sinusoidal, impedancia, potencia, máxima transferencia → `cursos/07-Circuito/`.
 - Decibelios (dB, dBm), logaritmos.
 
-## Trabajo en curso (2026-10-19) — reconstrucción del sitio
+## Estructura del sitio (2026-10-19)
 
-Plan: sustituir el `index.html` antiguo (fracciones hechas a mano) por portada + `temas/`
-con KaTeX y la estructura compartida (`../assets/css/course.css`, `../assets/js/course.js`):
-`t1-teoria-general.html` (C1 + 1.ª Evaluación), `t1b-carta-smith.html` (C2), `t2-guias-de-onda.html`
-(clase GO + Tarea GO), `t2b-lineas-planares.html` (microcinta Pozar 3.8, coplanar Simons 2.2.3),
-`t3-acoplamiento.html` (2A, 2B, 2C, balun).
+| Archivo | Contenido |
+|---|---|
+| `index.html` | portada: temas, Parte 2 (sin materiales), plan, evaluación, tarea final, profesor, bibliografía, software (web, `ltx`, Octave, PCAAD), prerrequisitos, FAQ |
+| `temas/t1-teoria-general.html` | C1 completa + TI 1–6 + 1.ª Evaluación (circuito interactivo) |
+| `temas/t1b-carta-smith.html` | C2: bilineal, lectura, problemas 1–5, TI 2 |
+| `temas/t2-guias-de-onda.html` | clase GO + 1.ª Tarea resuelta (P1–P3), WR, atenuación |
+| `temas/t2b-lineas-planares.html` | microcinta (Pozar 3.8, Di Paolo cap. 2) y CPW (Simons 2.2.3) — sin conferencia aún |
+| `temas/t3-acoplamiento.html` | 2A, 2B, 2C y balun |
+| `js/lta.js`, `css/lta.css` | 17 widgets (ver ids en el código); clase `Smith` para cartas en canvas |
+| `software/ltx/` | paquete Python + CLI (`carga`, `rlgc`, `cuarto`, `stub`, `doble`, `cheb`, `binomial`, `guia`, `circular`, `micro`, `cpw`) + 5 pruebas |
 
-**Hecho (sin enlazar aún):** `js/lta.js` (17 widgets: onda estacionaria, γ/Z₀, |Γ|↔ROE↔RL, Zin(l),
-circuito de la 1.ª Evaluación, λ/4 y su ancho de banda, transformación bilineal, carta de Smith,
-modos de guía rectangular + campos TE/TM, guía circular, microcinta análisis/síntesis, CPW,
-stub simple con |Γ|(f), doble stub con zona prohibida, binomial/Chebyshev, exponencial; ids en el
-código). `software/ltx/` (módulos lineas, stubs, multiseccion, guias, planares; **falta** `__main__.py`
-CLI, `pyproject.toml`, tests y README). Ningún widget probado todavía en navegador.
+Verificado en Chromium (sin errores JS/KaTeX, 390 px sin desborde, widgets con valores del curso).
+Ojo: `<`/`>` dentro de fórmulas deben escribirse `\lt`/`\gt` (si no, el HTML se rompe).
 
 **Bibliografía verificada:** Pozar 4.ª ed. 2012 = impresa **+20** (2.1 p.48, 2.3 p.56, 2.4 Smith 63–72,
 2.5 λ/4 72–76, 2.7 78–85, 3.1 p.96, 3.3 rect. 110–121, 3.4 circ. 121–130, 3.5 coax 130, 3.8 microcinta
@@ -100,37 +101,32 @@ Simons (CPW) = **+20**: 2.2.3 pp.20–21. Tocci/Boylestad no aplican.
 
 ## Estado
 
-El `index.html` actual (~115 KB, de la etapa anterior) cubre: qué es una LTx, ondas TEM/TE/TM,
-por qué no basta la teoría de circuitos, parámetros distribuidos y ecuaciones del telegrafista,
-γ = α + jβ y Z₀, coeficiente de reflexión / pérdidas de retorno / ROE, Z(z), transformador λ/4,
-construcción de la carta de Smith, **carta de Smith interactiva**, tarjetas de aprendizaje y
-ejemplos resueltos. **Hay que revisarlo** contra la plantilla del `CLAUDE.md` raíz (bibliografía
-exacta, prerrequisitos, FAQ, enlaces) y migrarlo a `../assets/css/base.css` si conviene.
-
 | Tema | Teoría | Interactivo | Ejemplos | Ejercicios | CP/Tareas | Biblio | Links | FAQ |
 |---|---|---|---|---|---|---|---|---|
-| I Teoría general LTx | 🟡 | 🟡 (Smith) | 🟡 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| I Carta de Smith | 🟡 | 🟡 | 🟡 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| II Guías de onda | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ (Tarea GO) | ⬜ | ⬜ | ⬜ |
-| II Líneas planares (microcinta, coplanar) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| III Stub simple / doble | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| III λ/4, exponencial, Chebyshev, balun | 🟡 (λ/4) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| I Teoría general LTx | ✅ | ✅ | ✅ | ✅ | ✅ 1.ª Eval. | ✅ | ✅ | ✅ |
+| I Carta de Smith | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| II Guías de onda | ✅ | ✅ | ✅ | ✅ | ✅ Tarea GO | ✅ | ✅ | ✅ |
+| II Líneas planares | ✅ | ✅ | ✅ | ✅ | — | ✅ | ✅ | ✅ |
+| III Stubs, λ/4, multisección, exponencial, balun | ✅ | ✅ | ✅ | ✅ | ✅ TI 2A–2C | ✅ | ✅ | ✅ |
 | Parte 2 Antenas | ⛔ sin materiales | | | | | | | |
-| Software (Octave/Python: guías, microcinta, stubs) | ⬜ | | | | | | | |
-| Evaluaciones (1ra Evaluación, formato de tarea) | ⬜ | | | | | | | |
+| Software `ltx` | ✅ | | | | | | | |
 
 ## Pendientes y dudas
 
-- Leer `02-Conf_Problema_Teorico_Fundamental`, `04-Resumen_C1_LTx`, los PDF de guías de onda y
-  los encuentros 2A/2B/2C para completar Temas I–III.
-- Resolver/explicar la **1ra Evaluación** y la **Tarea sobre Guías de Ondas** como ejemplos guiados.
-- Página de metamateriales como contenido complementario.
-- Guía de instalación de GNU Octave y de PCAAD 5 (Windows/Wine).
+- Parte 2 (Antenas): esperar materiales (Balanis 4.ª ed. ya está en `05-Bibliografia`).
+- Duración de los vídeos de YouTube no comprobada (red inestable); solo título/canal por oEmbed.
+- Enlaces de Orfanidis (Rutgers) y de la página de Pozar (UMass) no respondían: no se enlazan.
+- No hay Octave instalado: no se publicaron scripts `.m` (la tarea los pide; se podrían añadir y probar).
+- Metamateriales (`08-Complementarios`) sin tratar. PCAAD 5 sin guía de instalación.
+- Gupta y Wadell son PDF escaneados: no se citan páginas.
+- Erratas señaladas en las páginas: «0.2 H/m» (µH), p′₂₁ = 30.54 (3,054), ½ del exponencial (0,87→0,438),
+  T₄ de Chebyshev, caso 4 de la 1.ª Evaluación repetido.
 
 ## Bitácora
 
-- **2026-10-19** — Leídos todos los materiales; bibliografía verificada; `js/lta.js` y `software/ltx`
-  (borrador) escritos; soluciones calculadas (ver «Trabajo en curso»). Páginas aún sin escribir.
+- **2026-10-19** — Sitio reconstruido: el antiguo `index.html` (fórmulas con fracciones HTML hechas a mano)
+  se sustituyó por portada + 5 temas con KaTeX, explicaciones ampliadas, problemas del curso recalculados,
+  bibliografía verificada, vídeos verificados, `js/lta.js` (17 widgets) y `software/ltx`. Ficha `repaso/fisica-em.html`.
 
 - **2026-10-18** — Reorganización: `Conferencias`→`01-Conferencias` (+ PDFs de guías de onda y
   Encuentros 2A/2B/2C), `Evaluaciones y Tareas`→`04-…`, `Libros` + 4 libros sueltos→`05-Bibliografia`,
