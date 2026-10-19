@@ -49,6 +49,55 @@
 - Circuitos en régimen sinusoidal, impedancia, potencia, máxima transferencia → `cursos/07-Circuito/`.
 - Decibelios (dB, dBm), logaritmos.
 
+## Trabajo en curso (2026-10-19) — reconstrucción del sitio
+
+Plan: sustituir el `index.html` antiguo (fracciones hechas a mano) por portada + `temas/`
+con KaTeX y la estructura compartida (`../assets/css/course.css`, `../assets/js/course.js`):
+`t1-teoria-general.html` (C1 + 1.ª Evaluación), `t1b-carta-smith.html` (C2), `t2-guias-de-onda.html`
+(clase GO + Tarea GO), `t2b-lineas-planares.html` (microcinta Pozar 3.8, coplanar Simons 2.2.3),
+`t3-acoplamiento.html` (2A, 2B, 2C, balun).
+
+**Hecho (sin enlazar aún):** `js/lta.js` (17 widgets: onda estacionaria, γ/Z₀, |Γ|↔ROE↔RL, Zin(l),
+circuito de la 1.ª Evaluación, λ/4 y su ancho de banda, transformación bilineal, carta de Smith,
+modos de guía rectangular + campos TE/TM, guía circular, microcinta análisis/síntesis, CPW,
+stub simple con |Γ|(f), doble stub con zona prohibida, binomial/Chebyshev, exponencial; ids en el
+código). `software/ltx/` (módulos lineas, stubs, multiseccion, guias, planares; **falta** `__main__.py`
+CLI, `pyproject.toml`, tests y README). Ningún widget probado todavía en navegador.
+
+**Bibliografía verificada:** Pozar 4.ª ed. 2012 = impresa **+20** (2.1 p.48, 2.3 p.56, 2.4 Smith 63–72,
+2.5 λ/4 72–76, 2.7 78–85, 3.1 p.96, 3.3 rect. 110–121, 3.4 circ. 121–130, 3.5 coax 130, 3.8 microcinta
+147–153, 3.10 p.154, 5.1 p.229, 5.2 stub 234–241, 5.3 doble 241–246, 5.4 λ/4 246–250, 5.5 p.250,
+5.6 binomial 252–256, 5.7 Chebyshev 256–261, 5.8 tapered 261–266, ap. F p.719 (latón 2,564·10⁷),
+ap. G p.719 (teflón 2,08/0,0004), ap. I guías WR p.720, balun p.594). Orfanidis rev. 1-ago-2016 =
+impresa **+37** (cap. 9 guías desde p.363, 9.4 p.374, 9.9 p.384; 11.1 p.535, 11.3 p.542, 11.6 p.553,
+11.12 p.566, 11.14 Smith p.572; 13.3 Chebyshev p.617; 13.8 stub p.639; 13.9 p.643; 13.10 p.645).
+Simons (CPW) = **+20**: 2.2.3 pp.20–21. Tocci/Boylestad no aplican.
+
+**Soluciones calculadas con `ltx` (verificadas):**
+- C1 TI4 (L = 0,2 µH/m): γ = 0,226 + j24,33, Z₀ = 25,82 + j0,034 Ω; sin pérdidas Z₀ = 25,82. TI5: ROE 3 → 75 %
+  entregado. TI6.2: λ/4 = 25 cm → 300 MHz.
+- C2: 30+j100/50: Γ = 0,796∠50°, RL 1,98 dB, ROE 8,82. TI2 75+j42,5/300: 0,607∠162,8°, ROE 4,09.
+  P2: λ = 6,25 cm, l = 0,32λ, Zin = 18,99 − j20,55, ROE 4,27 (= curso). P3: Γ = 0,707∠45°, ROE 5,83,
+  Zin = 58,1 − j162,3 Ω. P4: ZL = 55,6 + j102,6 Ω, Γ = 0,6∠80°, 1.er máx a 0,111λ, Zmáx = 400 Ω.
+  P5 (300+j100, 550 Ω, 25 MHz): ROE 1,92; en Vmín (0,4604λ = 5,53 m) Zt = 397 Ω, D ≈ 5,5 cm (mejor);
+  en Vmáx (0,2104λ) Zt = 762 Ω, D ≈ 1,14 m (impracticable); l = 3 m (1,5 m con εr = 4). Ej 3.8: 66,7/150 Ω.
+- 1.ª Evaluación (interpretación: interruptor en el extremo de un stub λ/4): S1 cerr./S2 abierto → B;
+  ambos abiertos → ninguna; ambos cerrados → A y B (Z₀/2); S1 abierto/S2 cerrado → A (el enunciado
+  repite el caso 2 como 4, probable errata).
+- 2A: 15+j10/50 stub paralelo CA d = 0,044λ l = 0,147λ / d = 0,387λ l = 0,353λ (= curso); CC: l = 0,397/0,103;
+  serie CA: d = 0,137 l = 0,103 / d = 0,294 l = 0,397; coax εr4 2 GHz: d = 0,33 cm, l = 1,10 cm.
+- 2B: Pozar 5.4 (60−j80, λ/8): b₁ = −0,114/1,314, b₂ = −1,38/3,38; CA l = 0,482/0,350 y 0,146/0,204;
+  CC l = 0,232/0,100 y 0,396/0,454. Pozar 5.5: 10→50 Ω, ROE 1,5 → 29 %.
+- 2C: Chebyshev 60→120, N=2, ROE 1,105: Z₁ = 73,15, Z₂ = 98,4 Ω, θm = 59,9°, BW 67 %. Rómbica 250→600:
+  aL = 0,875; **errata del curso**: |Γ|máx = ½ln 2,4 = 0,438 (no 0,87). Exp 50→100, Γ ≤ 0,05 en 100 %:
+  βL₁ = 5,39 → L = 1,72λ₀ (curso 1,75λ₀ leyendo la gráfica); Chebyshev N = 2,98 → 3 (0,75λ₀).
+- Tarea GO: P1 Hz ∝ cos(200πx) → TE₂₀ (fc = 30 GHz), Ey = (ωµ/200π)H₀ sen(200πx) sen(ωt−βz),
+  Hx = −(β/200π)H₀ sen(200πx) sen(ωt−βz). P2 bandas monomodo: guía1 3,75–7,49; guía2 6,25–11,53;
+  guía3 6,25–12,49; circular r = 1,2 cm 7,32–9,56 GHz → 8–9 GHz: guías 2, 3, 4; comercial WR-90
+  (2,286×1,016 cm, 8,2–12,4 GHz), latón a 9 GHz αc = 0,182 dB/m. P3 = Pozar ej. 3.1: 9,72/19,44/24,19 GHz,
+  a 15 GHz αd = 1,03 dB/m, αc = 0,434 dB/m.
+- Clase GO: tabla p′₂₁ «30.54» es errata de 3,054; TM₀₁ usa 2,405 (curso redondea 2,45 → λc = 2,61a).
+
 ## Estado
 
 El `index.html` actual (~115 KB, de la etapa anterior) cubre: qué es una LTx, ondas TEM/TE/TM,
@@ -79,6 +128,9 @@ exacta, prerrequisitos, FAQ, enlaces) y migrarlo a `../assets/css/base.css` si c
 - Guía de instalación de GNU Octave y de PCAAD 5 (Windows/Wine).
 
 ## Bitácora
+
+- **2026-10-19** — Leídos todos los materiales; bibliografía verificada; `js/lta.js` y `software/ltx`
+  (borrador) escritos; soluciones calculadas (ver «Trabajo en curso»). Páginas aún sin escribir.
 
 - **2026-10-18** — Reorganización: `Conferencias`→`01-Conferencias` (+ PDFs de guías de onda y
   Encuentros 2A/2B/2C), `Evaluaciones y Tareas`→`04-…`, `Libros` + 4 libros sueltos→`05-Bibliografia`,
