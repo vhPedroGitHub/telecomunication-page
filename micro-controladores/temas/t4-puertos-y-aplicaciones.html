@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T4 · Puertos, ADC, teclado, display y motor de paso — Microcontroladores</title>
+  <meta name="description" content="Señales del 8051, puertos de E/S, conexión de LED, bocinas e interruptores, atención por encuesta, conversor A/D y unidades de ingeniería, display de 7 segmentos multiplexado, teclado matricial y motor de paso. Conferencias C5–C8, CP3, CP4, LAB2, LAB3.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/micro.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/micro.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="../#temas" aria-current="page">Temas</a><a href="../simulador.html">Simulador</a><a href="../#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema 4 · Conferencias C5, C6, C7 y C8 · CP3 y CP4 · LAB2 y LAB3</p>
+<h1>Puertos de E/S y aplicaciones: ADC, display, teclado y motor de paso</h1>
+<p class="lead">Un microcontrolador es útil cuando toca el mundo físico. Aquí aprendemos a conectar dispositivos a los puertos respetando sus características <strong>eléctricas</strong> (corrientes y tensiones) y a atenderlos por <strong>encuesta</strong>: el programa pregunta periódicamente por su estado. Las mismas técnicas —tablas, barridos, temporización— reaparecen en todos los sistemas del curso.</p>
+
+<div class="objectives"><strong>Objetivos (C5–C8)</strong><ul>
+  <li>Conocer las señales de reloj y RESET del 8051 y la estructura de sus puertos.</li>
+  <li>Saber conectar dispositivos de E/S y atenderlos por encuesta.</li>
+  <li>Saber adquirir datos con un conversor A/D y convertirlos a unidades de ingeniería.</li>
+  <li>Saber programar el refrescamiento de un display de 7 segmentos multiplexado y el barrido de un teclado matricial.</li>
+  <li>Dominar las secuencias de control de un motor de paso.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">ley de Ohm, transistor como interruptor y niveles lógicos</span>
+<p>Un LED en serie con una resistencia: \(R=(V_{\text{fuente}}-V_{\text{LED}})/I_{\text{LED}}\). Un transistor NPN en saturación es un interruptor: con \(I_B\ge I_C/\beta\) (en la práctica 2–5 veces más) conduce entre colector y emisor con \(V_{CE,\text{sat}}\approx0{,}2\) V. Niveles lógicos: \(V_{OH}\), \(V_{OL}\) (salidas) y \(V_{IH}\), \(V_{IL}\) (entradas), con sus corrientes máximas \(I_{OH}\), \(I_{OL}\). Repaso: <a href="../../repaso/electronica-analogica.html#transistor">transistor como interruptor</a> · <a href="../../repaso/electronica-analogica.html#niveles">niveles lógicos y pull-up</a> · <a href="../../repaso/circuitos.html#rc">circuito RC (RESET, antirrebote)</a>.</p></div>
+
+<h2 id="senales">1. Señales del 8051 (C5)</h2>
+<ul>
+  <li><strong>Alimentación</strong> Vcc y GND.</li>
+  <li><strong>X1, X2</strong>: cristal externo del oscilador interno (1–12 MHz en el original; hasta ~40 MHz en los actuales). Determina la duración del ciclo de máquina (12 pulsos en el original, 1–2 en los actuales).</li>
+  <li><strong>RESET</strong> (activo en «1»): debe permanecer activo un tiempo mínimo (hoja de datos) para inicializar los registros. Conexión típica: condensador de 10 µF a Vcc y resistencia de 4,7 kΩ a GND (al encender, el condensador descargado mantiene RESET alto unos milisegundos).</li>
+  <li><strong>EA/</strong> (habilitación de la ROM interna, a Vcc), <strong>ALE</strong> y <strong>PSEN/</strong> (memoria externa): no relevantes en el curso.</li>
+  <li><strong>Puertos P0–P3</strong> (32 líneas). P3 tiene <strong>funciones alternativas</strong>:</li>
+</ul>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Pin</th><th>P3.0</th><th>P3.1</th><th>P3.2</th><th>P3.3</th><th>P3.4</th><th>P3.5</th><th>P3.6</th><th>P3.7</th></tr></thead>
+  <tbody><tr><td>Función</td><td>RxD</td><td>TxD</td><td>INT0/</td><td>INT1/</td><td>T0</td><td>T1</td><td>WR/</td><td>RD/</td></tr></tbody>
+</table></div>
+
+<h2 id="puertos">2. Puertos de E/S</h2>
+<p>En un sistema con µP, un <strong>puerto de entrada</strong> es un <em>buffer de tercer estado</em> (se habilita con la dirección decodificada y RD/) y un <strong>puerto de salida</strong> es un <em>almacenador</em> (biestable D que retiene lo escrito; se carga con la dirección y WR/). Pueden compartir dirección porque se distinguen por RD/ y WR/.</p>
+<p>En un µC los puertos se manejan, como todos los periféricos, a través de SFR, y casi siempre son de <strong>E/S</strong> (cada línea puede ser entrada o salida). En el <strong>8051 original</strong>:</p>
+<ul>
+  <li>Cuatro puertos de 8 bits con salida de <strong>drenador abierto</strong> (AND cableado entre el latch y el pin) y sin registro de dirección.</li>
+  <li><strong>P1, P2 y P3</strong> tienen resistencias de pull-up internas; <strong>P0 no</strong>: como salida lógica necesita pull-up externa.</li>
+  <li>Con RESET valen FFh: ya sirven de entrada. <strong>Para usar un pin como entrada hay que escribir un 1</strong> en su latch; si se escribe un 0, siempre se leerá 0.</li>
+  <li>Instrucciones que leen el <strong>pin</strong> (<code>mov A,P2</code>) y las de lectura-modificación-escritura que leen el <strong>latch</strong> (<code>anl P2,#0Fh</code>, <code>cpl P1.0</code>, <code>setb</code>, <code>inc</code>…).</li>
+</ul>
+<h3 id="electrica">2.1 Conexión de dispositivos: lo eléctrico importa</h3>
+<p>Para conectar a una <strong>salida</strong>: niveles \(V_{OH}\), \(V_{OL}\) y su variación con la corriente; corrientes máximas \(I_{OH}\), \(I_{OL}\) (del orden de mA). Para una <strong>entrada</strong> CMOS solo hay que garantizar \(V_{IH}\) o \(V_{IL}\) (corrientes de µA). Un LED se puede activar con «1» o con «0»; una bocina de 30–50 mA supera lo que da un pin: necesita un <strong>transistor</strong> de interfaz.</p>
+<div class="sim" id="w-led">
+  <div class="sim-title">Resistencia limitadora de un LED (propuesto de la C5)</div>
+  <div class="controls">
+    <label>Vcc (V) <input type="number" id="ld-vcc" value="5" step="0.1" style="width:70px"></label>
+    <label>VOH (V) <input type="number" id="ld-voh" value="4.6" step="0.05" style="width:70px"></label>
+    <label>VOL (V) <input type="number" id="ld-vol" value="0.32" step="0.01" style="width:70px"></label>
+    <label>VLED (V) <input type="number" id="ld-vd" value="2" step="0.1" style="width:70px"></label>
+    <label>ILED (mA) <input type="number" id="ld-i" value="6" step="0.5" style="width:70px"></label>
+    <label>Imáx del pin (mA) <input type="number" id="ld-imax" value="10" step="1" style="width:70px"></label>
+  </div>
+  <div class="readout" id="ld-out"></div>
+</div>
+<p>Un <strong>interruptor o tecla</strong> se conecta a una entrada con una resistencia (≈10 kΩ, puede ser la pull-up interna) que fija el nivel cuando está abierto; cerrado, lleva el pin a 0.</p>
+<h3 id="encuesta">2.2 Atención por encuesta</h3>
+<p>El mecanismo más simple: el programa pregunta periódicamente (o continuamente) por el estado del periférico. <code>jb P2.6,$</code> no sale de ahí hasta que P2.6 = 0 (en C: <code>while (P2_6);</code>). Es ineficiente para el procesador y el periférico, pero válido cuando el procesador no tiene otra cosa que hacer. La alternativa es la <a href="t5-interrupciones.html">interrupción</a>.</p>
+
+<h2 id="adc">3. Conversor A/D y unidades de ingeniería (C6)</h2>
+<p>Un ADC convierte una tensión analógica en un número de \(n\) bits (\(2^n\) valores; error de cuantificación de ±½ LSB). La conversión tarda un <strong>tiempo de conversión</strong>. El más común en µC es el de <strong>aproximaciones sucesivas</strong>. Con \(V_{\text{ref}}=5\) V y 8 bits, \(V_{\text{in}}=2{,}17\) V da \(\lfloor2{,}17/5\cdot256\rfloor\approx6\text{Fh}\) (111).</p>
+<p>Señales del ADC genérico del curso: entrada analógica, datos D0–7, <strong>INIC/</strong> (pulso de inicio, ≥ 2 µs) y <strong>FIN/</strong> (fin de conversión, ≤ 1 ms después). Conexión típica: D0–7 a P0, INIC/ a P3.0, FIN/ a P3.2 (que luego será INT0/). Por encuesta: dar el pulso (<code>clr P3.0 / nop / setb P3.0</code>), esperar <code>jb P3.2,$</code> y leer <code>mov A,P0</code>.</p>
+<h3 id="ui">3.1 Conversión a unidades de ingeniería</h3>
+<p>La salida está en <strong>unidades de conversión</strong> (UC: 0–255); el usuario quiere <strong>unidades de ingeniería</strong> (UI: °C, V, %…). Con una función transferencial lineal (C6: 0–255 → 10–70 °C):</p>
+$$\text{UI}=\text{UC}\cdot\frac{70-10}{255}+10$$
+<p><strong>Métodos</strong>: (1) resolver la ecuación (la división es el problema; se puede simplificar o hacer por restas sucesivas); (2) <strong>aproximar el denominador a una potencia de 2</strong>: dividir entre 256 es quedarse con el byte alto del producto (<code>mul AB</code> deja el resultado en B:A → B es el cociente entre 256), y el error de cuantificación lo permite; (3) <strong>tablas</strong> en memoria de programa indexadas por UC (<code>movc</code>): muy rápido y admite funciones no lineales, pero el tamaño crece exponencialmente con la resolución.</p>
+<div class="sim" id="w-ui">
+  <div class="sim-title">Conversión UC → UI</div>
+  <div class="controls">
+    <label>Bits <select id="ui-n"><option>8</option><option>10</option><option>12</option></select></label>
+    <label>UC <input type="number" id="ui-uc" value="128" min="0" max="255" style="width:80px"></label>
+    <label>UI mín <input type="number" id="ui-min" value="10" style="width:70px"></label>
+    <label>UI máx <input type="number" id="ui-max" value="70" style="width:70px"></label>
+  </div>
+  <div class="readout" id="ui-out"></div>
+</div>
+<p>Un ADC interno (en muchos 8051 actuales, p. ej. C8051F34x) tiene multiplexor de entradas, registros de datos (ADDATA), de control (ADCSR), bandera de fin (ADIF) y referencias \(V_{\text{ref}}\): se maneja igual, pero a través de SFR.</p>
+
+<h2 id="siete">4. Display de lámparas de 7 segmentos (C7)</h2>
+<p>Cada lámpara son 8 LED (a–g y dp). <strong>Ánodo común</strong>: el ánodo a Vcc, el segmento se enciende con «0». <strong>Cátodo común</strong>: el cátodo a GND, se enciende con «1». Cada LED consume 3–10 mA y necesita su resistencia.</p>
+<div class="sim seg7" id="w-seg">
+  <div class="sim-title">Constructor de códigos de 7 segmentos</div>
+  <div class="two">
+    <div><svg id="sg-svg" viewBox="0 0 64 104" role="group" aria-label="Lámpara: pulse los segmentos"></svg></div>
+    <div>
+      <div class="controls" style="flex-direction:column;align-items:flex-start">
+        <label>Tipo <select id="sg-pol"><option value="ac">ánodo común (activo en 0)</option><option value="cc">cátodo común (activo en 1)</option></select></label>
+        <label>Conexión <select id="sg-ord"><option value="a0">a → bit 0 … g → bit 6, dp → bit 7</option><option value="a7">a → bit 7 … g → bit 1, dp → bit 0</option></select></label>
+        <label>Bit del dp <select id="sg-b7"><option value="0">sin conectar (0), como en el curso</option><option value="dp">dp apagado</option></select></label>
+        <label>Cargar dígito <select id="sg-dig"><option value="">—</option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option></select></label>
+      </div>
+    </div>
+  </div>
+  <div class="readout" id="sg-out"></div>
+  <div class="readout" id="sg-tab"></div>
+</div>
+<div class="box warn"><span class="box-title">Comprueba las tablas de las conferencias</span><p>Con ánodo común, a → bit 0 y bit 7 a 0, la tabla correcta es <code>40h, 79h, 24h, 30h, 19h, 12h, 02h, 78h, 00h, 18h</code> (C4a, C12, C14). En la C10 y en la C16 aparecen <code>44h, 60h, 31h</code> para el 2, 3 y 4: con esa misma conexión mostrarían símbolos erróneos. ¿Es uno de los «errores» que pide encontrar la C10? Compruébalo con el constructor.</p></div>
+<h3 id="multiplex">4.1 Display multiplexado</h3>
+<p>Con más de dos lámparas no alcanzan los puertos: se <strong>multiplexan en tiempo</strong>. Los segmentos homónimos de todas las lámparas se unen (un solo puerto de 8 bits) y el terminal común de cada una va a un elemento de conmutación (transistor). Se enciende <strong>una lámpara a la vez</strong> durante \(T_{\text{ref}}/N\); gracias a la persistencia de la retina y a la inercia lumínica del LED, si cada lámpara se refresca al menos cada \(T_{\text{ref}}\approx20\) ms no se aprecia parpadeo. Como cada LED solo está encendido 1/N del tiempo, la corriente de pico debe ser mayor para el mismo brillo.</p>
+<p><strong>RAM de display</strong>: la aplicación <em>escribe</em> en N bytes de RAM los códigos a mostrar; la rutina de refrescamiento <em>lee</em> periódicamente uno de ellos y lo envía a su lámpara, sin depender de la aplicación:</p>
+<pre><code>Refresca_UNA_Lampara:        ; llamar cada Tref/N (p. ej. 5 ms con 4 lámparas)
+        mov  A,Indice        ; 0..N-1
+        add  A,#RAM_Disp
+        mov  R0,A
+        mov  P2,#0FFh        ; apagar todas (evita "fantasmas")
+        mov  P1,@R0          ; código 7 seg de la lámpara Indice
+        mov  P2,Scan         ; activar SU terminal común (un bit a 0)
+        mov  A,Scan
+        rl   A               ; siguiente código de barrido
+        mov  Scan,A
+        inc  Indice
+        mov  A,Indice
+        cjne A,#N,fin
+        mov  Indice,#0       ; volver a la primera
+        mov  Scan,#11111110b
+fin:    ret</code></pre>
+
+<h2 id="teclado">5. Teclado matricial (C7)</h2>
+<p>Un conjunto de líneas en filas y columnas: al pulsar una tecla se conecta una fila con una columna. Conexión típica: <strong>filas a salidas</strong>, <strong>columnas a entradas</strong> con resistencias a Vdd (pueden ser las pull-up del puerto). Sin tecla pulsada, todas las columnas leen 1. El <strong>rebote</strong> mecánico produce cambios de nivel durante ≈5 ms: se elimina esperando o volviendo a leer pasado ese tiempo.</p>
+<p><strong>Barrido</strong> (cada ≈20 ms, como el refresco del display —se pueden combinar—): poner una fila a 0 y las demás a 1 y leer las columnas; si alguna es 0, hay tecla en esa fila y la combinación <em>código de barrido – columnas</em> es única. <strong>Identificación</strong>: con una tabla de \(p\times q\) bytes en memoria de programa, la tecla de la fila \(i\) y columna \(j\) está en la posición \(q\cdot i+j\) (<code>movc A,@A+DPTR</code>).</p>
+<div class="sim" id="w-kp">
+  <div class="sim-title">Barrido de un teclado de 4 × 3 (filas P1.0–P1.3, columnas P2.0–P2.2)</div>
+  <div class="two"><div class="kp" id="kp-keys" role="group" aria-label="Teclado"></div><div class="readout" id="kp-out"></div></div>
+</div>
+<p>Otro método (C7): dos tablas, una con las combinaciones <em>barrido–columnas</em> de cada tecla y otra con sus códigos; se busca la coincidencia en la primera y se usa el índice en la segunda. Inconveniente: dos teclas de la misma fila dan un código que no está en la tabla. Otra conexión: filas y columnas con resistencias a GND; poner todas las filas a 1, leer columnas; invertir el papel de filas y columnas, leer filas: la combinación columna–fila identifica la tecla.</p>
+
+<h2 id="motor">6. Motor de paso (C8)</h2>
+<p>Motor cuyo eje gira un ángulo exacto (paso) con cada excitación: convierte pulsos eléctricos en movimientos discretos, ideal para posicionar. Valores comunes: 1,8° (200 pasos/vuelta), 3,6° (100), 7,5° (48), 15° (24). Lento (2–3 vueltas/s, frecuencia de pasos &lt; 1 kHz) y con corrientes de 60–500 mA: necesita un <strong>driver</strong> (ULN2003A: 7 darlington con diodos de protección). Tipos: imán permanente, reluctancia variable, híbridos; <strong>unipolar</strong> (5 o 6 terminales, con toma central) y <strong>bipolar</strong> (4 terminales, necesita puente H).</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Secuencia</th><th>Fases excitadas</th><th>Códigos (DCBA)</th><th>Características</th></tr></thead>
+  <tbody>
+    <tr><td>Normal (<em>wave drive</em>)</td><td>una a la vez</td><td class="mono">01h, 02h, 04h, 08h</td><td>Rotor alineado con un polo; poco torque.</td></tr>
+    <tr><td>Paso doble (<em>full step</em>)</td><td>dos a la vez</td><td class="mono">03h, 06h, 0Ch, 09h</td><td>Rotor entre dos polos; mayor torque: la más usada.</td></tr>
+    <tr><td>Medio paso (<em>half step</em>)</td><td>alterna una y dos</td><td class="mono">01h, 03h, 02h, 06h, 04h, 0Ch, 08h, 09h</td><td>El doble de resolución (pasos de la mitad del ángulo).</td></tr>
+  </tbody>
+</table></div>
+<div class="sim" id="w-step">
+  <div class="sim-title">Motor de paso unipolar</div>
+  <div class="controls">
+    <label>Secuencia <select id="st-mode"><option value="full">full step</option><option value="wave">wave drive</option><option value="half">half step</option></select></label>
+    <label>Grados/paso <input type="number" id="st-deg" value="3.6" step="0.1" style="width:70px"></label>
+    <button class="btn ghost" id="st-ccw" type="button">⟲ paso</button><button class="btn ghost" id="st-cw" type="button">paso ⟳</button>
+    <label>Sentido <select id="st-dir"><option value="1">horario</option><option value="-1">antihorario</option></select></label>
+    <button class="btn" id="st-run" type="button">▶ Girar</button>
+  </div>
+  <div class="two"><canvas id="st-cv" aria-label="Rotor y bobinas del motor"></canvas><div class="readout" id="st-out"></div></div>
+</div>
+<div class="example"><h4>Ejemplo 6.1 — Control de movimiento (C8)</h4>
+<p>Motor unipolar de 3,6°/paso, full step, 10 ms por paso. a) Una vuelta por segundo: 100 pasos/s × 3,6° = 360°/s ⇒ basta enviar un valor de la tabla cada 10 ms durante 100 pasos. b) 72° ⇒ 72/3,6 = <strong>20 pasos</strong>. c) 36° en sentido contrario ⇒ <strong>10 pasos</strong> recorriendo la tabla en orden inverso. El programa completo (tabla + demora de 10 ms) está en el <a href="../simulador.html?ej=7">simulador (ejemplo 8)</a>: mira cómo cambia P1.</p></div>
+
+<h2 id="cp3">7. Guía de la CP3: puertos y encuesta</h2>
+<div class="example"><h4>Ejercicio 1 — Adquisición de 50 muestras por encuesta</h4>
+<div class="step"><span class="n">a</span><div><p><strong>Hardware</strong> (Vcc = 5 V, pines de 10 mA): ADC con D0–7 → P0 (con pull-up externa), INIC/ → P3.0, FIN/ → P3.2; dos lámparas de ánodo común a P1 y P2 con resistencias \((5-2-0{,}32)/6\text{ mA}\approx470\ \Omega\); interruptor a P3.3 con pull-up; bocina (50 mA, 1 V) con transistor NPN: \(R_C=(5-1-0{,}2)/50\text{ mA}=76\ \Omega\) (75 Ω) y \(R_B\) para \(I_B\approx2I_C/\beta\).</p></div></div>
+<div class="step"><span class="n">b</span><div><p><strong>Inicialización</strong>: puntero a la tabla 7 seg, contador de muestras, puntero al buffer, display en «00», bocina apagada.</p></div></div>
+<div class="step"><span class="n">c</span><div><p><strong>Algoritmo</strong>: repetir 50 veces {pulso INIC → esperar FIN = 0 → leer P0 → guardar en @R0 → incrementar y mostrar el contador}; luego complementar la bocina cada 250 µs (2 kHz) mientras el interruptor esté abierto; después, lazo infinito hasta RESET.</p></div></div>
+<div class="step"><span class="n">e</span><div><p><strong>Limitaciones</strong>: las muestras se adquieren tan rápido como el ADC convierte (no hay período de muestreo controlado), el procesador no puede hacer nada más mientras espera, y la frecuencia de la bocina depende de la demora por software.</p></div></div>
+<div class="step"><span class="n">f</span><div><p><strong>Al conectar la alimentación</strong> los puertos valen FFh: en ánodo común todos los segmentos quedan apagados (display en blanco) hasta que el programa escribe «00».</p></div></div>
+</div>
+<div class="example"><h4>Ejercicio 2 — Temperatura con resolución de 1 °C y de 0,5 °C</h4>
+<p>UI = UC·60/255 + 10. Con 1 °C: <code>mov A,UC / mov B,#60 / mul AB</code> → B ≈ UC·60/256 (0–59) → sumar 10 → <code>mov B,#10 / div AB</code> → decenas en A, unidades en B → tablas. Con 0,5 °C hay que trabajar en medios grados: UC·120/256 (0–119) + 20, y mostrar el resultado entre 2 con la cifra decimal 0 o 5 (tres lámparas).</p></div>
+<div class="example"><h4>Ejercicio 3 — Secuencias de LED con 4 teclas</h4>
+<p>Cuatro teclas (A más prioritaria) en un puerto, 8 LED en otro, 0,5 s entre LED. Tablas en memoria de programa con las cuatro secuencias (derecha → izquierda: <code>01h, 02h, 04h…</code>; centro → extremos: <code>18h, 24h, 42h, 81h</code>; extremos → centro: <code>81h, 42h, 24h, 18h</code>) y un único bucle que recorre la tabla elegida: así el programa no repite código.</p></div>
+
+<h2 id="cp4">8. Guía de la CP4 y de los LAB2–LAB3</h2>
+<ul>
+  <li><strong>CP4 ej. 1</strong>: 200 muestras (necesita RAM de 256 bytes: 8052) cada 1 s con display multiplexado. Hay que combinar en un mismo lazo: refrescar una lámpara cada ≈5 ms, contar 200 refrescos = 1 s y entonces adquirir. La temporización por software se complica: es la motivación de los <a href="t6-temporizadores.html">timers</a>.</li>
+  <li><strong>CP4 ej. 2 y LAB3</strong>: teclado 4 × 3 (dígitos, B = borrar, E = enter), número de hasta 3 dígitos; si es &lt; 256 parpadea un LED a 1 Hz, si no, queda encendido. Claves: guardar los dígitos en BCD, convertir a binario con <code>mul</code> (centenas × 100 + decenas × 10 + unidades) vigilando el desbordamiento (B ≠ 0 o CY = 1 ⇒ ≥ 256), y mostrar «entrada por la derecha» desplazando la RAM de display.</li>
+  <li><strong>LAB2 (ADC0801)</strong>: CS/ y WR/ dan el inicio, INTR/ indica el fin, CS/ y RD/ habilitan las salidas de tercer estado. Resolución de 0,1 V con 5 V de referencia: décimas = UC·50/256 (byte alto de <code>mul AB</code> con B = 50), y se muestran las dos cifras con el punto decimal encendido en la primera. <strong>Fallo del modelo de Proteus</strong>: la primera vez hay que seleccionar el conversor y hacer una lectura falsa (pulso en RD/).</li>
+</ul>
+
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. Para leer un interruptor en P1.3 hay que…</p><div class="opts"><button class="opt" type="button">escribir 0 en P1.3</button><button class="opt" type="button" data-ok>tener un 1 en el latch de P1.3</button><button class="opt" type="button">configurar un registro de dirección</button></div><p class="why">Con drenador abierto, un 0 en el latch fuerza el pin a 0 siempre.</p></div>
+  <div class="q"><p>2. ¿Por qué P0 necesita resistencias externas como salida?</p><div class="opts"><button class="opt" type="button">porque es más rápido</button><button class="opt" type="button" data-ok>porque no tiene pull-up interna</button><button class="opt" type="button">porque es solo de entrada</button></div><p class="why">P1–P3 sí tienen pull-up interna.</p></div>
+  <div class="q"><p>3. Un display de 4 lámparas refrescado cada 20 ms: cada lámpara se enciende…</p><div class="opts"><button class="opt" type="button">20 ms cada 80 ms</button><button class="opt" type="button" data-ok>5 ms cada 20 ms</button><button class="opt" type="button">1 ms cada 4 ms</button></div><p class="why">\(T_{\text{ref}}/N=20/4\).</p></div>
+  <div class="q"><p>4. Con 1,8°/paso en half step, una vuelta son…</p><div class="opts"><button class="opt" type="button">200 pasos</button><button class="opt" type="button" data-ok>400 medios pasos</button><button class="opt" type="button">100 pasos</button></div><p class="why">El medio paso divide el ángulo entre 2.</p></div>
+</div>
+
+<h2 id="biblio">Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>MacKenzie y Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007</td><td>2</td><td>2.2 Descripción de las terminales · 2.3 Estructura de los puertos de E/S · 2.4 Sincronización y el ciclo de máquina</td><td>pp. 18–24 (PDF 33–39)</td><td>Señales, puertos, ciclo de máquina</td></tr>
+    <tr><td>MacKenzie y Phan (ídem)</td><td>11</td><td>11.3 Interfaz a un teclado numérico hexadecimal · 11.4 Interfaz con varios LEDs de 7 segmentos · 11.6 Interfaz con un altavoz · 11.12 Entrada analógica · 11.15 Interfaz a motor paso a paso</td><td>pp. 265–272, 276, 300–302, 310 (PDF 280–287, 291, 315–317, 325)</td><td>Teclado, display, bocina, ADC, motor (en ensamblador)</td></tr>
+    <tr><td>MacKenzie y Phan (ídem)</td><td>12</td><td>12.2 Interfaz de teclado numérico hexadecimal · 12.11 Entradas analógicas · 12.14 Interfaz para un motor paso a paso</td><td>pp. 319, 342, 347 (PDF 334, 357, 362)</td><td>Los mismos ejemplos en C</td></tr>
+    <tr><td>Intel, <em>MCS-51 User's Manual</em>, 1994</td><td>3</td><td>Port Structures and Operation · Writing to a Port · Port Loading and Interfacing · Read-Modify-Write Feature</td><td>pp. 3-6 a 3-9 (PDF 114–117)</td><td>Estructura eléctrica de los puertos</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — UPV, <a href="https://www.youtube.com/watch?v=8AHeBojJl3g">«Arquitectura de los puertos de E/S digital en la familia 8051»</a> (8:50).</li>
+  <li><strong>Vídeo</strong> — Intronic, <a href="https://www.youtube.com/watch?v=i9cEgcEVsSI">«Anti-rebote (debounce) para botones: con programación, discreto y con IC»</a> (31:31).</li>
+  <li><strong>Vídeo</strong> — Clasecitas Piuck, <a href="https://www.youtube.com/watch?v=8V6K1yWx0DA">«Motores a pasos: secuencia, microcontrolador, unipolar, bipolar»</a> (14:33).</li>
+  <li><strong>Vídeo</strong> — Study Microcontrollers, <a href="https://www.youtube.com/watch?v=XzzHbw4n6Ew">«Lecture 23: Assembly language program to interface seven segment display»</a> (27:29, inglés).</li>
+  <li><strong>Vídeo</strong> — EROTECH Solutions, <a href="https://www.youtube.com/watch?v=iyVTRsud2xU">«Keypad interfacing with 8051»</a> (18:38, inglés).</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué al leer P1 a veces obtengo 0 aunque el interruptor esté abierto?</summary><div><p>Porque escribiste un 0 en ese bit antes (por ejemplo, al usarlo como salida). El latch en 0 fuerza el pin. Escribe 1 en los bits que vayas a leer.</p></div></details>
+  <details><summary>¿Puedo conectar la bocina directamente a un pin?</summary><div><p>No si necesita más corriente que \(I_{OL}\)/\(I_{OH}\) del pin (30–50 mA frente a unos 10 mA): usa un transistor y, si es inductiva, un diodo de protección.</p></div></details>
+  <details><summary>¿Cada cuánto debo barrer el teclado?</summary><div><p>Cada ≈20 ms: más rápido que la pulsación humana y más lento que el rebote (≈5 ms). Si se combina con el refresco del display, en cada interrupción de 5 ms se refresca una lámpara y se barre una fila.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencias C5 «Señales y puertos de E/S», C6 «Conversor A/D y conversión a UI», C7 «Atención a teclado y a display», C8 «Motor de paso»; CP3, CP4; LAB2 (ADC0801) y LAB3 (teclado y display) (Dr. A. J. Cabrera Sarmiento y colectivo, CUJAE). Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

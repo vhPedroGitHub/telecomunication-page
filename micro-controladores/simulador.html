@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulador 8051 — Microcontroladores</title>
+  <meta name="description" content="Simulador del microcontrolador 8051 en el navegador: ensamblador, ejecución paso a paso y hacia atrás, registros, RAM, SFR, puertos con interruptores, display de 7 segmentos, temporizadores, interrupciones y puerto serie.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <link rel="stylesheet" href="css/sim.css">
+  <script src="../assets/js/theme.js"></script>
+  <script defer src="js/sim8051.js"></script>
+  <script defer src="js/simui.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../">← Portal</a>
+    <span class="title">Microcontroladores · 8051</span>
+    <nav class="tabs" aria-label="Secciones de la asignatura">
+      <a href="./">Inicio</a>
+      <a href="./#temas">Temas</a>
+      <a href="simulador.html" aria-current="page">Simulador</a>
+      <a href="./#software">Software</a>
+    </nav>
+  </div>
+</header>
+
+<main class="simwrap" id="sim">
+  <div class="sim-head">
+    <h1>Simulador 8051</h1>
+    <p class="meta">Ensamblador compatible con la sintaxis del curso (ASEM-51 / MCU 8051 IDE): <code>ORG</code>, <code>EQU</code>, <code>DB</code>, <code>DW</code>, <code>END</code>, etiquetas, <code>$</code>, <code>HIGH()</code>/<code>LOW()</code>, números <code>0Fh</code>, <code>1010b</code>, <code>'A'</code>. <code>JMP</code>/<code>CALL</code> genéricos se ensamblan como <code>LJMP</code>/<code>LCALL</code>. Modelo: 8051/8052 con 256 bytes de RAM interna, ciclo de máquina configurable. Atajos: <kbd>F7</kbd> paso, <kbd>Alt</kbd>+<kbd>F7</kbd> atrás, <kbd>F5</kbd> ejecutar/pausar.</p>
+  </div>
+
+  <div class="toolbar">
+    <label>Ejemplo <select id="ex"></select></label>
+    <button class="btn" id="b-asm" type="button">Ensamblar</button>
+    <button class="btn ghost" id="b-reset" type="button" title="RESET">⟲ Reset</button>
+    <button class="btn ghost" id="b-back" type="button" title="Alt+F7">◀ Atrás</button>
+    <button class="btn ghost" id="b-step" type="button" title="F7">Paso ▶</button>
+    <button class="btn" id="b-run" type="button" title="F5">▶▶ Ejecutar</button>
+    <label>Velocidad <select id="speed">
+      <option value="1">1 instr./cuadro</option><option value="20">20 instr./cuadro</option><option value="500">500 instr./cuadro</option>
+      <option value="rt" selected>tiempo real</option><option value="max">máxima</option></select></label>
+    <label>Ciclo de máquina <select id="mc"><option value="1">1 µs (12 MHz, 8051 original)</option><option value="2">2 µs</option><option value="5">5 µs</option><option value="0.0833">83 ns (12 MHz, 1 ciclo/CM)</option></select></label>
+    <button class="btn ghost" id="b-hex" type="button">Descargar .hex</button>
+  </div>
+  <div class="status" id="status" role="status"></div>
+
+  <div class="simgrid">
+    <section class="pane pane-code">
+      <h2>Programa</h2>
+      <textarea id="src" spellcheck="false" aria-label="Código fuente en ensamblador"></textarea>
+      <h2>Listado <span class="meta">(clic en una línea = punto de ruptura)</span></h2>
+      <div class="listing" id="listing" aria-label="Listado ensamblado"></div>
+    </section>
+
+    <section class="pane pane-cpu">
+      <h2>Procesador</h2>
+      <div class="regs" id="regs"></div>
+      <div class="psw" id="psw"></div>
+      <h2>RAM interna <span class="meta">(00–FFh · resaltado: cambió en el último paso)</span></h2>
+      <div class="ram" id="ram"></div>
+      <h2>SFR</h2>
+      <div class="sfrs" id="sfrs"></div>
+    </section>
+
+    <section class="pane pane-io">
+      <h2>Puertos</h2>
+      <p class="meta">Cada pin muestra su nivel (latch AND dispositivo externo). El interruptor de debajo, cerrado, lleva el pin a «0». En P0 puede fijarse además un byte de entrada (p. ej. el dato de un conversor A/D).</p>
+      <div id="ports"></div>
+      <label class="inl">Byte externo en P0 <input type="text" id="p0in" value="FF" size="4" class="mono"></label>
+      <h2>Display de 7 segmentos</h2>
+      <div class="controls">
+        <label>Conectado a <select id="segport"><option value="2">P2</option><option value="12">P1 (decenas) y P2 (unidades)</option><option value="1">P1</option><option value="0">P0</option><option value="-1">ninguno</option></select></label>
+        <label>Tipo <select id="segpol"><option value="0">ánodo común (activo en 0)</option><option value="1">cátodo común (activo en 1)</option></select></label>
+      </div>
+      <div class="segs" id="segs"></div>
+      <p class="meta">Conexión del curso: segmento a → bit 0, b → bit 1, …, g → bit 6, dp → bit 7.</p>
+      <h2>Frecuencímetro</h2>
+      <label class="inl">Pin <select id="fpin"></select></label> <span class="mono" id="freq">—</span>
+      <h2>Temporizadores e interrupciones</h2>
+      <div class="readout" id="timers"></div>
+      <h2>Puerto serie (terminal)</h2>
+      <pre class="term" id="term" aria-live="polite"></pre>
+      <div class="controls">
+        <label class="inl">Enviar al 8051 <input type="text" id="rxin" size="12" placeholder="texto o AAh"></label>
+        <button class="btn ghost" id="b-rx" type="button">Enviar</button>
+        <button class="btn ghost" id="b-clr" type="button">Limpiar</button>
+      </div>
+    </section>
+  </div>
+  <p class="source-note">Simulador didáctico de elaboración propia. Los ejemplos reproducen programas de las conferencias C4, C4a, C10–C14 y de las CP 2 y LAB0 de la asignatura (Dr. A. J. Cabrera Sarmiento, CUJAE). No modela tiempos dentro del ciclo de máquina ni la memoria externa más allá de MOVX. Para el curso, el entorno oficial es MCU 8051 IDE / Proteus.</p>
+</main>
+<footer class="site wrap">Microcontroladores · <a href="./">Volver a la asignatura</a></footer>
+</body>
+</html>

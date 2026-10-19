@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T5 · Interrupciones — Microcontroladores</title>
+  <meta name="description" content="Mecanismo de interrupción en un microprocesador y en el 8051: solicitud, habilitación, prioridades, vectores, bits ocultos de nivel en servicio, RET y RETI, interrupciones externas, IE e IP. Conferencias C9 y C10, CP5, LAB4.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/micro.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/micro.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="../#temas" aria-current="page">Temas</a><a href="../simulador.html">Simulador</a><a href="../#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema 5 · Conferencias C9 y C10 · CP5 · LAB4</p>
+<h1>Interrupciones</h1>
+<p class="lead">Con la encuesta, el <em>programa</em> es responsable de detectar que un periférico necesita atención. Con la <strong>interrupción</strong>, lo detecta el <em>hardware</em>: el periférico «avisa» y el procesador interrumpe lo que hace, ejecuta una rutina de atención y vuelve. Es la base de cualquier sistema que haga varias cosas «a la vez».</p>
+
+<div class="objectives"><strong>Objetivos (C9, C10)</strong><ul>
+  <li>Conocer el mecanismo de interrupción en un µP en general y en el 8051 en particular.</li>
+  <li>Dominar los conceptos de habilitación, prioridades, fuentes y vectores de IT, y el mecanismo de prioridades del 8051.</li>
+  <li>Saber usar los registros asociados (IE, IP, TCON) y la diferencia entre RET y RETI.</li>
+  <li>Saber configurar las IT externas y programar sus rutinas de atención.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">subrutinas y stack, flancos</span>
+<p>Una interrupción es como un <code>call</code> que no está en el programa: usa la pila igual (guarda el PC, SP aumenta 2). Un <strong>flanco de caída</strong> es la transición 1 → 0 de una señal; un <strong>nivel bajo</strong> es el estado 0 mantenido. Repaso: <a href="t3-instrucciones.html#stack">subrutinas y stack (Tema 3)</a> · <a href="../../repaso/electronica-digital.html#secuencial">biestables y flancos</a>.</p></div>
+
+<h2 id="formas">1. Encuesta frente a interrupción</h2>
+<ul>
+  <li><strong>Encuesta</strong>: el software indaga periódicamente el estado del periférico. Ineficiente para el procesador (pierde tiempo preguntando) y para el periférico (espera a que le pregunten)… pero puede ser <em>eficaz</em> si el procesador no tiene otra cosa que hacer. No hay contradicción: eficiencia ≠ eficacia.</li>
+  <li><strong>Interrupción</strong>: la solicitud se detecta por hardware (asincrónica: en cualquier instante); la atención la hace el propio procesador por software (sincrónica: al terminar una instrucción) mediante la <strong>rutina de servicio de interrupción</strong> (ISR).</li>
+</ul>
+
+<h2 id="general">2. Mecanismo general en un µP</h2>
+<ol>
+  <li>Se activa una solicitud de IT.</li>
+  <li>El µP <strong>termina la instrucción en curso</strong> (la atención es por software: no puede dejar una instrucción a medias).</li>
+  <li>Analiza si puede atenderla (<strong>habilitación</strong>). Si no, continúa.</li>
+  <li>Si sí: guarda la <strong>dirección de la siguiente instrucción a ejecutar</strong> (en la pila), obtiene la dirección de la rutina (<strong>vector</strong>) y carga el PC con ella.</li>
+  <li>Al final de la ISR, una instrucción de retorno devuelve al PC la dirección guardada.</li>
+</ol>
+<div class="example"><h4>Ejemplo 2.1 — ¿Qué dirección se guarda? (C9)</h4>
+<pre><code>Repite: mov  B,#20      ; PC1
+        call Suma       ; PC2
+        jb   P3.6,$     ; PC3
+        mov  @R0,P0     ; PC4
+        jmp  Repite     ; PC5
+Suma:   …               ; PC6</code></pre>
+<p>Si la IT llega durante: <code>mov B,#20</code> → se guarda PC2; <code>call Suma</code> → PC6 (la siguiente a ejecutar es la primera de Suma, no PC3); <code>jb P3.6,$</code> → PC3 si P3.6 = 1 (vuelve a sí misma) o PC4 si P3.6 = 0; <code>mov @R0,P0</code> → PC5; <code>jmp Repite</code> → PC1. La dirección guardada <strong>no siempre es la de la instrucción que sigue en el programa</strong>.</p></div>
+
+<h2 id="uc">3. Interrupciones en un microcontrolador</h2>
+<ul>
+  <li>Múltiples fuentes: <strong>externas</strong> (pines) e <strong>internas</strong> (periféricos), gestionadas por un controlador de IT interno.</li>
+  <li>Cada fuente tiene una <strong>bandera de solicitud</strong> (se activa por hardware; se puede activar o borrar por software). Hay que <strong>limpiarla antes de terminar la ISR</strong> (algunas se limpian solas).</li>
+  <li>Cada fuente tiene una <strong>bandera de habilitación</strong> y hay una <strong>habilitación general</strong>. Con RESET, todas inhabilitadas.</li>
+  <li><strong>Lógica de prioridades</strong>: niveles configurables y una prioridad preestablecida dentro de cada nivel para solicitudes «simultáneas». Permite anidar ISR.</li>
+  <li><strong>Vector</strong>: cada fuente salta a una dirección fija de la memoria de programa (algunas fuentes comparten vector).</li>
+</ul>
+
+<h2 id="8051">4. Interrupciones en el 8051</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Fuente</th><th>Bandera (registro)</th><th>Vector</th><th>Habilitación (IE)</th><th>Prioridad (IP)</th><th>¿Se limpia sola?</th></tr></thead>
+  <tbody>
+    <tr><td>Externa 0 (INT0/, P3.2)</td><td>IE0 (TCON.1)</td><td class="mono">0003h</td><td>EX0</td><td>PX0</td><td>Sí, si es por flanco (IT0 = 1)</td></tr>
+    <tr><td>Timer 0</td><td>TF0 (TCON.5)</td><td class="mono">000Bh</td><td>ET0</td><td>PT0</td><td>Sí</td></tr>
+    <tr><td>Externa 1 (INT1/, P3.3)</td><td>IE1 (TCON.3)</td><td class="mono">0013h</td><td>EX1</td><td>PX1</td><td>Sí, si es por flanco (IT1 = 1)</td></tr>
+    <tr><td>Timer 1</td><td>TF1 (TCON.7)</td><td class="mono">001Bh</td><td>ET1</td><td>PT1</td><td>Sí</td></tr>
+    <tr><td>Puerto serie</td><td>RI o TI (SCON.0, SCON.1)</td><td class="mono">0023h</td><td>ES</td><td>PS</td><td><strong>No</strong>: la ISR debe ver cuál fue y limpiarla</td></tr>
+  </tbody>
+</table></div>
+<p>El orden de la tabla es también la <strong>prioridad preestablecida</strong> dentro de un mismo nivel (IE0 la más alta, puerto serie la más baja).</p>
+<h3 id="ie">4.1 Registros IE e IP</h3>
+<div class="regbits"><div class="n">EA</div><div>—</div><div>—</div><div class="n">ES</div><div class="n">ET1</div><div class="n">EX1</div><div class="n">ET0</div><div class="n">EX0</div><div>7</div><div>6</div><div>5</div><div>4</div><div>3</div><div>2</div><div>1</div><div>0</div></div>
+<div class="sim"><div class="sim-title">Construye el valor de IE</div><div class="chk" id="w-ie"></div><div class="readout" id="ie-out"></div></div>
+<div class="regbits"><div>—</div><div>—</div><div>—</div><div class="n">PS</div><div class="n">PT1</div><div class="n">PX1</div><div class="n">PT0</div><div class="n">PX0</div><div>7</div><div>6</div><div>5</div><div>4</div><div>3</div><div>2</div><div>1</div><div>0</div></div>
+<div class="sim"><div class="sim-title">Construye el valor de IP (1 = prioridad alta)</div><div class="chk" id="w-ip"></div><div class="readout" id="ip-out"></div></div>
+
+<h3 id="mecanismo">4.2 El mecanismo en el 8051</h3>
+<ol>
+  <li>Solicitud: se activa la bandera correspondiente.</li>
+  <li>Al terminar cada instrucción se analizan habilitación y prioridades (hay una pequeña demora en atender).</li>
+  <li>Atención: el PC se guarda en la pila (SP ← SP + 2), el PC se carga con el vector, y se <strong>marca el nivel de prioridad en servicio</strong> en un bit <em>no accesible por programa</em> (llamémoslos <strong>L</strong> y <strong>H</strong>). Algunas banderas de solicitud se limpian automáticamente.</li>
+  <li><strong>RETI</strong> desmarca el bit del nivel más prioritario en servicio y recupera el PC.</li>
+</ol>
+<div class="box warn"><span class="box-title">RET frente a RETI</span><p>Ambas sacan el PC de la pila, pero solo <code>reti</code> limpia el bit oculto de nivel en servicio. Si una ISR termina con <code>ret</code>, el 8051 «cree» que sigue atendiendo esa interrupción y ninguna otra del mismo nivel (o inferior) volverá a atenderse. No confundas la bandera de solicitud, el bit de prioridad (IP) y el bit oculto de nivel en servicio.</p></div>
+<div class="sim" id="w-prio">
+  <div class="sim-title">Escenario de prioridades de la C9 (IT1 e IT3 baja, IT2 alta)</div>
+  <div class="controls"><button class="btn ghost" id="pr-prev" type="button">◀</button><button class="btn" id="pr-next" type="button">Siguiente ▶</button></div>
+  <div class="readout" id="pr-out"></div>
+</div>
+<h3 id="simultaneas">4.3 Solicitudes «simultáneas»</h3>
+<p>No significa que se activen en el mismo instante, sino que están <strong>pendientes a la vez cuando el µP decide</strong> (al final de una instrucción). Ejemplo de la C9: durante un <code>mul</code> (4 ciclos) se activa IT4 en el 1.er ciclo e IT5 en el 3.º; si IT5 tiene mayor prioridad preestablecida, se atiende IT5 aunque IT4 llegó antes. Y si durante la ISR de IT5 llega IT6 (mismo nivel), tras el <code>reti</code> IT4 e IT6 son de nuevo «simultáneas» y gana IT6: ¡IT4 sigue esperando a pesar de haber sido la primera!</p>
+
+<h3 id="externas">4.4 Interrupciones externas</h3>
+<p>INT0/ (P3.2) e INT1/ (P3.3), activas por <strong>flanco de caída</strong> o por <strong>nivel bajo</strong> según IT0/IT1 en TCON:</p>
+<div class="regbits"><div>TF1</div><div>TR1</div><div>TF0</div><div>TR0</div><div class="n">IE1</div><div class="n">IT1</div><div class="n">IE0</div><div class="n">IT0</div><div>7</div><div>6</div><div>5</div><div>4</div><div>3</div><div>2</div><div>1</div><div>0</div></div>
+<ul>
+  <li><code>ITx = 1</code>: por flanco; la bandera IEx se activa con la caída y se limpia sola al atenderse. Ideal para eventos (un pulso, el FIN/ de un ADC).</li>
+  <li><code>ITx = 0</code>: por nivel; IEx es el negado del pin: mientras el pin esté a 0 se seguirá solicitando. La causa debe desaparecer antes del <code>reti</code>.</li>
+</ul>
+
+<h2 id="programar">5. Programar con interrupciones</h2>
+<p>A diferencia de los programas anteriores, hacen falta un <code>ORG</code> por cada vector usado y un salto en 0000h por encima de los vectores. Si una ISR no cabe entre su vector y el siguiente usado, se pone un salto.</p>
+<pre><code>        ORG  0          ; vector de RESET
+        jmp  Inicio
+        ORG  3          ; vector de la IT externa 0
+        jmp  IT_Ext0
+        ORG  13h        ; vector de la IT externa 1: ISR corta, cabe aquí
+        …
+        reti
+Inicio: …               ; inicialización: ITx, IE (EA al final), punteros…
+IT_Ext0: …
+        reti
+        END</code></pre>
+<div class="box idea"><span class="box-title">Reglas para las rutinas de interrupción (C9)</span>
+<ul>
+  <li>No saltar al programa principal desde una ISR (la pila quedaría desbalanceada y el nivel marcado).</li>
+  <li>Cortas, sin esperas bloqueantes ni lazos largos.</li>
+  <li>Salvar el contexto que modifican (sobre todo PSW y ACC) o cambiar de banco de registros.</li>
+  <li>Mantener la pila balanceada.</li>
+  <li>Limpiar la bandera de solicitud si no se limpia sola.</li>
+</ul></div>
+
+<h2 id="c10">6. Sistema con interrupciones (C10)</h2>
+<p><strong>Problema</strong>: adquirir 50 muestras de un ADC de 8 bits, mostrar la cantidad en un display de 7 segmentos y, al terminar, hacer sonar una bocina a 2 kHz hasta que se cierre un interruptor; el ADC (FIN/ → INT0/, por flanco de caída: el ADC da un pulso) y el interruptor (INT1/) se atienden por interrupción.</p>
+<pre><code>Punt_m  EQU R0
+Cont_m  EQU R7
+Cont_BCD EQU R6
+Inic_AD EQU P3.0
+Bocina  EQU P3.1
+Band_tecla EQU 20h.0
+        ORG 0
+        sjmp Inicio
+        ORG 3
+        sjmp IT_AD
+        ORG 13h             ; ISR de la tecla: cabe en el vector
+        clr  Bocina
+        clr  EX1            ; no volver a atender la tecla
+        setb Band_tecla
+        reti
+Inicio: clr  Bocina
+        mov  Cont_m,#50
+        mov  Cont_BCD,#0
+        mov  Punt_m,#30h
+        mov  DPTR,#Tabla7Seg
+        mov  P1,#40h
+        mov  P2,#40h        ; display en 00
+        clr  Band_tecla
+        setb IT0            ; ambas por flanco de caída
+        setb IT1
+        mov  IE,#10000001b  ; solo IT externa 0 (ADC)
+        clr  Inic_AD
+        nop
+        setb Inic_AD        ; primer INIC
+        jnb  F0,$           ; esperar las 50 muestras (F0 lo pone la ISR)
+        mov  IE,#10000100b  ; ahora solo la tecla
+suena:  cpl  Bocina
+        call Demora         ; 250 µs
+        jnb  Band_tecla,suena
+        jmp  $              ; inactivo hasta RESET
+IT_AD:  mov  A,P0           ; leer el ADC y guardar
+        mov  @Punt_m,A
+        inc  Punt_m
+        mov  A,Cont_BCD     ; contador BCD
+        add  A,#1           ; ¿puede ser inc A? (no: inc no afecta AC y da A lo necesita)
+        da   A
+        mov  Cont_BCD,A
+        …                   ; mostrar unidades (P2) y decenas (P1) con la tabla
+        djnz Cont_m,otro
+        setb F0             ; 50 muestras
+        reti
+otro:   clr  Inic_AD        ; siguiente conversión
+        nop
+        setb Inic_AD
+        reti</code></pre>
+<p><strong>Aspectos deficientes</strong> (C10): las muestras se adquieren continuamente (sin período de muestreo) y la temporización (bocina) la hace el procesador. ¿Es necesaria F0? (se podría preguntar por <code>Cont_m</code>). <strong>«El programa tiene un error»</strong>: una pista: compara la Tabla7Seg de la C10 (<code>…, 44h, 60h, 31h, …</code>) con la de la C12/C14 (<code>…, 24h, 30h, 19h, …</code>) usando el <a href="t4-puertos-y-aplicaciones.html#siete">constructor de códigos del Tema 4</a>. Revisa además, como hábito, qué registros modifica cada ISR y si el programa principal los usa en ese momento. Una versión corregida del contador por INT0 está en el <a href="../simulador.html?ej=4">simulador (ejemplo 5)</a>.</p>
+
+<h2 id="cp5">7. Guía de la CP5 y del LAB4</h2>
+<div class="example"><h4>CP5 ej. 1 — Conteo de 200 cajas</h4>
+<ul>
+  <li>El sensor da un <strong>pulso positivo</strong> por caja: las IT externas se activan por caída ⇒ invertir la señal (transistor/inversor) o usar el flanco final del pulso.</li>
+  <li>INT0 (sensor, por flanco): en su ISR incrementar el contador (BCD o binario) y actualizar la RAM de display; al llegar a 200, inhabilitar EX0, apagar el display y activar el parpadeo del LED a 2 Hz (0,25 s encendido / 0,25 s apagado).</li>
+  <li>INT1 (interruptor): detiene el parpadeo y reinicia el conteo. El display multiplexado se refresca en el programa principal.</li>
+  <li>f) ¿Dónde es más probable que llegue el pulso? Donde el programa pasa más tiempo: en la demora del refresco/parpadeo del lazo principal.</li>
+  <li>g) ¿Puede sustituir RESET al interruptor? Sí reinicia todo, pero pierde el estado (y no es elegante: RESET también reinicia los periféricos y la RAM no se borra).</li>
+</ul></div>
+<p><strong>CP5 ej. 2</strong>: como la C10 pero con 100 muestras, temperatura de 10–80 °C con resolución de 1 °C en display de cátodo común; compárese con la versión por encuesta de la CP3. <strong>LAB4</strong>: el teclado de la CP4/LAB3 atendido por interrupción: las columnas, a través de una AND de 4 entradas (todas a 1 sin tecla), generan un flanco de caída en INT0/ al pulsar cualquier tecla; con todas las filas a 0 en reposo, la ISR barre las filas para identificar la tecla.</p>
+
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. Si IE = 05h, ¿se atienden las interrupciones externas?</p><div class="opts"><button class="opt" type="button">Sí, las dos</button><button class="opt" type="button" data-ok>No: falta EA</button><button class="opt" type="button">Solo INT0</button></div><p class="why">05h habilita EX0 y EX1 pero EA (bit 7) = 0.</p></div>
+  <div class="q"><p>2. ¿Qué bandera NO se limpia automáticamente al atender la IT?</p><div class="opts"><button class="opt" type="button">TF0</button><button class="opt" type="button">IE0 por flanco</button><button class="opt" type="button" data-ok>RI</button></div><p class="why">RI y TI comparten vector: la ISR debe identificar la causa y limpiarla.</p></div>
+  <div class="q"><p>3. Durante la ISR de una IT de prioridad baja llega otra de prioridad baja…</p><div class="opts"><button class="opt" type="button">la interrumpe</button><button class="opt" type="button" data-ok>espera al RETI</button><button class="opt" type="button">se pierde</button></div><p class="why">Solo una de prioridad alta puede interrumpir a una de baja. La solicitud queda pendiente.</p></div>
+  <div class="q"><p>4. ¿Dónde está el vector del Timer 1?</p><div class="opts"><button class="opt" type="button">0013h</button><button class="opt" type="button" data-ok>001Bh</button><button class="opt" type="button">0023h</button></div><p class="why">03h, 0Bh, 13h, 1Bh, 23h.</p></div>
+</div>
+
+<h2 id="biblio">Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>MacKenzie y Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007</td><td>6</td><td>6.1 Introducción · 6.2 Organización de las interrupciones en el 8051 · 6.3 Procesamiento · 6.4 Diseño de programas con interrupciones · 6.7 Interrupciones externas · 6.8 Sincronización</td><td>pp. 131–150 (PDF 146–165)</td><td>Todo el tema</td></tr>
+    <tr><td>Intel, <em>MCS-51 User's Manual</em>, 1994</td><td>2</td><td>Interrupts · IE · Assigning higher priority · Priority within level · IP</td><td>pp. 2-12 a 2-13 (PDF 42–43)</td><td>Registros y prioridades</td></tr>
+    <tr><td>Intel (ídem)</td><td>3</td><td>Interrupts · Priority Level Structure · How Interrupts Are Handled · External Interrupts · Response Time</td><td>pp. 3-23 a 3-25 (PDF 131–133)</td><td>Mecanismo detallado y tiempos de respuesta</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — Engineering Funda, <a href="https://www.youtube.com/watch?v=x4eBYZ52Vgo">«Interrupts in 8051: IE register, IP register and basics»</a> (10:30, inglés).</li>
+  <li><strong>Vídeo</strong> — Engineering Funda, <a href="https://www.youtube.com/watch?v=SqSA2WLORqs">«RET and RETI instructions of 8051: comparison»</a> (8:23, inglés).</li>
+  <li><strong>Simulador</strong> — En el <a href="../simulador.html?ej=4">ejemplo 5</a>, cierra y abre el interruptor de P3.2 y observa IE0, el stack y los bits L/H en el panel de interrupciones.</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué se pone EA al final de la inicialización?</summary><div><p>Para que ninguna interrupción llegue antes de que punteros, contadores y periféricos estén listos.</p></div></details>
+  <details><summary>¿Puedo llamar a una subrutina desde una ISR?</summary><div><p>Sí, si es corta y mantiene la pila balanceada; pero cuidado con subrutinas que también usa el programa principal (pueden corromperse variables o registros compartidos).</p></div></details>
+  <details><summary>¿Qué pasa si no limpio RI en la ISR del puerto serie?</summary><div><p>Tras el <code>reti</code>, la solicitud sigue activa y la ISR se ejecuta otra vez inmediatamente: el programa principal queda «congelado».</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencias C9 «Interrupción en 8051» y C10 «Ejemplo de sistema simple con interrupción», CP5 «Mecanismo de interrupción. Atención a dispositivos por IT», LAB4 «Atención de un teclado matricial por interrupción» (Dr. A. J. Cabrera Sarmiento y colectivo, CUJAE). Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

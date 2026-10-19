@@ -1,3 +1,4 @@
-# Software complementario
+# Software complementario de Microcontroladores
 
-Cada herramienta va en su propia carpeta con README (instalación y uso).
+- `mcs51calc/` — calculadoras de timers, baud rate, demoras, 7 segmentos, UC→UI y LED (Python).
+- El simulador 8051 web está en `../simulador.html` (núcleo en `../js/sim8051.js`).

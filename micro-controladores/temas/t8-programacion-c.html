@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T8 · Programación en C con SDCC — Microcontroladores</title>
+  <meta name="description" content="Programación en C del 8051 con SDCC: tareas del compilador, diferencias con la programación en PC, tipos de datos, clases de almacenamiento (__data, __idata, __code, __bit, __sfr, __sbit), direccionamiento absoluto, rutinas de interrupción, código ensamblador generado. Conferencias C15 y C16, CP8.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/micro.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="../#temas" aria-current="page">Temas</a><a href="../simulador.html">Simulador</a><a href="../#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema 8 · Conferencias C15 y C16 · CP8</p>
+<h1>Programación en C del 8051 con SDCC</h1>
+<p class="lead">En la vida profesional los microcontroladores se programan en C, y en ensamblador solo las rutinas críticas en tiempo. Pero <strong>el dominio de los recursos del µC (memoria, SFR, interrupciones) sigue siendo imprescindible</strong>: el C del 8051 tiene extensiones que solo se entienden si se conoce el hardware, y a veces hay que leer el ensamblador que genera el compilador.</p>
+
+<div class="objectives"><strong>Objetivos (C15, C16)</strong><ul>
+  <li>Conocer las tareas de un compilador de C y las diferencias entre programar en C para un PC y para un µC.</li>
+  <li>Conocer las precauciones al programar un µC en C y las características del compilador SDCC.</li>
+  <li>Dominar los tipos de datos, de memoria y de interrupción de SDCC.</li>
+  <li>Analizar la relación entre el código C y el ensamblador generado y el efecto de las directivas sobre el mapa de memoria.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">C básico: tipos, punteros y operadores de bits</span>
+<p><code>unsigned char</code> (8 bits, 0–255), operadores <code>&amp;</code> <code>|</code> <code>^</code> <code>~</code> <code>&lt;&lt;</code> <code>&gt;&gt;</code> para máscaras, punteros (<code>*p</code>, <code>&amp;x</code>), <code>volatile</code>, <code>while(1)</code>. Referencia: Kernighan y Ritchie, <em>El lenguaje de programación C</em> (en la bibliografía) · <a href="t2-familia-8051.html#datos">mapa de memoria del 8051 (Tema 2)</a>.</p></div>
+
+<h2 id="compilador">1. ¿Qué hace un compilador de C?</h2>
+<ol><li>Expandir ficheros (cabeceras <code>.h</code>).</li><li>Chequear la sintaxis (<em>parser</em>).</li><li>Generar un fichero ASM equivalente a partir de patrones (su calidad depende del compilador).</li><li>Ensamblarlo y enlazarlo con las bibliotecas.</li><li>Obtener el <code>.hex</code>.</li></ol>
+<p>Ficheros de SDCC: <code>.c</code> → <code>.asm</code> (equivalente) → <code>.rel</code> (+ <code>.lst</code>, <code>.sym</code>) → enlazador → <code>.hex</code>/<code>.ihx</code> (+ <code>.rst</code>, <code>.map</code>, <code>.mem</code>, <code>.cdb</code> para el simulador).</p>
+
+<h2 id="diferencias">2. C para PC frente a C para µC</h2>
+<ul>
+  <li>Recursos muy distintos (incluso dentro de la misma familia); RAM muy limitada en los de 8 bits: cuidado con los tipos de datos.</li>
+  <li>La E/S estándar suele ser una UART: <code>printf</code>/<code>scanf</code> generan mucho código.</li>
+  <li>Extensiones no ANSI: tipos de bit, clases de memoria, interrupciones.</li>
+  <li>Conviene un asistente de configuración que genere la inicialización de periféricos.</li>
+</ul>
+<div class="box warn"><span class="box-title">Precauciones (C15)</span>
+<ul>
+  <li>Evitar tipos sobredimensionados (y algunos no están soportados: SDCC no tiene <code>double</code> ni <code>long double</code>).</li>
+  <li>Evitar <code>printf</code>/<code>scanf</code>.</li>
+  <li>Evitar el desbordamiento de la pila: poco anidamiento, cuidado con la recursividad (muchos compiladores no lo detectan).</li>
+  <li>No optimizar antes de depurar: el optimizador puede eliminar <code>for (i=0; i&lt;1000; i++);</code> (una demora «que no hace nada»). Las variables que cambian en una ISR deben ser <code>volatile</code>.</li>
+</ul></div>
+
+<h2 id="sdcc">3. SDCC (Small Device C Compiler)</h2>
+<p>Compilador de C libre y de código abierto, optimizado para procesadores de 8 bits (8051 de muchos fabricantes, HC08/S08, Z80, STM8, PIC en desarrollo). Soporta ANSI C89 a ISO C17 con algunas restricciones. En MCU 8051 IDE: el tipo <code>char</code> es <code>unsigned</code> por defecto y, según la configuración, puede no reconocer los comentarios <code>//</code>. Compilación típica:</p>
+<pre><code>sdcc -mmcs51 --iram-size 128 --xram-size 0 --code-size 8192 programa.c</code></pre>
+
+<h2 id="tipos">4. Tipos de datos</h2>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Tipo</th><th>Tamaño</th><th>Comentario</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">__bit</td><td>1 bit</td><td>En la zona 20h–2Fh. Extensión.</td></tr>
+    <tr><td class="mono">char / unsigned char</td><td>8 bits</td><td>El tipo natural del 8051: úsalo siempre que alcance.</td></tr>
+    <tr><td class="mono">short, int</td><td>16 bits</td><td>Operaciones mucho más lentas que con char.</td></tr>
+    <tr><td class="mono">long</td><td>32 bits</td><td>Muy costoso.</td></tr>
+    <tr><td class="mono">float</td><td>32 bits</td><td>Por software: evitar.</td></tr>
+    <tr><td class="mono">puntero</td><td>1–3 bytes</td><td>Según el espacio al que apunta (genérico = 3).</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="memoria">5. Clases de almacenamiento (zonas de memoria)</h2>
+<p>Hay que decir al compilador <strong>en qué memoria</strong> va cada variable:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Clase</th><th>Zona</th><th>Acceso</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">__code</td><td>Memoria de programa (constantes, tablas)</td><td><code>movc</code></td></tr>
+    <tr><td class="mono">__data</td><td>128 bytes bajos de la RAM interna</td><td>Directo (el más rápido)</td></tr>
+    <tr><td class="mono">__idata</td><td>256 bytes de RAM interna</td><td>Indirecto (@R0, @R1)</td></tr>
+    <tr><td class="mono">__xdata</td><td>Memoria de datos externa</td><td><code>movx</code></td></tr>
+    <tr><td class="mono">__bit</td><td>Zona direccionable bit a bit (20h–2Fh)</td><td>Instrucciones de bit</td></tr>
+    <tr><td class="mono">__sfr / __sfr16 / __sbit</td><td>Registros de funciones especiales / pares de SFR / un bit de SFR</td><td>Directo · de bit</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Punteros</strong>: se especifica la clase de la variable puntero <em>y</em> la de la memoria a la que apunta: <code>__xdata char * __data puntero;</code> (puntero almacenado en __data que apunta a __xdata). Se implementan con R0, R1 o DPTR.</p>
+<h3 id="absoluto">5.1 Direccionamiento absoluto</h3>
+<p>Con <code>__at (dirección)</code> se fija dónde va algo (el compilador <strong>no</strong> detecta solapamientos):</p>
+<pre><code>__code __at (0x300) char Id[5] = "SDCC";
+__code __at (0x100) char Tabla7Seg[] = {0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 0x02, 0x78, 0x00, 0x18};
+__bit  __at (0x02) Fin_Adq;
+volatile __data __at (0x30) char ADC_Values[50];   // volatile: puede cambiarla una ISR o el HW
+__sfr16 __at (0x8C8A) TMR0;                         // TH0 (8Ch) : TL0 (8Ah)</code></pre>
+<p>Los SFR y sus bits ya están declarados en <code>&lt;8051.h&gt;</code> (equivalente al <code>.inc</code> del ensamblador): <code>__sfr __at (0x80) P0;</code>, <code>__sbit __at (0xD7) CY;</code>, máscaras como <code>T0_M0 = 0x01</code>, <code>T1_M1 = 0x20</code> para formar TMOD con OR, y los números de vector <code>IE0_VECTOR 0</code>, <code>TF0_VECTOR 1</code>, <code>IE1_VECTOR 2</code>, <code>TF1_VECTOR 3</code>, <code>SI0_VECTOR 4</code>. Así <code>CY = 0; P0 = 0x55; TMR0 = 0x3CB0;</code> genera <code>clr C</code>, <code>mov 80h,#55h</code>, <code>mov 8Ch,#3Ch</code>, <code>mov 8Ah,#0B0h</code>.</p>
+
+<h2 id="isr">6. Bancos de registros y rutinas de interrupción</h2>
+<p>SDCC usa el banco 0 para sus operaciones (punteros, temporales). Una función puede usar otro banco con <code>__using (n)</code>. El enlazador coloca la pila después de la última variable y avisa si no hay memoria suficiente.</p>
+<pre><code>void timer1_isr (void) __interrupt (3) __using (1);   // vector 3 = Timer 1, banco 1</code></pre>
+<p>El número de <code>__interrupt</code> es el <strong>número de vector</strong> (0 = INT0 en 03h, 1 = Timer 0 en 0Bh, 2 = INT1, 3 = Timer 1, 4 = puerto serie). Con <code>__using</code> el compilador salva PSW (y A, B, DPTR si hace falta) y cambia de banco; sin él, salva todos los registros que use. Para insertar ensamblador: <code>__asm … __endasm;</code> o en línea <code>__asm__ ("NOP");</code>.</p>
+
+<h2 id="c16">7. El sistema de la C14 en C (C16)</h2>
+<pre><code>#include &lt;8051.h&gt;
+#define TMOD_CONF 0b00100001       // T1 modo 2; T0 modo 1
+#define TMR0_REC  0x3CB0           // 50 ms
+#define TMR1_REC  230              // 1200 baudios
+#define SCON_CONF 0b01010000       // modo 1, Rx habilitada
+#define INIC_AD   P3_4
+__sfr16 __at (0x8C8A) TMR0;
+
+void intr_ADC  (void) __interrupt (0) __using (2);   // INT0
+void intr_50ms (void) __interrupt (1) __using (2);   // Timer 0
+void intr_UART (void) __interrupt (4) __using (2);   // UART
+
+volatile __data unsigned char ADC_Values[50];
+volatile __data unsigned char Cont_m, Cont_1s;
+volatile __bit Fin_Tx;
+__code const char Tabla7Seg[] = {0x40, 0x79, 0x24, 0x30, 0x19, 0x12, 2, 0x78, 0, 0x18};
+
+void main (void) {
+  TMR0 = TMR0_REC; TH1 = TMR1_REC; TL1 = TMR1_REC;
+  TMOD = TMOD_CONF;
+  IT0 = 1;                          // INT0 por flanco de caída
+  while (1) {
+    P1 = 0x40; P2 = 0x40;           // display en 00
+    Cont_m = 0; Fin_Tx = 0; Cont_1s = 20;
+    IE = 0b10000011;                // EX0 y ET0
+    TR0 = 1;
+    while (Cont_m &lt; 50);            // esperar las 50 muestras
+    TR0 = 0;
+    SCON = SCON_CONF; TR1 = 1;
+    IE = 0b10010000;                // ES
+    while (!Fin_Tx);                // esperar el fin de las Tx
+  }
+}
+void intr_ADC (void) __interrupt (0) __using (2) {
+  ADC_Values[Cont_m] = P0;
+  P1 = Tabla7Seg[++Cont_m / 10];    // decenas
+  P2 = Tabla7Seg[Cont_m % 10];      // unidades
+}
+void intr_50ms (void) __interrupt (1) __using (2) {
+  TMR0 = TMR0_REC;
+  if (--Cont_1s == 0) { Cont_1s = 20; INIC_AD = 0; __asm__ ("NOP"); INIC_AD = 1; }
+}
+void intr_UART (void) __interrupt (4) __using (2) {
+  if (RI) {                         // prioridad a la Rx
+    RI = 0;
+    if (SBUF == 0xAA) { Cont_m = 0; REN = 0; TI = 1; }
+  } else {
+    TI = 0;
+    if (Cont_m == 50) Fin_Tx = 1;
+    else SBUF = ADC_Values[Cont_m++];
+  }
+}</code></pre>
+<p class="meta">En la diapositiva de la C16 la tabla aparece como <code>{0x40, 0x79, 0x44, 0x60, 0x31, …}</code>; aquí se usa la de la C14 (<code>0x24, 0x30, 0x19</code>), coherente con la conexión a → bit 0 (ver <a href="t4-puertos-y-aplicaciones.html#siete">Tema 4</a>).</p>
+<h3 id="asm">7.1 Lo que genera el compilador</h3>
+<ul>
+  <li>En 0000h, <code>ljmp __sdcc_gsinit_startup</code>: código de inicialización de la biblioteca (limpia RAM, inicializa SP y variables) que aumenta tamaño y tiempo.</li>
+  <li>En los vectores no usados, <code>reti</code>; en los usados, <code>ljmp _intr_…</code>.</li>
+  <li><code>intr_ADC</code> empieza con <code>push acc / push b / push dpl / push dph / push psw / mov psw,#0x10</code> (banco 2): en este caso solo hacía falta PSW, «pero el compilador no lo sabe».</li>
+  <li><code>++Cont_m/10</code> y <code>Cont_m%10</code> generan dos <code>div ab</code> y dos <code>mov dptr,#_Tabla7Seg</code>: redundancia que en ensamblador se evita (un solo <code>div</code> da cociente y resto).</li>
+  <li>En <code>intr_50ms</code> el optimizador elimina el cambio de banco y los <code>push</code> innecesarios (lo indica con comentarios <code>; eliminated unneeded…</code>).</li>
+</ul>
+
+<h2 id="cp8">8. Guía de la CP8</h2>
+<p>Los ejercicios son los de la CP7 programados en C: 90 muestras cada 5 s, bocina a 4 kHz (Timer 1 no puede: está generando el BR → bocina con Timer 0 en modo 2 y la base de 5 s contando desbordamientos de 125 µs, o al revés), comandos 1–6 a <strong>2400 baudios con paridad par</strong> (modo 3: TH1 = 256 − 12·10⁶/(384·2400) = 242,98 → 243; error 0,16 %). Paridad en C: <code>ACC = dato; TB8 = P;</code> (P del PSW). Declarar las ISR con <code>__interrupt(n)</code>, las variables compartidas <code>volatile</code>, y decidir en qué clase de memoria va cada buffer (90 bytes no caben junto al resto en __data: usar __idata en un 8052).</p>
+
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. ¿Qué número de <code>__interrupt</code> corresponde al Timer 0?</p><div class="opts"><button class="opt" type="button">0</button><button class="opt" type="button" data-ok>1</button><button class="opt" type="button">0x0B</button></div><p class="why">Número de vector, no dirección: 0Bh es el vector 1.</p></div>
+  <div class="q"><p>2. Una variable que modifica una ISR y lee el main debe ser…</p><div class="opts"><button class="opt" type="button">static</button><button class="opt" type="button" data-ok>volatile</button><button class="opt" type="button">__code</button></div><p class="why">Para que el optimizador no la guarde en un registro y la lea siempre de memoria.</p></div>
+  <div class="q"><p>3. Una tabla de constantes se declara…</p><div class="opts"><button class="opt" type="button">__data</button><button class="opt" type="button" data-ok>__code</button><button class="opt" type="button">__xdata</button></div><p class="why">En memoria de programa, sin gastar RAM.</p></div>
+</div>
+
+<h2 id="biblio">Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td><em>SDCC Compiler User Guide</em>, v3.2.1</td><td>3</td><td>3.1 Compiling · 3.2 Command Line Options (3.2.4 MCS51 Options)</td><td>pp. 24–35 (PDF 25–36)</td><td>Compilar y opciones</td></tr>
+    <tr><td>SDCC (ídem)</td><td>3</td><td>3.4 Storage Class Language Extensions (3.4.1 MCS51) · 3.5 Other Language Extensions · 3.6 Absolute Addressing</td><td>pp. 35–41 (PDF 36–42)</td><td>__data, __idata, __code, __bit, __sfr, __at</td></tr>
+    <tr><td>SDCC (ídem)</td><td>3</td><td>3.9 Interrupt Service Routines (3.9.2 MCS51) · 3.10 Enabling and Disabling Interrupts · 3.11 Private Register Banks</td><td>pp. 42–45 (PDF 43–46)</td><td>__interrupt, __using, __critical</td></tr>
+    <tr><td>MacKenzie y Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007</td><td>8</td><td>8.1 Introducción · 8.4 Tipos de datos · 8.5 Tipos y modelos de memoria · 8.8 Apuntadores · 8.9 Funciones</td><td>pp. 191–216 (PDF 206–231)</td><td>C para 8051 (con sintaxis de otro compilador)</td></tr>
+    <tr><td>Ibrahim, <em>Microcontroller Projects in C for the 8051</em>, Newnes, 2000</td><td>—</td><td>Proyectos completos en C</td><td>—</td><td>Ejemplos de aplicación</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Documentación</strong> — <a href="https://sdcc.sourceforge.net/">SDCC</a>, sitio oficial (descargas y manual actual).</li>
+  <li><strong>Vídeo</strong> — Óscar Cáceres, <a href="https://www.youtube.com/watch?v=PM6WbtbBmeY">«Unidad 1. Curso programación en C para 8051»</a> (9:01).</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué mi demora con <code>for</code> no tarda nada?</summary><div><p>El optimizador vio que el bucle no hace nada y lo eliminó. Usa una variable <code>volatile</code>, inserta <code>__asm__("NOP")</code> o, mejor, un timer.</p></div></details>
+  <details><summary>¿Cuándo vale la pena el ensamblador?</summary><div><p>En rutinas críticas en tiempo (ISR muy frecuentes, protocolos por software) o cuando hay que ajustar ciclos exactos. Para el resto, C es más productivo y mantenible.</p></div></details>
+  <details><summary>¿Por qué SDCC pone el stack «después de las variables»?</summary><div><p>Porque la pila del 8051 crece hacia arriba: lo más alto de la RAM libre queda para ella. El enlazador avisa si las variables más la pila no caben.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencias C15 «Programación en C para 8051» y C16 «Ejemplo de sistema con programación en C», CP8 «Programación en C de 8051» (Dr. A. J. Cabrera Sarmiento y colectivo, CUJAE; algunas tablas citan a L. M. Garcés). Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T6 · Temporizadores/contadores — Microcontroladores</title>
+  <meta name="description" content="Temporizadores y contadores del 8051: estructura, modos 0–3, TMOD y TCON, disparo por software y por hardware, cálculo de recargas, postescalador por software, sistema con timers. Conferencias C11 y C12, CP6, LAB5.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/micro.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/micro.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="../#temas" aria-current="page">Temas</a><a href="../simulador.html">Simulador</a><a href="../#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema 6 · Conferencias C11 y C12 · CP6 · LAB5</p>
+<h1>Temporizadores y contadores</h1>
+<p class="lead">Un temporizador libera al procesador de contar ciclos con lazos de demora: un <strong>contador binario por hardware</strong> avanza solo y avisa (bandera, interrupción) al desbordarse. Con él se miden tiempos exactos mientras el programa hace otras cosas.</p>
+
+<div class="objectives"><strong>Objetivos (C11, C12)</strong><ul>
+  <li>Conocer qué es y cómo se estructura un temporizador/contador.</li>
+  <li>Conocer los temporizadores 0 y 1 del 8051 original, sus registros (TMOD, TCON, THx, TLx) y modos de operación.</li>
+  <li>Saber configurarlos y programar sus rutinas de atención por interrupción.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">contadores binarios y frecuencia/período</span>
+<p>Un contador de \(n\) bits cuenta de 0 a \(2^n-1\) y luego vuelve a 0 (desbordamiento). Si cuenta pulsos de período \(T\), tras \(N\) pulsos ha pasado \(t=NT\). <strong>Dividir la frecuencia</strong> por \(k\) equivale a <strong>multiplicar el período</strong> por \(k\). Repaso: <a href="../../repaso/electronica-digital.html#secuencial">contadores y biestables</a> · <a href="t5-interrupciones.html">Interrupciones (Tema 5)</a>.</p></div>
+
+<h2 id="concepto">1. Temporizador y contador</h2>
+<p>El componente básico es un <strong>contador binario</strong> (ascendente o descendente, lo que cambia cómo se interpreta su valor). Si cuenta pulsos de un reloj interno de frecuencia fija (ciclos de máquina) es un <strong>temporizador</strong> y mide tiempo; si cuenta pulsos de una entrada externa es un <strong>contador</strong> de eventos. Estructura general: selección de reloj (C/T), lógica de disparo, <em>preescalador</em> (divisor de frecuencia antes del contador), contador de \(N\) bits, <strong>registros de recarga</strong> (para recargar el contador automáticamente), <em>postescalador</em> y bandera de desbordamiento <strong>TF</strong> (puede solicitar interrupción). Algunos están ligados a otros periféricos (captura/comparación, puerto serie).</p>
+
+<h2 id="8051">2. Timers 0 y 1 del 8051</h2>
+<ul>
+  <li>Dos temporizadores/contadores de 16 bits <strong>ascendentes</strong> (algunos miembros tienen un Timer 2 distinto).</li>
+  <li>Temporizador: cuenta ciclos de máquina. Contador: cuenta flancos de caída en T0 (P3.4) o T1 (P3.5).</li>
+  <li><strong>Sin</strong> pre ni postescalador por hardware (el postescalador se hace por software).</li>
+  <li>4 modos (solo se usan dos). Al pasar de FFFFh a 0 activan TFx (y siguen contando); se pueden atender por IT (vectores 0Bh y 1Bh, banderas que se limpian solas) o por encuesta.</li>
+  <li>El Timer 1 además genera la razón de baudios del puerto serie.</li>
+</ul>
+<h3 id="tmod">2.1 TMOD (no direccionable bit a bit)</h3>
+<div class="regbits"><div class="n">GATE1</div><div class="n">C/T1</div><div class="n">M1</div><div class="n">M0</div><div class="n">GATE0</div><div class="n">C/T0</div><div class="n">M1</div><div class="n">M0</div><div colspan="4" style="grid-column:span 4">← Timer 1</div><div style="grid-column:span 4">Timer 0 →</div></div>
+<div class="sim" id="w-tmod">
+  <div class="sim-title">Construye TMOD</div>
+  <div class="controls">
+    <label><input type="checkbox" id="tm-g1"> GATE1</label><label><input type="checkbox" id="tm-c1"> C/T1 (contador)</label>
+    <label>Modo T1 <select id="tm-m1"><option value="0">0 (13 bit)</option><option value="1">1 (16 bit)</option><option value="2" selected>2 (8 bit, recarga)</option><option value="3">3 (detenido)</option></select></label>
+    <label><input type="checkbox" id="tm-g0"> GATE0</label><label><input type="checkbox" id="tm-c0"> C/T0 (contador)</label>
+    <label>Modo T0 <select id="tm-m0"><option value="0">0 (13 bit)</option><option value="1" selected>1 (16 bit)</option><option value="2">2 (8 bit, recarga)</option><option value="3">3 (dos de 8 bit)</option></select></label>
+  </div>
+  <div class="readout" id="tm-out"></div>
+</div>
+<h3 id="tcon">2.2 TCON (4 bits altos) y disparo</h3>
+<div class="regbits"><div class="n">TF1</div><div class="n">TR1</div><div class="n">TF0</div><div class="n">TR0</div><div>IE1</div><div>IT1</div><div>IE0</div><div>IT0</div><div>7</div><div>6</div><div>5</div><div>4</div><div>3</div><div>2</div><div>1</div><div>0</div></div>
+<ul>
+  <li><strong>Disparo por software</strong> (GATEx = 0): el timer cuenta mientras <code>TRx = 1</code>. Es lo que tienen casi todos los µC.</li>
+  <li><strong>Disparo por hardware</strong> (GATEx = TRx = 1): cuenta mientras el pin INTx/ (P3.2 o P3.3) está a 1; con el flanco de subida empieza, con el de caída se detiene y, si está habilitada, se solicita la IT externa. Muy útil para <strong>medir el ancho de un pulso</strong>.</li>
+</ul>
+<h3 id="modos">2.3 Modos de operación</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th>Modo</th><th>Contador</th><th>Recarga</th><th>Desborda tras</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>13 bits (8 de THx + 5 de TLx)</td><td>No</td><td>8192 cuentas</td><td>Compatibilidad con el 8048: no se usa.</td></tr>
+    <tr><td><strong>1</strong></td><td><strong>16 bits</strong> (THx:TLx)</td><td>No: por software</td><td>65 536 − valor inicial</td><td>Bases de tiempo largas (detener, recargar, redisparar en la ISR).</td></tr>
+    <tr><td><strong>2</strong></td><td><strong>8 bits</strong> (TLx)</td><td><strong>Sí: TLx ← THx</strong> por hardware</td><td>256 − THx</td><td>Tiempos exactos cortos, contar eventos, baud rate.</td></tr>
+    <tr><td>3</td><td>T0: dos de 8 bits (TL0 con TF0; TH0 con TR1/TF1) · T1: detenido</td><td>—</td><td>—</td><td>No se usa (existen 8051 con más timers).</td></tr>
+  </tbody>
+</table></div>
+<div class="eq key">$$\text{valor inicial}=2^{n}-N,\qquad N=\frac{t}{T_{\text{CM}}}\qquad(n=16\text{ en modo 1},\ 8\text{ en modo 2})$$<div class="eq-label">Recarga para que el timer desborde tras \(N\) ciclos de máquina</div></div>
+
+<h2 id="ejemplos">3. Ejemplos de la C11</h2>
+<div class="example"><h4>Ejemplo 3.1 — Dar INIC al ADC cada 1 s (ciclo de máquina de 1 µs)</h4>
+<div class="step"><span class="n">1</span><div><p>Hay que contar 1 000 000 de ciclos: imposible con 16 bits. Se busca el submúltiplo mayor posible: base de <strong>50 000</strong> (50 ms) ⇒ valor inicial 65 536 − 50 000 = 15 536 = <strong>3CB0h</strong>; y un contador por software (postescalador) de <strong>20</strong>.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Modo 1, temporizador, disparo por software: <code>mov TMOD,#00000001b</code>, <code>setb TR0</code>, <code>mov IE,#10000010b</code>.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>ISR en 0Bh: <code>clr TR0</code> (detención temporal: para no recargar mientras cuenta), recargar <code>TH0 = 3Ch</code>, <code>TL0 = B0h</code>, <code>setb TR0</code>; <code>djnz Cont_1s,aun</code>; al llegar a 0, recargar 20 y dar el pulso INIC. ¿Puede un mismo timer medir varios eventos? Sí, con contadores distintos sobre la misma base.</p></div></div>
+<p>Pruébalo en el <a href="../simulador.html?ej=2">simulador (ejemplo 3)</a>: P1.0 conmuta cada 1,000214 s (los 214 µs extra son la latencia de las ISR: el tiempo que se tarda en recargar en modo 1).</p></div>
+<div class="example"><h4>Ejemplo 3.2 — IT cada 24 objetos (contador)</h4>
+<p>Un sensor da un pulso negativo por objeto en T1 (P3.5). Modo 2, <strong>contador</strong>, disparo por software, base 24: TH1 = TL1 = 256 − 24 = <strong>232</strong>. <code>mov TMOD,#01100000b</code> (C/T1 = 1, modo 2), <code>setb TR1</code>, <code>mov IE,#10001000b</code>. En la ISR (1Bh) no hay que recargar: lo hace el hardware.</p>
+<p class="meta">Ojo: en la diapositiva aparece <code>mov IE,#1001000b</code> (¡7 bits!: 48h = ET1 sin EA). El valor correcto es <code>10001000b</code> (88h).</p></div>
+<div class="sim" id="w-tim">
+  <div class="sim-title">Calculadora de recargas</div>
+  <div class="controls">
+    <label>Tiempo <input type="number" id="tc-t" value="1" step="any" style="width:90px"></label>
+    <label><select id="tc-u"><option value="us">µs</option><option value="ms">ms</option><option value="s" selected>s</option></select></label>
+    <label>Ciclo de máquina (µs) <input type="number" id="tc-mc" value="1" step="any" style="width:80px"></label>
+    <label>Modo <select id="tc-mode"><option value="1" selected>1 (16 bit)</option><option value="2">2 (8 bit, recarga)</option><option value="0">0 (13 bit)</option></select></label>
+  </div>
+  <div class="readout" id="tc-out"></div>
+</div>
+<p><strong>Uso combinado</strong>: un timer puede medir varios eventos <em>simultáneos</em> (p. ej. refrescar el display cada 5 ms y medir 10 s) con una base común y contadores diferentes; o eventos <em>no simultáneos</em> con banderas de estado y distinta configuración.</p>
+
+<h2 id="c12">4. Sistema con timers (C12)</h2>
+<p>Igual que la C10, pero las muestras se adquieren cada 1 s y la bocina de 2 kHz la genera un timer. <strong>Timer 0</strong>: modo 1, base 50 000 × 20 = 1 s (da INIC). <strong>Timer 1</strong>: modo 2, base 250 (TH1 = 6) → cada 250 µs se complementa la bocina ⇒ 2 kHz. Su ISR cabe en el vector:</p>
+<pre><code>        ORG  1Bh
+        cpl  Bocina          ; sonar bocina
+        reti
+…
+        mov  TH1,#6          ; tau para 250 µs
+        mov  TL1,#6
+        mov  TMOD,#00100001b ; T1 modo 2, T0 modo 1, temporizadores, disparo SW
+        setb TR0
+        setb IT0             ; IT externas por caída
+        setb IT1
+        mov  IE,#10000011b   ; EX0 y ET0
+        cjne Cont_m,#50,$    ; de aquí se sale solo por IT
+        clr  TR0
+        setb TR1             ; bocina
+        mov  IE,#10001100b   ; EX1 y ET1
+        jnb  Band_Tecla,$
+        clr  TF1             ; ¿es necesario?
+        jmp  Inicio</code></pre>
+<p>La ISR del ADC calcula decenas y unidades con <code>mov B,#10 / div AB</code>. La de la tecla hace <code>clr Bocina</code>, <code>clr EA</code>, <code>clr TR1</code> y pone la bandera. <strong>Analiza</strong>: ¿qué pasa si se elimina <code>clr EA</code>? (Una IT de Timer 1 pendiente podría ejecutarse después y volver a encender la bocina; y la tecla podría atenderse varias veces por rebotes). Mide los 2 kHz en el <a href="../simulador.html?ej=3">simulador (ejemplo 4)</a> con el frecuencímetro.</p>
+
+<h2 id="cp6">5. Guía de la CP6 y del LAB5</h2>
+<ul>
+  <li><strong>CP6 ej. 1</strong> (conteo de 200 cajas, ciclo de 5 µs): el sensor puede ir a T0 como <strong>contador</strong> (modo 2, base 200: TL0 = TH0 = 56) para que el hardware cuente y solo interrumpa al llegar a 200; Timer 1 para el refresco del display (p. ej. 5 ms = 1000 ciclos: modo 1, 65 536 − 1000 = FC18h) y para el parpadeo de 1 Hz (postescalador de 100 sobre 5 ms = 0,5 s).</li>
+  <li><strong>CP6 ej. 2 y 4</strong> (un solo timer): una base común (p. ej. 5 ms) y contadores por software para todo; el conteo de cajas pasa a IT externa.</li>
+  <li><strong>CP6 ej. 3</strong> (ciclo de 2 µs, 1 s, 10–120 °C): base de 50 000 ciclos = 100 ms × 10; bocina de 2 kHz = 125 ciclos (TH1 = 131).</li>
+  <li><strong>LAB5 / Propuesto CP6</strong> (reloj digital 24 h con alarma): base de 50 ms × 20 = 1 s para los segundos; display multiplexado de 4 dígitos con dos puntos parpadeando; teclas para modo (hora/alarma), incremento de horas, de minutos y confirmación; al coincidir con la alarma, LED a 1 Hz durante 5 s. En Proteus, el display es <code>GROVE4DIGIT</code> (el DP enciende los dos puntos).</li>
+</ul>
+<p class="meta">Propuesto (C11): medir el ancho de un pulso positivo con la mayor exactitud: GATE = 1, TR = 1, el pulso en INTx/; al caer, la IT externa lee THx:TLx (ciclos de máquina que duró el pulso). Ventajas de los timers frente a las demoras por software: exactitud, el procesador queda libre, no se alteran con otras interrupciones.</p>
+
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. Con ciclo de 1 µs, ¿qué valor se carga en TH0:TL0 (modo 1) para 10 ms?</p><div class="opts"><button class="opt" type="button">2710h</button><button class="opt" type="button" data-ok>D8F0h</button><button class="opt" type="button">FFF6h</button></div><p class="why">65 536 − 10 000 = 55 536 = D8F0h.</p></div>
+  <div class="q"><p>2. ¿Qué modo recarga el contador por hardware?</p><div class="opts"><button class="opt" type="button">modo 1</button><button class="opt" type="button" data-ok>modo 2</button><button class="opt" type="button">modo 0</button></div><p class="why">TLx ← THx al desbordarse.</p></div>
+  <div class="q"><p>3. ¿Para qué sirve GATE = 1?</p><div class="opts"><button class="opt" type="button">para contar eventos</button><button class="opt" type="button" data-ok>para que el pin INTx/ controle el conteo</button><button class="opt" type="button">para generar el baud rate</button></div><p class="why">Disparo por hardware: medición de anchos de pulso.</p></div>
+  <div class="q"><p>4. Un 2 kHz cuadrado con Timer 1 en modo 2 y ciclo de 1 µs: TH1 =</p><div class="opts"><button class="opt" type="button">250</button><button class="opt" type="button" data-ok>6</button><button class="opt" type="button">131</button></div><p class="why">Semiperíodo 250 µs = 250 cuentas: 256 − 250 = 6.</p></div>
+</div>
+
+<h2 id="biblio">Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>MacKenzie y Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007</td><td>4</td><td>4.1 Introducción · 4.2 TMOD · 4.3 TCON · 4.4 Modos y bandera de desbordamiento · 4.5 Fuentes de reloj · 4.6 Inicio, detención y control · 4.7 Inicialización y acceso · 4.8 Intervalos cortos, medianos y largos · 4.9 Generación de frecuencias exactas</td><td>pp. 87–105 (PDF 102–120)</td><td>Todo el tema</td></tr>
+    <tr><td>MacKenzie y Phan (ídem)</td><td>6</td><td>6.5 Interrupciones del temporizador</td><td>pp. 139–141 (PDF 154–156)</td><td>Timers por interrupción</td></tr>
+    <tr><td>Intel, <em>MCS-51 User's Manual</em>, 1994</td><td>2</td><td>TCON · TMOD · Timer Set-up</td><td>pp. 2-14 a 2-16 (PDF 44–46)</td><td>Registros y configuración</td></tr>
+    <tr><td>Intel (ídem)</td><td>3</td><td>Timer/Counters · Timer 0 and Timer 1</td><td>pp. 3-9 a 3-12 (PDF 117–120)</td><td>Esquemas de los modos</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — Engineering Funda, <a href="https://www.youtube.com/watch?v=rB1M1Gl1XvY">«TCON and TMOD registers of 8051»</a> (12:11, inglés) y <a href="https://www.youtube.com/watch?v=RLjA9jSY2fM">«Modes of timer &amp; counter in 8051»</a> (12:11, inglés).</li>
+  <li><strong>Simulador</strong> — Ejemplos 3 y 4 del <a href="../simulador.html">simulador</a>: observa TH0:TL0 contar en el panel de temporizadores.</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué detener el timer antes de recargarlo en modo 1?</summary><div><p>Porque se recargan dos bytes con dos instrucciones: si el timer cuenta entre ambas, TL podría desbordar sobre el TH recién escrito. Detener, recargar y redisparar lo evita (a costa de unos ciclos de error).</p></div></details>
+  <details><summary>¿Hace falta habilitar la IT del Timer 1 para el puerto serie?</summary><div><p>No: el puerto serie detecta internamente el desbordamiento del Timer 1. Se configura en modo 2 y no se usa su interrupción.</p></div></details>
+  <details><summary>¿Cómo consigo 1 s exacto con un cristal de 11,0592 MHz?</summary><div><p>El ciclo es 1,0851 µs: 1 s = 921 600 ciclos = 18 432 × 50, o 46 080 × 20 (modo 1: 65 536 − 46 080 = 4C00h, ×20). La calculadora de esta página busca combinaciones exactas.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencias C11 «Temporizadores/Contadores» y C12 «Ejemplo de sistema con temporizadores», CP6 «Temporizadores/contadores en 8051», LAB5 «Diseño de un reloj digital utilizando los timers del 8051» (Dr. A. J. Cabrera Sarmiento y colectivo, CUJAE). Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

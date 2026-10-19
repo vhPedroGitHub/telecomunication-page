@@ -48,10 +48,12 @@ las asignaturas enlacen de forma estable. **No cambiar los `id` una vez publicad
 | `matematica.html` | ✅ complejos · trig · logaritmos/dB · integrales · series · hiperbólicas · impulso · binario |
 | `probabilidad.html` | ✅ discreta · va · gauss (+ calculadora Q) · procesos |
 | `circuitos.html` | ✅ fasores · potencia · maxtrans · rc · filtros (+ Bode) |
-| `fisica-em.html`, `electronica-*.html`, `redes.html` | ⬜ |
+| `electronica-digital.html` | ✅ numeracion · secuencial · tristate · memorias |
+| `electronica-analogica.html` | ✅ transistor · niveles |
+| `fisica-em.html`, `redes.html` | ⬜ |
 
 Bibliografía verificada: Stewart (el PDF «…9naEd» es en realidad *Cálculo. Trascendentes tempranas*, 8ª ed., 2018; PDF = impresa + 31), Walpole 9ª 2012 (+22),
-Hayt 8ª (+17).
+Hayt 8ª (+17), Tocci 10ª (+28), Boylestad 10ª (+19).
 
 ## Bitácora
 

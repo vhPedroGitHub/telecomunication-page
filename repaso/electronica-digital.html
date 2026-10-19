@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repaso · Electrónica digital</title>
+
+  <meta name="description" content="Fichas de repaso: numeración, complemento a 2, BCD, biestables, registros, contadores, tercer estado, drenador abierto y memorias.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <script src="../assets/js/theme.js"></script>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-repaso); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../">← Portal</a><span class="title">Repaso de prerrequisitos</span>
+  <nav class="tabs" aria-label="Fichas"><a href="./">Índice</a><a href="matematica.html">Matemática</a><a href="probabilidad.html">Probabilidad</a><a href="circuitos.html">Circuitos</a><a href="electronica-digital.html" aria-current="page">Electrónica digital</a><a href="electronica-analogica.html">Electrónica analógica</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice de fichas"><h2>Fichas</h2><ol data-auto></ol></nav>
+<main class="content">
+<h1>Electrónica digital para microcontroladores</h1>
+<p class="lead">Lo que Microcontroladores da por sabido de Electrónica Digital: sistemas de numeración, aritmética binaria, biestables y contadores, salidas de tercer estado y memorias.</p>
+
+<h2 id="numeracion">Sistemas de numeración y complemento a 2</h2>
+<p>Binario (base 2), hexadecimal (base 16: 0–9, A–F; cada dígito = 4 bits) y BCD (cada dígito decimal en 4 bits: 59 → <code>0101 1001</code>). Para pasar de hexadecimal a binario se sustituye cada dígito por sus 4 bits: <code>9Ch = 1001 1100b = 156</code>. Un byte = 8 bits = 2 nibbles.</p>
+<div class="eq key">$$-x\ \text{(complemento a 2)}=\overline{x}+1,\qquad \text{rango con signo de 8 bits: }-128\ (80\text{h})\ldots+127\ (7\text{Fh})$$</div>
+<p>Restar es sumar el complemento a 2. Con números sin signo, el <strong>acarreo</strong> indica que el resultado no cabe en 8 bits (o, en la resta, que hubo «préstamo»); con signo, el <strong>desbordamiento</strong> (OV) indica que el resultado cambió de signo indebidamente (p. ej. 7Fh + 01h = 80h: +127 + 1 ≠ −128). En BCD, una suma binaria puede dar nibbles &gt; 9 y se corrige sumando 6 (lo que hace <code>da A</code> en el 8051).</p>
+<p class="meta">Dónde estudiarlo: Tocci, Widmer y Moss, <em>Digital Systems: Principles and Applications</em>, 10.ª ed., Pearson, 2007: 2-1 a 2-4 (binario, hexadecimal, BCD), pp. 26–34 (PDF 54–62); 6-2 «Representing Signed Numbers» y 6-7 «BCD Addition», pp. 299 y 312 (PDF 327 y 340).</p>
+
+<h2 id="secuencial">Biestables, registros y contadores</h2>
+<p>Un <strong>biestable D</strong> copia su entrada D en la salida Q con el flanco activo del reloj y la retiene: es la celda de un puerto de salida y de un registro. Un <strong>registro</strong> son \(n\) biestables con reloj común; si cada uno pasa su dato al siguiente, es un <strong>registro de desplazamiento</strong> (paralelo ↔ serie: el corazón de una UART). Un <strong>contador</strong> binario de \(n\) bits cuenta \(2^n\) estados y vuelve a 0 (desborda): el corazón de un temporizador. Dividir la frecuencia por \(k\) multiplica el período por \(k\). <strong>Flanco de caída</strong>: transición 1 → 0; <strong>nivel bajo</strong>: estado 0 mantenido.</p>
+<p class="meta">Dónde estudiarlo: Tocci, 10.ª ed.: 5-8 «Clocked D Flip-Flop», p. 230 (PDF 258); 7-1 «Asynchronous (Ripple) Counters», p. 362 (PDF 390); 7-15 a 7-19 «Integrated-Circuit Registers» (paralelo/serie), pp. 437–444 (PDF 465–472).</p>
+
+<h2 id="tristate">Salidas de tercer estado y buses</h2>
+<p>Una salida <strong>de tercer estado</strong> tiene, además de 0 y 1, un estado de <strong>alta impedancia</strong> (desconectada) controlado por una entrada de habilitación. Así varios dispositivos (memorias, puertos) pueden compartir un <strong>bus</strong> de datos: solo el habilitado conduce. Una salida de <strong>drenador (colector) abierto</strong> solo puede llevar la línea a 0; el 1 lo pone una resistencia de pull-up, y varias salidas unidas forman un AND cableado (los puertos del 8051 original son así).</p>
+<p class="meta">Dónde estudiarlo: Tocci, 10.ª ed.: 8-11 «Open-Collector/Open-Drain Outputs», p. 533 (PDF 561), y 8-12 «Tristate (Three-State) Logic Outputs», p. 538 (PDF 566).</p>
+
+<h2 id="memorias">Memorias</h2>
+<p>Una memoria de \(2^n\times m\) tiene \(n\) líneas de dirección, \(m\) de datos (de tercer estado) y señales de control activas en 0: selección (CE/), lectura (OE/) y escritura (WE/). Internamente: un decodificador \(n\to2^n\) selecciona una fila de la matriz de celdas. <strong>ROM/Flash</strong>: no volátil (programa); <strong>RAM</strong>: lectura/escritura, volátil (datos). Capacidad = localizaciones × bits.</p>
+<p class="meta">Dónde estudiarlo: Tocci, 10.ª ed.: 12-1 «Memory Terminology» y 12-2 «General Memory Operation», pp. 786–795 (PDF 814–823); 12-5 «ROM Architecture», p. 796 (PDF 824); 12-11 «RAM Architecture», p. 815 (PDF 843).</p>
+
+<p class="source-note">Fichas de repaso de elaboración propia. Bibliografía de los cursos básicos (06-ElecD): Tocci, Widmer y Moss, 10.ª ed.</p>
+</main></div>
+<footer class="site wrap">Repaso de prerrequisitos · <a href="./">Índice de fichas</a></footer>
+</body>
+</html>

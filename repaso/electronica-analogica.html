@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repaso · Electrónica analógica</title>
+
+  <meta name="description" content="Fichas de repaso: transistor como interruptor, niveles lógicos, pull-up y antirrebote.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <script src="../assets/js/theme.js"></script>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-repaso); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../">← Portal</a><span class="title">Repaso de prerrequisitos</span>
+  <nav class="tabs" aria-label="Fichas"><a href="./">Índice</a><a href="matematica.html">Matemática</a><a href="probabilidad.html">Probabilidad</a><a href="circuitos.html">Circuitos</a><a href="electronica-digital.html">Electrónica digital</a><a href="electronica-analogica.html" aria-current="page">Electrónica analógica</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice de fichas"><h2>Fichas</h2><ol data-auto></ol></nav>
+<main class="content">
+<h1>Electrónica analógica para microcontroladores</h1>
+<p class="lead">Lo justo para conectar cargas a un microcontrolador: el transistor como interruptor y los niveles lógicos.</p>
+
+<h2 id="transistor">Transistor como interruptor</h2>
+<p>Un pin de un µC entrega pocos mA (≈10). Para una bocina, un relé, un motor o muchos LED se usa un transistor NPN como interruptor: el pin, a través de \(R_B\), excita la base; la carga va entre Vcc y el colector.</p>
+<div class="eq key">$$I_C=\frac{V_{CC}-V_{\text{carga}}-V_{CE,\text{sat}}}{R_C},\qquad I_B\ge\frac{I_C}{\beta}\ (\text{en la práctica }2\text{–}5\text{ veces más}),\qquad R_B=\frac{V_{OH}-V_{BE}}{I_B}$$</div>
+<p>Con \(V_{BE}\approx0{,}7\) V y \(V_{CE,\text{sat}}\approx0{,}2\) V. Ejemplo (CP3): bocina de 50 mA y 1 V, Vcc = 5 V, β = 100, \(V_{OH}=4{,}6\) V: \(R_C=(5-1-0{,}2)/0{,}05=76\ \Omega\); \(I_B=2\cdot0{,}05/100=1\) mA ⇒ \(R_B=(4{,}6-0{,}7)/1\text{ mA}=3{,}9\) kΩ. Si la carga es inductiva (relé, motor), un <strong>diodo de libre circulación</strong> en paralelo protege el transistor. Para varias cargas, los arreglos darlington como el ULN2003 incluyen todo.</p>
+<p class="meta">Dónde estudiarlo: Boylestad y Nashelsky, <em>Electrónica: teoría de circuitos y dispositivos electrónicos</em>, 10.ª ed., Pearson, 2009: 4.15 «Redes de conmutación con transistores», pp. 206–209 (PDF 225–228).</p>
+
+<h2 id="niveles">Niveles lógicos, pull-up y antirrebote</h2>
+<p>Salidas: \(V_{OH}\) (mínimo garantizado para un 1) y \(V_{OL}\) (máximo para un 0), que empeoran al aumentar la corriente; corrientes máximas \(I_{OH}\), \(I_{OL}\). Entradas: \(V_{IH}\) y \(V_{IL}\); en CMOS la corriente de entrada es de µA, así que basta garantizar el nivel. Una entrada no debe quedar «al aire»: una <strong>resistencia de pull-up</strong> (≈10 kΩ, o la interna del puerto) la fija a 1 y un interruptor la lleva a 0. Los contactos mecánicos <strong>rebotan</strong> ≈5 ms: se filtra por software (leer de nuevo pasado ese tiempo) o con un RC y una entrada Schmitt.</p>
+<p class="meta">Dónde estudiarlo: Tocci, Widmer y Moss, <em>Digital Systems</em>, 10.ª ed.: 8-9 «CMOS Series Characteristics», p. 523 (PDF 551), y 8-16 «IC Interfacing», p. 548 (PDF 576).</p>
+
+<p class="source-note">Fichas de repaso de elaboración propia. Bibliografía de los cursos básicos (05-ElecA, 06-ElecD).</p>
+</main></div>
+<footer class="site wrap">Repaso de prerrequisitos · <a href="./">Índice de fichas</a></footer>
+</body>
+</html>

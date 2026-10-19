@@ -178,12 +178,12 @@ El repo es **público**. Los materiales fuente están **fuera** del repo a prop�
 | Asignatura | Estado | Notas |
 |---|---|---|
 | Líneas de Transmisión y Antenas | 🟡 iniciada | `index.html` con Tema I (teoría general de LTx, carta de Smith interactiva, λ/4) |
-| Microcontroladores | ⬜ pendiente | solo estructura |
+| Microcontroladores | 🟡 casi completa | 8 temas + simulador 8051 web + `software/mcs51calc`; faltan programas completos de CP3–CP8 |
 | Fundamentos de las Comunicaciones I | 🟡 casi completa | Temas I–III con 20 simuladores + `software/fc1`; faltan Conf. 14, más variantes de PP |
 | Redes 3 | ⬜ pendiente | solo estructura |
 | Gestión y Seguridad de Redes | ⬜ pendiente | solo estructura |
 | Estudios Sociales de la CyT | ⛔ sin materiales | carpeta fuente vacía |
-| Repaso de prerrequisitos | 🟡 iniciada | matemática, probabilidad, circuitos |
+| Repaso de prerrequisitos | 🟡 iniciada | matemática, probabilidad, circuitos, electrónica digital y analógica |
 | Portal raíz + CI/CD | ✅ hecho | `index.html`, `assets/css/base.css`, workflow |
 
 Leyenda: ✅ completo · 🟡 en progreso · ⬜ pendiente · ⛔ bloqueado.

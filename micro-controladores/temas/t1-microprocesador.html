@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T1 · Microprocesador y ejecución de instrucciones — Microcontroladores</title>
+  <meta name="description" content="Qué es un microprocesador, cómo se codifican y ejecutan las instrucciones, estructura interna (UC, ALU, registros), memorias ROM y RAM, buses y ciclos de máquina. Conferencias C1 y C2, CP1.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/micro.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/micro.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="../#temas" aria-current="page">Temas</a><a href="../simulador.html">Simulador</a><a href="../#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema 1 · Conferencias C1 y C2 · Clase práctica CP1</p>
+<h1>El microprocesador y la ejecución de instrucciones</h1>
+<p class="lead">Un microcontrolador es, antes que nada, un <strong>microprocesador</strong> con memoria y periféricos alrededor. Como dice la C3: <em>«dominar un µC es dominar el µP que contiene»</em>. Este tema explica qué hace exactamente un µP en cada pulso de reloj, sin el que nada de lo que sigue tiene sentido.</p>
+
+<div class="objectives"><strong>Objetivos (C1 y C2)</strong><ul>
+  <li>Conocer la definición de microprocesador y cómo se codifican las instrucciones.</li>
+  <li>Dominar la estructura interna (UC, ALU, registros) y las señales fundamentales de un µP.</li>
+  <li>Saber qué son las memorias ROM y RAM, su estructura y señales.</li>
+  <li>Dominar los ciclos de máquina (búsqueda, lectura, escritura) y cómo interacciona el µP con las memorias al ejecutar cada instrucción.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">sistemas de numeración, buses y tercer estado</span>
+<p>Hexadecimal: cada dígito son 4 bits (\(9\text{Ch}=1001\,1100_2=156\)). Un bus de \(n\) líneas de dirección selecciona \(2^n\) posiciones (16 líneas → 64 kB). Una salida de <strong>tercer estado</strong> puede estar en 0, en 1 o «desconectada» (alta impedancia), lo que permite que varios dispositivos compartan el bus de datos sin cortocircuito: solo el seleccionado conduce. Repaso: <a href="../../repaso/electronica-digital.html#numeracion">numeración y complemento a 2</a> · <a href="../../repaso/electronica-digital.html#tristate">tercer estado y buses</a> · <a href="../../repaso/electronica-digital.html#memorias">memorias</a>.</p></div>
+
+<h2 id="definicion">1. ¿Qué es un microprocesador?</h2>
+<p>Un <strong>circuito integrado digital (CMOS) capaz de buscar, decodificar y ejecutar instrucciones</strong>. Todo su trabajo es un bucle infinito de tres fases:</p>
+<div class="flow"><span>Búsqueda (fetch)</span>→<span>Decodificación</span>→<span>Ejecución</span>→<span>…siguiente</span></div>
+<p>Las preguntas que guían la C1 son las que hay que saber contestar: ¿cómo están codificadas las instrucciones?, ¿dónde y cómo las busca?, ¿cómo las decodifica y ejecuta?, ¿puede buscar la siguiente mientras ejecuta la actual? (sí, en procesadores con <em>pipeline</em>; el 8051 original no).</p>
+
+<h3 id="codificacion">1.1 Codificación de las instrucciones</h3>
+<p>En la memoria todo son bits. Una instrucción es un número binario (<strong>lenguaje de máquina</strong>) al que el ensamblador le pone un nombre (<strong>mnemónico</strong>):</p>
+<pre><code>10011100b = 9Ch   ↔   add A,B    (ensamblador)   ↔   a += b;   (C)</code></pre>
+<p>Ejemplos reales del 8051 (C1): <code>add A,Rn</code> = <code>0 0 1 0 1 n n n</code> (un byte; los 3 bits bajos dicen qué registro) y <code>add A,#dato</code> = <code>0 0 1 0 0 1 0 0</code> seguido del byte del dato (dos bytes). Una instrucción puede ocupar uno o más bytes.</p>
+<div class="box idea"><span class="box-title">¿Puede existir un dato de valor 9Ch? ¿Cómo lo distingue el µP de la instrucción 9Ch?</span>
+<p>Sí. El µP <strong>no</strong> distingue por el valor sino por el <strong>momento</strong>: lo que lee en un ciclo de búsqueda lo trata como código de instrucción y lo carga en el registro de instrucción; lo que lee mientras ejecuta (2.º byte, operando en memoria) lo trata como dato. Por eso, si el PC llega por error a una tabla de datos, el µP la «ejecuta» como si fueran instrucciones (pregunta de la C4: <em>¿qué ocurre si se hace un ciclo de búsqueda a la dirección donde está una tabla?</em>).</p></div>
+
+<h2 id="estructura">2. Estructura interna</h2>
+<svg class="diagram" viewBox="0 0 720 250" role="img" aria-label="Estructura de un microprocesador: unidad de control, ALU, registros, PC, registro de instrucción, conectados a los buses de direcciones, datos y control">
+  <rect class="box-s" x="20" y="20" width="440" height="210" rx="10"/><text x="30" y="40" class="muted">µP</text>
+  <rect class="box-s" x="40" y="55" width="150" height="70" rx="6"/><text x="115" y="85" text-anchor="middle">Unidad de decodificación</text><text x="115" y="102" text-anchor="middle">y control (UC)</text>
+  <rect class="box-s" x="40" y="145" width="150" height="65" rx="6"/><text x="115" y="173" text-anchor="middle">ALU</text><text x="115" y="192" text-anchor="middle" class="muted">+ banderas C, Z, P…</text>
+  <rect class="box-s" x="215" y="55" width="105" height="30" rx="5"/><text x="267" y="75" text-anchor="middle">PC (16 bit)</text>
+  <rect class="box-s" x="215" y="95" width="105" height="30" rx="5"/><text x="267" y="115" text-anchor="middle">Reg. instrucción</text>
+  <rect class="box-s" x="215" y="145" width="105" height="30" rx="5"/><text x="267" y="165" text-anchor="middle">Acumulador A</text>
+  <rect class="box-s" x="335" y="55" width="110" height="30" rx="5"/><text x="390" y="75" text-anchor="middle">Registros (B…)</text>
+  <rect class="box-s" x="335" y="95" width="110" height="30" rx="5"/><text x="390" y="115" text-anchor="middle">Punteros X, Y</text>
+  <rect class="box-s" x="215" y="185" width="230" height="30" rx="5"/><text x="330" y="205" text-anchor="middle" class="muted">bus interno</text>
+  <path class="acc" d="M460 70 H700" /><text x="580" y="62" text-anchor="middle">Bus de direcciones A0–15</text>
+  <path class="acc" d="M460 130 H700" /><text x="580" y="122" text-anchor="middle">Bus de datos D0–7 (bidireccional)</text>
+  <path class="acc" d="M460 190 H700" /><text x="580" y="182" text-anchor="middle">Bus de control RD/, WR/</text>
+  <text x="20" y="245" class="muted">Reloj y RESET entran a la UC</text>
+</svg>
+<div class="table-wrap"><table>
+  <thead><tr><th>Bloque</th><th>Función</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Unidad de control (UC)</strong></td><td>El «cerebro»: una máquina de estados que busca las instrucciones, las decodifica y genera la secuencia de micro-operaciones (señales internas y de bus) que las ejecutan.</td></tr>
+    <tr><td><strong>ALU</strong></td><td>Hace las operaciones aritméticas y lógicas por orden de la UC. Muchas operaciones afectan las <strong>banderas</strong>.</td></tr>
+    <tr><td><strong>Contador de programa (PC)</strong></td><td>Dirección de la próxima instrucción (o del próximo byte de la actual). Contador ascendente: se incrementa con cada lectura de código. Las instrucciones de transferencia de control (<code>jmp</code>, <code>call</code>, <code>ret</code>) lo <em>cargan</em>.</td></tr>
+    <tr><td><strong>Registro de instrucción (IR)</strong></td><td>Guarda el código buscado para decodificarlo. No es accesible por el programador.</td></tr>
+    <tr><td><strong>Banderas</strong></td><td>Biestables que indican resultados de la ALU: acarreo (C), cero (Z), paridad (P)… Se consultan individualmente (<code>jc</code>, <code>jnz</code>).</td></tr>
+    <tr><td><strong>Acumulador (A)</strong></td><td>Registro de datos más usado: fuente y destino de la mayoría de las operaciones de la ALU.</td></tr>
+    <tr><td><strong>Registros de propósito general</strong></td><td>Pocos (8–32) almacenes rápidos dentro del µP.</td></tr>
+    <tr><td><strong>Punteros</strong></td><td>Su contenido se usa como <em>dirección</em> de memoria: base del direccionado indirecto.</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="sistema">3. Sistema con microprocesador y memorias</h2>
+<p>El µP solo no hace nada: necesita <strong>ROM</strong> (programa), <strong>RAM</strong> (datos) y <strong>puertos de E/S</strong> (mundo exterior), todos colgados de los tres buses. Un decodificador de direcciones decide quién responde a cada dirección.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th></th><th>ROM (Read Only Memory)</th><th>RAM (Random Access Memory)</th></tr></thead>
+  <tbody>
+    <tr><td>Escritura</td><td>No convencional (programación; hoy Flash)</td><td>Lectura y escritura (RWM)</td></tr>
+    <tr><td>Al quitar la alimentación</td><td>Conserva (no volátil)</td><td>Pierde (volátil)</td></tr>
+    <tr><td>Uso típico</td><td>Instrucciones y constantes (tablas)</td><td>Variables y pila (en µC nunca instrucciones)</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Definiciones</strong>: una <em>localización</em> agrupa un número de bits (celdas); cada localización tiene una <em>dirección</em>; la <em>capacidad</em> = número de localizaciones × bits por localización (\(2^n\times m\)). Señales externas: \(n\) líneas de dirección \(A_i\), \(m\) de datos \(D_i\) (de tercer estado), selección <code>CE/</code>, lectura <code>OE/</code> y escritura <code>WE/</code> (activas en 0). Internamente: un decodificador \(n\to2^n\) que activa una fila de la matriz de celdas.</p>
+<div class="example"><h4>Ejemplo — ROM MOS de 8 × 4 (C1)</h4>
+<p>3 líneas de dirección (\(2^3=8\) localizaciones) y 4 de datos. Con la tabla de la conferencia, al poner la dirección 2 y activar la lectura, la salida es \(D_3D_2D_1D_0=0101\). En la matriz, en cada cruce fila-columna hay o no hay transistor: eso «graba» un 0 o un 1 de forma permanente.</p></div>
+
+<h2 id="ciclos">4. Ciclos de máquina</h2>
+<p>Las acciones básicas de la UC —<strong>búsqueda de instrucción</strong>, <strong>lectura</strong> en memoria, <strong>escritura</strong> en memoria— duran un tiempo fijo marcado por el reloj: el <strong>ciclo de máquina</strong>. Cada instrucción tarda uno o más ciclos de máquina, y en esa unidad se da su duración.</p>
+<ul>
+  <li><strong>Ciclo de lectura</strong> (incluye la búsqueda): el µP pone la dirección en \(A_{0-15}\), activa <code>RD/</code> y la memoria pone el dato en \(D_{0-7}\), que el µP captura antes de desactivar <code>RD/</code>.</li>
+  <li><strong>Ciclo de escritura</strong>: el µP pone la dirección y el dato y activa <code>WR/</code>; la memoria lo almacena.</li>
+</ul>
+<p>Tiempo de una instrucción: \(t=N_{\text{ciclos}}\cdot T_{\text{CM}}\), con \(T_{\text{CM}}=k/f_{\text{reloj}}\) si el ciclo de máquina dura \(k\) pulsos de reloj (12 en el 8051 original, 1 en los actuales).</p>
+
+<h2 id="ejecucion">5. Ejecución de instrucciones paso a paso (C2)</h2>
+<p>La C2 sigue un programa en un µP de ejemplo (PC de 16 bits, A, B, banderas C y Z, punteros X e Y de 16 bits). Recórrelo micro-operación a micro-operación: observa cuándo hay ciclo de bus, qué hay en cada bus y cuándo cambia el PC.</p>
+<div class="sim" id="w-fetch">
+  <div class="sim-title">Búsqueda, decodificación y ejecución</div>
+  <p class="meta">Códigos de operación de este µP genérico: ficticios salvo <code>9Ch = add A,B</code> (de la C1). Antes de empezar: A = 05h, B = 03h, X = 2000h, Y = 3000h, [3000h] = 40h.</p>
+  <div class="controls"><button class="btn ghost" id="fx-prev" type="button">◀ Anterior</button><button class="btn" id="fx-next" type="button">Siguiente ▶</button><button class="btn ghost" id="fx-rst" type="button">⟲ Inicio</button></div>
+  <div class="fx-grid"><div class="fx-prog" id="fx-prog"></div><div><div class="fx-regs" id="fx-regs"></div><div class="fx-bus" id="fx-bus"></div></div></div>
+  <div class="readout" id="fx-desc"></div>
+</div>
+<div class="box warn"><span class="box-title">Pregunta de debate (C2): al leer el 2.º byte de <code>jmp 1234h</code>, ¿dónde lo guarda? ¿en el PC?</span>
+<p>No: si lo cargara en el PC ya no podría usar el PC para leer el 3.er byte. Se guarda en un registro temporal interno y solo al final, con los dos bytes, se carga el PC.</p></div>
+
+<h2 id="cp1">6. Guía de la CP1: funcionamiento de un microprocesador</h2>
+<p>Datos del µP de la CP: 8 bits de datos, bus de direcciones de 16 bits, <code>RD/</code> y <code>WR/</code>, registros PC, A, R0–R3, X e Y (16 bits), banderas C, Z y P (paridad par); todos a 0 con RESET; código de cada instrucción en 8 bits.</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Dir.</th><th>Instrucción</th><th>Bytes</th><th>Ciclos de máquina (suponiendo un ciclo por cada acceso a memoria)</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">0000</td><td class="mono">mov R3,10</td><td>2</td><td>2 (búsqueda + lectura del dato)</td></tr>
+    <tr><td class="mono">0002</td><td class="mono">mov Y,3AF4h</td><td>3</td><td>3</td></tr>
+    <tr><td class="mono">0005</td><td class="mono">mov X,Y</td><td>1</td><td>1</td></tr>
+    <tr><td class="mono">0006</td><td class="mono">mov [Y],A</td><td>1</td><td>2 (búsqueda + escritura)</td></tr>
+    <tr><td class="mono">0007–0009</td><td class="mono">inc A · inc Y · dec R3</td><td>1 c/u</td><td>1 c/u</td></tr>
+    <tr><td class="mono">000A</td><td class="mono">jnz 0006</td><td>3</td><td>3</td></tr>
+    <tr><td class="mono">000D</td><td class="mono">inc [X]</td><td>1</td><td>3 (búsqueda + lectura + escritura)</td></tr>
+    <tr><td class="mono">000E</td><td class="mono">mov A,[X]</td><td>1</td><td>2</td></tr>
+    <tr><td class="mono">000F</td><td class="mono">and A,00000011b</td><td>2</td><td>2</td></tr>
+    <tr><td class="mono">0011–0012</td><td class="mono">inc R3 · cmp R3,10</td><td>1 · 2</td><td>1 · 2</td></tr>
+    <tr><td class="mono">0014</td><td class="mono">jc 000Dh</td><td>3</td><td>3</td></tr>
+    <tr><td class="mono">0017</td><td class="mono">jmp 0000</td><td>3</td><td>3</td></tr>
+  </tbody>
+</table></div>
+<div class="example"><h4>Claves para resolverla</h4>
+<div class="step"><span class="n">a</span><div><p><strong>Secuencia</strong>: el lazo 0006–000A se repite 10 veces (R3 = 10, 9, …, 1); escribe A = 0, 1, …, 9 en 3AF4h…3AFDh. Al salir, X = 3AF4h (apunta a la primera posición) y R3 = 0. El segundo lazo (000D–0014) incrementa <code>[X]</code>, toma sus 2 bits bajos, incrementa R3 y compara con 10: <code>cmp</code> resta sin guardar; C = 1 mientras R3 &lt; 10. Se repite 10 veces sobre la misma posición [3AF4h] (X no cambia).</p></div></div>
+<div class="step"><span class="n">f</span><div><p><strong>Tipo de memoria</strong>: en 0000h está el programa ⇒ ROM. En 3AF4h el programa <em>escribe</em> ⇒ tiene que ser RAM.</p></div></div>
+<div class="step"><span class="n">g</span><div><p>Con 20 MHz y 4 pulsos por ciclo de máquina: \(T_{\text{CM}}=4/20\text{ MHz}=0{,}2\) µs. <code>inc [X]</code> necesita búsqueda + lectura + escritura = 3 ciclos ⇒ 0,6 µs.</p></div></div>
+<div class="step"><span class="n">h</span><div><p>¿Qué frecuencia elegir entre 1 y 20 MHz? La menor que cumpla los requisitos de tiempo de la aplicación: menos consumo, menos ruido electromagnético y menores exigencias a las memorias. Sin requisitos de tiempo dados, no hace falta la máxima.</p></div></div>
+<div class="step"><span class="n">i</span><div><p>Si un ruido pone a 1 el bit 0 del PC tras la primera instrucción, el PC pasa de 0002h a 0003h: la siguiente «búsqueda» lee F4h (el byte bajo del dato de <code>mov Y,3AF4h</code>) como si fuera un código de instrucción. El µP ejecuta basura: el programa se pierde (por eso existen los perros guardianes, <em>watchdog</em>).</p></div></div>
+</div>
+<p><strong>Ejercicio 2 de la CP1</strong> (máximo y mínimo de 100 bytes en 4000h, resultados en 4080h y 4081h). Seudocódigo:</p>
+<pre><code>X ← 4000h ; max ← [X] ; min ← [X] ; R3 ← 99
+lazo: X ← X+1 ; A ← [X]
+      si A > max entonces max ← A      ; con cmp y jc / jnc
+      si A < min entonces min ← A
+      R3 ← R3−1 ; si R3 ≠ 0 ir a lazo
+[4080h] ← max ; [4081h] ← min</code></pre>
+
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. ¿Qué registro contiene la dirección de la próxima instrucción?</p><div class="opts"><button class="opt" type="button">IR</button><button class="opt" type="button" data-ok>PC</button><button class="opt" type="button">A</button></div><p class="why">El contador de programa (PC).</p></div>
+  <div class="q"><p>2. Durante la ejecución de <code>mov [X],A</code> hay un ciclo de…</p><div class="opts"><button class="opt" type="button">lectura con RD/ activa</button><button class="opt" type="button" data-ok>escritura con WR/ activa</button><button class="opt" type="button">ninguno</button></div><p class="why">Se escribe A en la RAM en la dirección que contiene X.</p></div>
+  <div class="q"><p>3. Una memoria con 13 líneas de dirección y 8 de datos tiene una capacidad de…</p><div class="opts"><button class="opt" type="button">13 × 8 bits</button><button class="opt" type="button" data-ok>8 kB</button><button class="opt" type="button">104 kB</button></div><p class="why">\(2^{13}=8192\) localizaciones de 8 bits = 8 kB.</p></div>
+  <div class="q"><p>4. ¿Por qué las salidas de datos de las memorias son de tercer estado?</p><div class="opts"><button class="opt" type="button">Para consumir menos</button><button class="opt" type="button" data-ok>Para compartir el bus de datos sin conflictos</button><button class="opt" type="button">Para ser más rápidas</button></div><p class="why">Solo el dispositivo seleccionado conduce; los demás quedan en alta impedancia.</p></div>
+</div>
+
+<h2 id="biblio">Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>MacKenzie y Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007</td><td>1</td><td>1.2 Terminología · 1.3 La unidad central de procesamiento · 1.5 Los buses de direcciones, datos y control · 1.9 Comparación entre microprocesadores y microcontroladores</td><td>pp. 3–11 (PDF 18–26)</td><td>Estructura del µP, buses, µP vs µC</td></tr>
+    <tr><td>Intel, <em>MCS-51 Microcontroller Family User's Manual</em>, 1994</td><td>3</td><td>Internal Timing (estados y fases del ciclo de máquina del 8051)</td><td>pp. 3-33 y ss. (PDF 141 y ss.)</td><td>Ciclo de máquina de 12 pulsos</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — Tom Scott, <a href="https://www.youtube.com/watch?v=Z5JC9Ve1sfI">«The Fetch-Execute Cycle: What's Your Computer Actually Doing?»</a> (9:04, inglés con subtítulos). El ciclo de la sección 5 contado con un «procesador humano».</li>
+  <li><strong>Simulador</strong> — Usa el <a href="../simulador.html">simulador 8051</a> con el botón «Paso» y observa el PC y el número de ciclos de cada instrucción.</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Microprocesador y CPU son lo mismo?</summary><div><p>En la práctica sí: el µP es una CPU en un solo circuito integrado. Un microcontrolador es la CPU más memorias y periféricos en el mismo chip.</p></div></details>
+  <details><summary>¿Por qué el PC se incrementa antes de ejecutar?</summary><div><p>Porque así siempre apunta al siguiente byte que hay que leer (2.º byte de la instrucción o siguiente instrucción). Por eso, en un salto relativo, el desplazamiento se suma al PC ya incrementado.</p></div></details>
+  <details><summary>¿Qué diferencia hay entre ciclo de máquina y ciclo de reloj?</summary><div><p>El de reloj es un período de la señal del oscilador; el de máquina es el tiempo de una operación básica de la UC, formado por varios ciclos de reloj (12 en el 8051 original, 1 en muchos 8051 modernos).</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencias C1 «Microprocesadores» y C2 «Ejecución de instrucciones», CP1 «Funcionamiento de un microprocesador» (Dr. A. J. Cabrera Sarmiento, CUJAE). Explicaciones y animación de elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

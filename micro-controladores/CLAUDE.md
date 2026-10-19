@@ -77,29 +77,52 @@ Citar siempre capítulo + epígrafe + páginas verificadas con `pdftotext`.
 - Software (Python/Go/Rust): ensamblador/desensamblador didáctico, calculadora de timers/UART por CLI.
 - Guía de instalación de MCU-8051 IDE, SDCC y Proteus (Windows y Linux/Wine).
 
+## Estructura del sitio
+
+| Archivo | Contenido |
+|---|---|
+| `index.html` | portada: temas, plan por encuentros, mapa C/CP/LAB, evaluación, uso de IA (C0), bibliografía, software (MCU 8051 IDE, SDCC, Proteus, mcs51calc), prerrequisitos, FAQ |
+| `simulador.html` + `js/sim8051.js` + `js/simui.js` + `css/sim.css` | **simulador 8051**: ensamblador (ORG/EQU/DB/DW/END, HIGH/LOW, $, alias EQU de registros y bits; JMP/CALL → LJMP/LCALL), CPU completa (255 códigos, ciclos reales), timers 0/1 (modos 0–3), IT con 2 niveles y bits L/H, UART (temporización con TH1/SMOD), puertos latch AND externo, paso atrás, breakpoints, 7 seg, frecuencímetro, terminal, .hex. 9 ejemplos del curso (`?ej=N`). |
+| `temas/t1…t8-*.html` + `js/micro.js` + `css/micro.css` | 8 temas con 15 widgets (fetch-execute, bits/bancos, codificador, demoras, LED, UC→UI, 7 seg, teclado, motor de paso, IE/IP/TMOD/SCON, prioridades, timers, baudios, trama UART) |
+| `software/mcs51calc/` | CLI Python (timer, baud, demora, seg7, ui, led) + pruebas |
+
+Pruebas del núcleo: en el scratchpad se ensamblaron los programas del curso y se compararon códigos
+con el .lst de C4; se verificaron demoras (1 006 035 ciclos), Timer0 1 s, UART 1200 bps, INT0 por
+flanco y las soluciones de la CP2.
+
+## Bibliografía verificada (página impresa → PDF)
+
+MacKenzie es 4ª ed. 2007: **+15** constante · Intel MCS-51 User's Manual: cap. 2 «2-n» = PDF 30+n,
+cap. 3 «3-n» = PDF 108+n · SDCC 3.2.1: +1 · el PDF «Mazidi» son **diapositivas** de C.-P. Young
+(NCKU) basadas en el libro (sin paginación del libro).
+
 ## Estado
 
 | Tema | Teoría | Interactivo | Ejemplos | Ejercicios | CP/LAB | Biblio | Links | FAQ |
 |---|---|---|---|---|---|---|---|---|
-| 1 µP y sistema con µP | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 2 Ejecución de instrucciones | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 3 Familia 8051 / memoria | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 4 Instrucciones + herramientas | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 5 Señales y puertos | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 6 ADC, teclado/display, motor | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 7 Interrupciones | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 8 Temporizadores | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 9 Puerto serie UART | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 10 Programación en C | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Portada / evaluación / software / FAQ general | ⬜ | | | | | | | |
+| 1 µP y ejecución | ✅ | ✅ | ✅ | ✅ | ✅ CP1 | ✅ | ✅ | ✅ |
+| 2 Familia 8051 / memoria | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| 3 Instrucciones + herramientas | ✅ | ✅ | ✅ | ✅ | ✅ CP2, LAB0–1 | ✅ | ✅ | ✅ |
+| 4 Puertos, ADC, display, teclado, motor | ✅ | ✅ | ✅ | 🟡 | ✅ CP3–4, LAB2–3 | ✅ | ✅ | ✅ |
+| 5 Interrupciones | ✅ | ✅ | ✅ | 🟡 | ✅ CP5, LAB4 | ✅ | ✅ | ✅ |
+| 6 Temporizadores | ✅ | ✅ | ✅ | 🟡 | ✅ CP6, LAB5 | ✅ | ✅ | ✅ |
+| 7 UART | ✅ | ✅ | ✅ | 🟡 | ✅ CP7, LAB6 | ✅ | ✅ | ✅ |
+| 8 C con SDCC | ✅ | ⬜ | ✅ | 🟡 | ✅ CP8 | ✅ | ✅ | ✅ |
+| Portada / software / simulador | ✅ | ✅ | | | | | | |
 
 ## Pendientes y dudas
 
-- Leer CP1–CP8 y LAB0–LAB6 y completar el mapeo tema ↔ CP ↔ LAB.
-- Revisar en C0 las fechas de los encuentros y el sistema de evaluación detallado.
-- El vídeo de C8 no está; si aparece, añadirlo a `07-Videos/`.
+- Las CP/LAB tienen figuras (hardware, teclados, tablas) solo en imagen: las guías describen la
+  solución sin reproducir esas figuras; programas completos de CP3–CP8 aún no escritos (solo guías).
+- Las Tabla7Seg de C10 y C16 (44h, 60h, 31h) no corresponden a la conexión a→bit0; se señaló en T4/T5/T8.
+- C11: `mov IE,#1001000b` (7 bits) es una errata; se señaló.
+- El simulador no implementa Timer 2 ni memoria externa con temporización; JMP/CALL siempre largos.
+- Vídeos de clases (07-Videos) no revisados.
 
 ## Bitácora
+
+- **2026-10-19** — Sitio construido: portada, simulador 8051 web, 8 temas (C1–C16, CP1–CP8, LAB0–LAB6),
+  `software/mcs51calc`, fichas de repaso de electrónica digital y analógica.
 
 - **2026-10-18** — Reorganización de materiales: `Conferencias pdf`→`01-Conferencias`, `CP`→`02-Clases-Practicas`,
   `Laboratorios`→`03-Laboratorios`, `Bibliografia`→`05-Bibliografia`, `MCU-8051_IDE`→`06-Software`,

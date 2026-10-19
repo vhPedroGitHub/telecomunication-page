@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcs51calc"
+version = "0.1.0"
+description = "Calculadoras para el 8051: recargas de timers, baud rate (TH1), demoras djnz, códigos de 7 segmentos, UC→UI y resistencias de LED."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = []
+
+[project.scripts]
+mcs51calc = "mcs51calc.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["mcs51calc*"]

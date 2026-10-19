@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T2 · Familia 8051 y organización de la memoria — Microcontroladores</title>
+  <meta name="description" content="Origen de los microcontroladores, la familia 8051, organización de la memoria de programa y de datos, bancos de registros, zona direccionable bit a bit, stack, SFR y PSW. Conferencia C3.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/micro.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/micro.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="../#temas" aria-current="page">Temas</a><a href="../simulador.html">Simulador</a><a href="../#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema 2 · Conferencia C3 · base de la CP2</p>
+<h1>La familia 8051 y la organización de su memoria</h1>
+<p class="lead">El 8051 lleva más de 40 años en el mercado y lo fabrican decenas de empresas porque su núcleo no ha cambiado: <strong>la organización de la memoria, los modos de direccionado, el repertorio de instrucciones y el mecanismo de interrupción son los mismos</strong>. Lo que cambia es la velocidad (ciclo de máquina de 1 pulso en lugar de 12) y la cantidad de periféricos. Este tema es el «mapa» que necesitas para programar.</p>
+
+<div class="objectives"><strong>Objetivos (C3)</strong><ul>
+  <li>Conocer el origen de los microcontroladores y la relevancia de la familia 8051.</li>
+  <li>Conocer las características generales de la familia 8051.</li>
+  <li>Saber cómo están organizadas las memorias de programa y de datos del 8051.</li>
+  <li>Saber la relevancia de los registros de funciones especiales (SFR).</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">hexadecimal, bits y memorias</span>
+<p>Un byte = 8 bits = 2 dígitos hexadecimales; los bits se numeran de 7 (MSB) a 0 (LSB). \(2^7=128\) direcciones van de 00h a 7Fh; \(2^8\) de 00h a FFh; \(2^{16}=64\text{ k}\) de 0000h a FFFFh. Repaso: <a href="../../repaso/electronica-digital.html#numeracion">numeración</a> · <a href="../../repaso/electronica-digital.html#memorias">memorias</a> · <a href="t1-microprocesador.html">Tema 1</a>.</p></div>
+
+<h2 id="microcontrolador">1. ¿Qué es un microcontrolador?</h2>
+<p>La idea original: integrar en <strong>un único circuito integrado</strong> todos los componentes de una placa basada en µP —por eso se llamó <em>single-chip microcomputer</em>—: el <strong>microprocesador</strong> (el elemento distintivo), memoria de programa (ROM/Flash), memoria de datos (RAM) y periféricos (puertos de E/S, temporizadores, puerto serie, conversor A/D, controlador de interrupciones…).</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Microcontrolador</th><th>Computadora personal</th></tr></thead>
+  <tbody>
+    <tr><td>Instrucciones y constantes en ROM; la RAM solo para datos y pila</td><td>Programas cargados en RAM desde disco</td></tr>
+    <tr><td>Memorias pequeñas: p. ej. 2 kB de ROM y 256 B de RAM (RAM ≪ ROM)</td><td>GB de RAM</td></tr>
+    <tr><td>Frecuencia moderada; a veces conviene la mínima posible (consumo)</td><td>GHz</td></tr>
+    <tr><td>Un único programa en lazo infinito, sin sistema operativo</td><td>Sistema operativo y muchos programas</td></tr>
+  </tbody>
+</table></div>
+<p>Hay µC de 4, 8, 16 y 32 bits, organizados en familias (8051, AVR, PIC, ARM Cortex-M…). Todas son «prácticamente iguales»: quien domina una aprende otra muy rápido.</p>
+
+<h2 id="familia">2. La familia 8051</h2>
+<p>Configuración del <strong>8051 original de Intel</strong> (que ya no se fabrica): 4 kB de memoria de código, 128 bytes de RAM de datos, 32 líneas de E/S (cuatro puertos de 8 bits), dos temporizadores/contadores de 16 bits, un puerto serie asincrónico y un controlador de interrupciones con 5 fuentes. Hoy existen más de 400 variantes (NXP, Microchip/Atmel, Silicon Labs, Infineon, Dallas/Maxim…) con hasta 64 kB de Flash, ADC, más UART, SPI, I²C, USB, ciclo de máquina de un pulso y frecuencias de decenas de MHz.</p>
+<div class="box warn"><span class="box-title">Sobre el libro de texto (MacKenzie)</span><p>Se basa en el 8051 original de Intel, pero sigue siendo totalmente aplicable. No sigue el mismo orden del curso y contiene algunos errores menores que se aclaran en clase.</p></div>
+
+<h2 id="arquitectura">3. Arquitectura: memorias separadas</h2>
+<p>La C3 la describe como <strong>Von Neumann con memoria segregada</strong>: el bus de datos interno es común a instrucciones y datos (no se accede a ambos a la vez), pero la memoria de <strong>programa</strong> y la de <strong>datos</strong> son espacios distintos que pueden tener <em>las mismas direcciones</em>; el µP las distingue por <strong>señales de control diferentes</strong> (y por instrucciones diferentes: <code>movc</code> lee código, <code>mov</code> lee datos internos, <code>movx</code> datos externos). Muchos textos llaman a esto arquitectura «Harvard modificada».</p>
+
+<h3 id="programa">3.1 Memoria de programa (código)</h3>
+<ul>
+  <li>Hasta 64 kB (interna + externa); en el curso solo se usa la interna, hoy de tipo Flash.</li>
+  <li>Contiene las instrucciones y los datos constantes (tablas definidas con <code>db</code>).</li>
+  <li>Las instrucciones se direccionan con el <strong>PC</strong>; los datos constantes, con <strong>DPTR</strong> (o con el PC) mediante <code>movc</code>.</li>
+  <li>Con RESET, <strong>PC = 0000h</strong>: la primera instrucción <em>tiene</em> que estar en la dirección 0.</li>
+</ul>
+<div class="memmap" role="table" aria-label="Vectores de la memoria de programa">
+  <div class="ad">002Bh</div><div class="z4">Timer 2 (8052)</div><div class="z4 meta">vector de IT</div>
+  <div class="ad">0023h</div><div class="z4">Puerto serie (RI o TI)</div><div class="z4 meta">vector de IT</div>
+  <div class="ad">001Bh</div><div class="z4">Timer 1 (TF1)</div><div class="z4 meta">vector de IT</div>
+  <div class="ad">0013h</div><div class="z4">Externa 1 (INT1/)</div><div class="z4 meta">vector de IT</div>
+  <div class="ad">000Bh</div><div class="z4">Timer 0 (TF0)</div><div class="z4 meta">vector de IT</div>
+  <div class="ad">0003h</div><div class="z4">Externa 0 (INT0/)</div><div class="z4 meta">vector de IT</div>
+  <div class="ad">0000h</div><div class="z1">RESET: primera instrucción</div><div class="z1 meta">si hay IT, aquí va un salto</div>
+</div>
+<p>Entre dos vectores hay 8 bytes: si una rutina de interrupción no cabe, en el vector se pone un salto. Si el programa usa interrupciones, en 0000h hay que saltar por encima de los vectores (<code>jmp Inicio</code>).</p>
+
+<h3 id="datos">3.2 Memoria de datos interna</h3>
+<p>Pequeña (de 64 bytes a 2 kB según el modelo), almacena las variables y la pila. Como toda RAM, <strong>no se inicializa con RESET</strong>: contiene valores aleatorios. No todas las direcciones admiten los mismos modos de direccionado, aunque todas se pueden acceder de forma indirecta.</p>
+<div class="memmap" role="table" aria-label="Mapa de la memoria de datos interna">
+  <div class="ad">80h–FFh</div><div class="z3"><strong>SFR</strong> (solo direccionado <em>directo</em>) · en el 8052, además 128 bytes de RAM (solo <em>indirecto</em>)</div><div class="z3 meta">misma dirección, distinto modo</div>
+  <div class="ad">30h–7Fh</div><div class="z3">Zona libre (80 bytes): variables, buffers, pila</div><div class="z3 meta">directo e indirecto</div>
+  <div class="ad">20h–2Fh</div><div class="z2">Zona direccionable <strong>bit a bit</strong>: 16 bytes = 128 bits (direcciones de bit 00h–7Fh)</div><div class="z2 meta">bit, directo, indirecto</div>
+  <div class="ad">18h–1Fh</div><div class="z1">Banco 3 (R0–R7)</div><div class="z1 meta">registro, directo, indirecto</div>
+  <div class="ad">10h–17h</div><div class="z1">Banco 2 (R0–R7)</div><div class="z1 meta"></div>
+  <div class="ad">08h–0Fh</div><div class="z1">Banco 1 (R0–R7)</div><div class="z1 meta"></div>
+  <div class="ad">00h–07h</div><div class="z1">Banco 0 (R0–R7) — activo con RESET</div><div class="z1 meta"></div>
+</div>
+<ul>
+  <li><strong>R0–R7</strong> no son registros del µP sino localizaciones de RAM que también se pueden direccionar como registros (instrucciones más cortas). R0 y R1 sirven de punteros (<code>@R0</code>, <code>@R1</code>). Hay cuatro bancos; el activo lo eligen los bits RS1 RS0 del PSW (muy útil para que una rutina de interrupción no destruya los registros del programa principal). Si no se usan, los bancos son RAM normal.</li>
+  <li>La <strong>zona de bits</strong> (20h–2Fh) da 128 banderas individuales (<code>setb 20h.0</code>, <code>jb 21h.3,…</code>); si no se usan, es RAM normal.</li>
+</ul>
+<div class="sim" id="w-bits">
+  <div class="sim-title">Bancos de registros y direcciones de bit</div>
+  <div class="controls">
+    <label>Banco activo <select id="bt-rs"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
+    <label>Byte <input type="text" id="bt-byte" value="22h" size="5" class="mono"></label>
+    <label>bit <select id="bt-bit"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option><option>6</option><option>7</option></select></label>
+    <label>Dirección de bit → byte.bit <input type="text" id="bt-addr" value="93h" size="5" class="mono"></label>
+  </div>
+  <div class="readout" id="bt-banks"></div>
+  <div class="readout" id="bt-out"></div>
+</div>
+
+<h3 id="stack">3.3 La pila (stack)</h3>
+<p>Zona de la RAM interna donde se guardan automáticamente las direcciones de retorno de las subrutinas y de las interrupciones, y donde el programa puede respaldar datos (<code>push</code>/<code>pop</code>). En el 8051:</p>
+<ul>
+  <li>El puntero <strong>SP</strong> apunta a la <strong>última dirección ocupada</strong>.</li>
+  <li>La pila <strong>crece hacia arriba</strong>: al escribir, primero se incrementa SP y luego se escribe; al leer, se lee y luego se decrementa.</li>
+  <li>Con RESET, <strong>SP = 07h</strong>. ¿Conflicto con R7? No: el primer dato va a 08h (R0 del banco 1). Pero si el programa usa el banco 1 o la zona de bits, hay que mover la pila: <code>mov SP,#2Fh</code> la coloca en 30h en adelante.</li>
+</ul>
+
+<h2 id="sfr">4. Registros de funciones especiales (SFR)</h2>
+<p>Aunque están «mapeados» en las direcciones 80h–FFh, <strong>no son memoria</strong> sino registros del procesador y de los periféricos. El µP se comunica con <em>todos</em> los periféricos de la misma manera: leyendo y escribiendo sus SFR. Más periféricos ⇒ más SFR. Los SFR cuya dirección termina en 0h u 8h son direccionables bit a bit.</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th></th><th>+0</th><th>+1</th><th>+2</th><th>+3</th><th>+4</th><th>+5</th><th>+6</th><th>+7</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">80h</td><td><strong>P0</strong></td><td>SP</td><td>DPL</td><td>DPH</td><td></td><td></td><td></td><td>PCON</td></tr>
+    <tr><td class="mono">88h</td><td><strong>TCON</strong></td><td>TMOD</td><td>TL0</td><td>TL1</td><td>TH0</td><td>TH1</td><td></td><td></td></tr>
+    <tr><td class="mono">90h</td><td><strong>P1</strong></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="mono">98h</td><td><strong>SCON</strong></td><td>SBUF</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td class="mono">A0h</td><td><strong>P2</strong></td><td colspan="7"></td></tr>
+    <tr><td class="mono">A8h</td><td><strong>IE</strong></td><td colspan="7"></td></tr>
+    <tr><td class="mono">B0h</td><td><strong>P3</strong></td><td colspan="7"></td></tr>
+    <tr><td class="mono">B8h</td><td><strong>IP</strong></td><td colspan="7"></td></tr>
+    <tr><td class="mono">D0h</td><td><strong>PSW</strong></td><td colspan="7"></td></tr>
+    <tr><td class="mono">E0h</td><td><strong>ACC</strong></td><td colspan="7"></td></tr>
+    <tr><td class="mono">F0h</td><td><strong>B</strong></td><td colspan="7"></td></tr>
+  </tbody>
+</table></div>
+<p class="meta">En negrita, los direccionables bit a bit. Con RESET todos los SFR valen 00h, excepto <strong>SP = 07h</strong> y los puertos <strong>P0–P3 = FFh</strong>.</p>
+<p><strong>SFR del procesador</strong>: ACC (acumulador), B (auxiliar para <code>mul</code>/<code>div</code>; si no se usan, registro de propósito general), PSW (palabra de estado), SP (pila) y DPTR = DPH:DPL (puntero de 16 bits a la memoria de programa o de datos externa). Los de los periféricos se estudian en cada tema.</p>
+<h3 id="psw">4.1 PSW: palabra de estado del procesador</h3>
+<div class="regbits"><div class="n">CY</div><div class="n">AC</div><div class="n">F0</div><div class="n">RS1</div><div class="n">RS0</div><div class="n">OV</div><div>—</div><div class="n">P</div><div>bit 7</div><div>6</div><div>5</div><div>4</div><div>3</div><div>2</div><div>1</div><div>0</div></div>
+<ul>
+  <li><strong>CY</strong> (acarreo, el «bit acumulador» de las operaciones booleanas), <strong>AC</strong> (acarreo auxiliar, del bit 3 al 4: lo usa <code>da A</code>), <strong>OV</strong> (desbordamiento en aritmética con signo).</li>
+  <li><strong>F0</strong>: bandera de propósito general para el usuario.</li>
+  <li><strong>RS1 RS0</strong>: selección del banco de registros (00 → banco 0, …, 11 → banco 3).</li>
+  <li><strong>P</strong>: paridad del acumulador, puesta por hardware: 1 si A tiene un número <em>impar</em> de unos.</li>
+</ul>
+<p>No hay bandera de cero: <code>jz</code>/<code>jnz</code> miran directamente el contenido de A.</p>
+
+<h2 id="ejercicios">5. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>¿Qué dirección de RAM corresponde a R5 si PSW = 18h? ¿Y si PSW = 08h?
+    <details class="sol"><summary>Solución</summary><div><p>PSW = 18h ⇒ RS1 RS0 = 11 ⇒ banco 3 ⇒ R5 = 18h + 5 = 1Dh. PSW = 08h ⇒ banco 1 ⇒ R5 = 0Dh.</p></div></details></li>
+  <li>Tras RESET se ejecutan <code>push ACC</code>, <code>push B</code> y <code>lcall Sub</code>. ¿Qué valor tiene SP y qué hay en cada posición?
+    <details class="sol"><summary>Solución</summary><div><p>08h ← A, 09h ← B, 0Ah ← byte bajo del PC de retorno, 0Bh ← byte alto. SP = 0Bh. ¡Se están pisando R0–R3 del banco 1!</p></div></details></li>
+  <li>¿Cuál es la dirección de bit de 2Fh.7? ¿Y de P3.2? ¿Qué es el bit 0Ah?
+    <details class="sol"><summary>Solución</summary><div><p>2Fh.7 → 7Fh (el último bit de RAM). P3.2 → B0h + 2 = B2h. El bit 0Ah es el bit 2 del byte 21h.</p></div></details></li>
+  <li>¿Por qué <code>mov A,90h</code> y <code>mov R0,#90h</code> / <code>mov A,@R0</code> leen cosas distintas en un 8052?
+    <details class="sol"><summary>Solución</summary><div><p>Con direccionado directo, 90h es el SFR P1 (se leen los pines del puerto). Con indirecto se accede a la RAM alta (90h de los 128 bytes adicionales del 8052). Misma dirección, distinto espacio.</p></div></details></li>
+  <li>¿Puede ubicarse una tabla a partir de la dirección 1 de la memoria de programa? (CP2, ej. 2e)
+    <details class="sol"><summary>Solución</summary><div><p>No conviene: en 0000h debe estar la primera instrucción y ocupa al menos 2 o 3 bytes (un salto por encima de la tabla), así que la tabla se solaparía con ella. Además, si hay interrupciones, 0003h, 000Bh… son vectores.</p></div></details></li>
+</ol>
+
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. Con RESET, el SP vale…</p><div class="opts"><button class="opt" type="button">00h</button><button class="opt" type="button" data-ok>07h</button><button class="opt" type="button">FFh</button></div><p class="why">Y el primer dato de la pila irá a 08h.</p></div>
+  <div class="q"><p>2. Los SFR solo pueden accederse con direccionado…</p><div class="opts"><button class="opt" type="button">indirecto</button><button class="opt" type="button" data-ok>directo</button><button class="opt" type="button">indexado</button></div><p class="why">Lo indirecto en 80h–FFh va a la RAM alta (8052).</p></div>
+  <div class="q"><p>3. ¿Cuántos bits direccionables individualmente hay en la RAM interna?</p><div class="opts"><button class="opt" type="button">16</button><button class="opt" type="button" data-ok>128</button><button class="opt" type="button">256</button></div><p class="why">16 bytes (20h–2Fh) × 8 bits.</p></div>
+  <div class="q"><p>4. ¿Qué contienen los puertos tras RESET y por qué importa?</p><div class="opts"><button class="opt" type="button">00h: todos los pines a 0</button><button class="opt" type="button" data-ok>FFh: pueden usarse ya como entradas</button><button class="opt" type="button">valores aleatorios</button></div><p class="why">Las salidas son de drenador abierto: escribir 1 «suelta» el pin para leerlo.</p></div>
+</div>
+
+<h2 id="biblio">Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>MacKenzie y Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007</td><td>2</td><td>2.1 Información general sobre la familia MCS-51 · 2.2 Descripción de las terminales · 2.5 Organización de la memoria · 2.6 Registros con funciones especiales</td><td>pp. 17–35 (PDF 32–50)</td><td>Familia, memoria, bancos, bits, SFR, PSW, pila</td></tr>
+    <tr><td>MacKenzie y Phan (ídem)</td><td>2</td><td>2.9 Operación de reinicio</td><td>p. 43 (PDF 58)</td><td>Valores tras RESET</td></tr>
+    <tr><td>Intel, <em>MCS-51 Microcontroller Family User's Manual</em>, 1994</td><td>2</td><td>Memory Organization · Special Function Registers · What do the SFRs contain after a reset · PSW</td><td>pp. 2-3 a 2-11 (PDF 33–41)</td><td>Mapa de memoria y SFR (fuente original)</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — nicosiored, <a href="https://www.youtube.com/watch?v=_nIl5obeGeU">«Arquitectura 8051 — Tutorial microcontroladores en español»</a> (10:17).</li>
+  <li><strong>Artículo</strong> — R. Boys, <em>What is the 8051 doing in the year 2008?</em> (en la bibliografía de la asignatura): por qué el 8051 sigue vigente.</li>
+  <li><strong>Simulador</strong> — En el <a href="../simulador.html">simulador</a> cambia RS0/RS1 (escribiendo en PSW) y mira cómo se desplaza el banco resaltado en la RAM.</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Si R0 es la dirección 00h, por qué existen las dos formas?</summary><div><p>Porque <code>mov A,R0</code> ocupa 1 byte (el registro va en 3 bits del código) y <code>mov A,00h</code> ocupa 2. Además R0 depende del banco activo: con RS = 01, R0 es la dirección 08h.</p></div></details>
+  <details><summary>¿Dónde debo poner mis variables?</summary><div><p>En 30h–7Fh las variables de byte; en 20h–2Fh las banderas de bit; y deja espacio para la pila (que crece hacia arriba desde SP+1). Documenta el mapa en comentarios con <code>EQU</code>.</p></div></details>
+  <details><summary>¿La RAM se borra con RESET?</summary><div><p>No. Contiene valores aleatorios: si necesitas un valor inicial, el programa debe ponerlo (la subrutina Limpia_RAM de la CP2).</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencia C3 «Introducción a los microcontroladores» (Dr. A. J. Cabrera Sarmiento, CUJAE) y CP2. Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

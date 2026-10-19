@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T7 · Puerto serie UART — Microcontroladores</title>
+  <meta name="description" content="Comunicación serie asincrónica, formato de trama, razón de baudios, UART del 8051: SCON, SBUF, modos 0–3, cálculo de TH1, interrupción del puerto serie, RS-232 y MAX232, sistema con comunicación serie. Conferencias C13 y C14, CP7, LAB6.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/micro.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/micro.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="../#temas" aria-current="page">Temas</a><a href="../simulador.html">Simulador</a><a href="../#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema 7 · Conferencias C13 y C14 · CP7 · LAB6</p>
+<h1>Puerto serie UART</h1>
+<p class="lead">La comunicación serie envía los bits uno detrás de otro por un solo hilo («biiit a biiit → leeenta»), pero con muy pocos cables. La <strong>UART</strong> (<em>Universal Asynchronous Receiver Transmitter</em>; «universal» = programable) la hace <strong>asincrónica</strong>: no hay reloj compartido, y transmisor y receptor se sincronizan con la propia trama.</p>
+
+<div class="objectives"><strong>Objetivos (C13, C14)</strong><ul>
+  <li>Conocer cómo funciona una UART y los parámetros de la comunicación asincrónica.</li>
+  <li>Conocer la UART del 8051 original, sus registros y modos de operación.</li>
+  <li>Saber configurar la razón de baudios y programar la comunicación por interrupción.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">registros de desplazamiento y paridad</span>
+<p>Un registro de desplazamiento convierte paralelo → serie (transmisión) y serie → paralelo (recepción) con cada pulso de reloj. <strong>Paridad par</strong>: se añade un bit para que el número total de unos sea par (el bit P del PSW da la paridad del acumulador: 1 si A tiene un número impar de unos). Repaso: <a href="../../repaso/electronica-digital.html#secuencial">registros de desplazamiento</a> · <a href="t6-temporizadores.html">Timer 1 en modo 2 (Tema 6)</a>.</p></div>
+
+<h2 id="uart">1. Estructura de una UART</h2>
+<ul>
+  <li><strong>Full duplex</strong>: puede transmitir y recibir a la vez (TxD = P3.1, RxD = P3.0 en el 8051).</li>
+  <li>Núcleo: <strong>registros de desplazamiento</strong> de Tx (P → S) y de Rx (S → P), y un circuito de control y reloj (una máquina de estados que necesita un <em>temporizador</em>).</li>
+  <li>Al terminar de transmitir o recibir un byte activa una bandera (TI, RI) que puede pedir interrupción.</li>
+  <li><strong>Recepción con buffer</strong>: el byte recibido pasa a un registro buffer y puede empezar a recibirse el siguiente; pero si llega un segundo byte completo sin haber leído el primero, el anterior se pierde (<em>error de sobreescritura</em>; el 8051 original no lo detecta).</li>
+  <li>La recepción tiene prioridad sobre la transmisión: el programa decide cuándo transmite, pero no cuándo le llega algo.</li>
+</ul>
+
+<h2 id="formato">2. Comunicación asincrónica y razón de baudios</h2>
+<p>Viendo en un osciloscopio la línea TxD con <code>0101…</code> no se puede saber si se transmitió <code>0101</code>, <code>00110011</code> o <code>000111…</code>: hay que conocer el <strong>tiempo de bit</strong>. La <strong>razón de baudios</strong> es \(\text{BR}=1/t_{\text{bit}}\) (a 9600 bps, \(t_{\text{bit}}\approx0{,}1\) ms). Ambos extremos deben usar la misma, y hace falta un timer para generarla.</p>
+<p><strong>Formato</strong>: la línea en reposo está a «1»; un <strong>bit de arranque</strong> «0» (cuya caída sincroniza al receptor), 5–8 bits de datos (normalmente 8, <strong>LSB primero</strong>), un bit programable opcional (p. ej. paridad) y al menos un <strong>bit de parada</strong> «1». Un byte cuesta 10 u 11 bits.</p>
+<div class="sim" id="w-frame">
+  <div class="sim-title">Trama UART</div>
+  <div class="controls">
+    <label>Carácter o byte <input type="text" id="fr-ch" value="A" size="5" class="mono"></label>
+    <label>Bit programable <select id="fr-par"><option value="no">ninguno (10 bits)</option><option value="par">paridad par</option><option value="impar">paridad impar</option></select></label>
+    <label>BR (bps) <select id="fr-br"><option>1200</option><option>2400</option><option>9600</option><option>19200</option></select></label>
+  </div>
+  <canvas id="fr-cv" aria-label="Forma de onda de la trama"></canvas>
+  <div class="readout" id="fr-out"></div>
+</div>
+
+<h2 id="8051">3. La UART del 8051</h2>
+<p>Formato 1-8-[1]-1 (10 u 11 bits), IT por fin de Tx y por fin de Rx, recepción con buffer, 4 modos (dos de comunicación), BR variable con el Timer 1 (en otros 8051, Timer 2 o un generador propio) y sin detección de errores.</p>
+<h3 id="scon">3.1 SCON y SBUF</h3>
+<div class="regbits"><div class="n">SM0</div><div class="n">SM1</div><div class="n">SM2</div><div class="n">REN</div><div class="n">TB8</div><div class="n">RB8</div><div class="n">TI</div><div class="n">RI</div><div>7</div><div>6</div><div>5</div><div>4</div><div>3</div><div>2</div><div>1</div><div>0</div></div>
+<ul>
+  <li><strong>SM0 SM1</strong>: modo. <strong>SM2</strong>: variante multiprocesador de los modos de 11 bits (no es objetivo del curso).</li>
+  <li><strong>REN</strong>: habilita la recepción (permite decidir cuándo se acepta un dato).</li>
+  <li><strong>TB8 / RB8</strong>: el bit programable (modos 2 y 3): antes de transmitir se coloca en TB8; al recibir queda en RB8.</li>
+  <li><strong>TI / RI</strong>: banderas de fin de transmisión / recepción.</li>
+  <li><strong>SBUF</strong>: en realidad son <strong>dos registros físicos</strong> en la misma dirección (99h): escribir inicia una transmisión; leer devuelve el último byte recibido.</li>
+</ul>
+<div class="table-wrap"><table>
+  <thead><tr><th>Modo</th><th>SM0 SM1</th><th>Tipo</th><th>Bits</th><th>Baud rate</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>0 0</td><td>Sincrónico: registro de desplazamiento (expansión de E/S, no comunicación)</td><td>8 (reloj por TxD, datos por RxD)</td><td>fosc/12 (fijo)</td></tr>
+    <tr><td><strong>1</strong></td><td>0 1</td><td>Asincrónico</td><td>10 (start, 8 datos, stop → RB8)</td><td>Variable: Timer 1</td></tr>
+    <tr><td>2</td><td>1 0</td><td>Asincrónico</td><td>11 (con TB8/RB8)</td><td>fosc/64 o fosc/32 (fijo)</td></tr>
+    <tr><td><strong>3</strong></td><td>1 1</td><td>Asincrónico</td><td>11 (con TB8/RB8)</td><td>Variable: Timer 1</td></tr>
+  </tbody>
+</table></div>
+<p class="meta">El libro de González Vázquez tiene un error «garrafal» (C13): pretende comunicar dos 8051 en modo 0, que no es un modo de comunicación sino de expansión de E/S.</p>
+<div class="sim" id="w-scon">
+  <div class="sim-title">Construye SCON</div>
+  <div class="controls">
+    <label>Modo <select id="sc-mode"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option></select></label>
+    <label><input type="checkbox" id="sc-ren" checked> REN</label>
+    <label><input type="checkbox" id="sc-sm2"> SM2</label>
+  </div>
+  <div class="readout" id="sc-out"></div>
+</div>
+
+<h3 id="baud">3.2 Razón de baudios con el Timer 1</h3>
+<p>En los modos 1 y 3, con el Timer 1 en <strong>modo 2</strong> (8 bits con recarga: BR exacto y sin IT del Timer 1):</p>
+<div class="eq key">$$\text{BR}=\frac{2^{\text{SMOD}}}{32}\cdot\frac{f_{\text{osc}}}{12\,(256-\text{TH1})}\qquad\Longleftrightarrow\qquad\text{TH1}=256-\frac{2^{\text{SMOD}}\,f_{\text{osc}}}{32\cdot12\cdot\text{BR}}$$<div class="eq-label">SMOD = PCON.7 (0 con RESET; 1 duplica el BR)</div></div>
+<p>1200 baudios a 12 MHz: TH1 = 256 − 26,04 = 229,96 → <strong>230</strong> (BR real 1201,9 bps, error despreciable). 9600 a 12 MHz: TH1 = 252,74 → 253 da 10 417 bps (+8,5 %): <strong>error muy grande</strong>. Por eso se usa el cristal «raro» de <strong>11,0592 MHz</strong>, con el que todos los BR estándar salen exactos (otros 8051 lo resuelven con Timer 2 o un generador propio).</p>
+<div class="sim" id="w-baud">
+  <div class="sim-title">Calculadora de TH1</div>
+  <div class="controls">
+    <label>fosc (MHz) <input type="number" id="bd-f" value="12" step="any" style="width:90px"></label>
+    <label>BR (bps) <input type="number" id="bd-br" value="1200" style="width:90px"></label>
+    <label>SMOD <select id="bd-smod"><option value="0">0</option><option value="1">1</option></select></label>
+  </div>
+  <div class="readout" id="bd-out"></div>
+</div>
+
+<h3 id="it">3.3 Interrupción del puerto serie</h3>
+<p>RI y TI comparten el vector <strong>23h</strong> y la habilitación (ES) y prioridad (PS); <strong>no se limpian solas</strong>: la ISR debe encuestarlas (primero RI: la recepción tiene prioridad) y limpiar la que corresponda. Para transmitir el primer byte se puede escribir SBUF fuera de la ISR o hacer <code>setb TI</code> (solicitud por software) y transmitir desde la ISR. La Tx del último byte produce una IT «indeseable»: la ISR debe comprobar si queda algo por transmitir.</p>
+<pre><code>        ORG  23h
+        jnb  RI,Tx           ; la Rx con más prioridad
+Rx:     mov  A,SBUF          ; leer carácter recibido
+        …                    ; acción
+        clr  RI
+        reti
+Tx:     …                    ; ¿seguir transmitiendo? en A el carácter
+        mov  SBUF,A          ; comienza la Tx
+        clr  TI
+        reti</code></pre>
+<div class="example"><h4>Ejemplo 3.1 — Transmitir una cadena ASCIIZ (C13)</h4>
+<p>En el programa principal: <code>mov DPTR,#Msg1</code>, <code>mov IndiceTx,#0</code>, <code>setb TI</code>. En la ISR: <code>mov A,IndiceTx / movc A,@A+DPTR / jz salir / mov SBUF,A / inc IndiceTx / salir: clr TI / reti</code>. <code>Msg1: db ' Bienvenidos al puerto serie. ',0</code> (el 0 marca el final y no se transmite). Está en el <a href="../simulador.html?ej=5">simulador (ejemplo 6)</a>, con la salida en el terminal.</p></div>
+
+<h2 id="rs232">4. RS-232</h2>
+<p>Uno de los estándares serie asincrónicos más difundidos (PC, computadoras industriales, PLC) aunque no el mejor. Usa <strong>lógica negativa</strong> y niveles incompatibles con TTL/CMOS: «1» = −3 a −15 V; «0» = +3 a +15 V. La conexión a la UART de un µC necesita un circuito de interfaz como el <strong>MAX232</strong>. Define los BR estándar (115,2 k; 19,2 k; 9,6 k; 4,8 k…). En el conector DB-9: pin 2 RxD, pin 3 TxD, pin 5 GND; entre dos equipos se usa un cable <strong>null-modem</strong> (cruzado: 2 ↔ 3, 5 ↔ 5). En Proteus, el <em>Virtual Terminal</em> simula el puerto del PC.</p>
+
+<h2 id="c14">5. Sistema con comunicación serie (C14)</h2>
+<p>50 muestras cada 1 s con display del número de muestras; al completar, esperar el comando <strong>AAh</strong> del PC y transmitirle las muestras a 1200 baudios sin paridad; luego reiniciar. Timer 0: base de 1 s (como en la C12). Timer 1: modo 2, TH1 = 230 (sin IT). SCON = <code>01010000b</code> (modo 1, Rx habilitada). La ISR serie:</p>
+<pre><code>IT_Serie: jnb  RI,Tx        ; si no es IT por Rx, atender la de Tx
+Rx:     clr  RI
+        mov  A,SBUF
+        cjne A,#0AAh,fuera  ; ¿comando de Tx? no, retornar
+        setb TI             ; sí: IT por SW para transmitir la 1.ª muestra
+        clr  REN            ; no recibir más
+fuera:  reti
+Tx:     clr  TI
+        cjne Cont_m,#50,sigue
+        setb Fin_Tx         ; terminaron todas las Tx
+        reti
+sigue:  mov  A,@Puntero
+        mov  SBUF,A
+        inc  Puntero
+        inc  Cont_m
+        reti</code></pre>
+<p>Pruébalo (versión reducida a 5 muestras) en el <a href="../simulador.html?ej=6">simulador (ejemplo 7)</a>: escribe <code>AAh</code> en «Enviar al 8051».</p>
+
+<h2 id="cp7">6. Guía de la CP7 y del LAB6</h2>
+<ul>
+  <li><strong>CP7 ej. 1</strong>: 90 muestras cada 5 s (Timer 0: base 50 ms × 100), LED a 1 Hz al terminar, comandos 1–5 del PC a 1200 bps sin bit programable. Organizar las respuestas en un buffer de Tx (máximo, mínimo, todas…) y una sola rutina de Tx por IT que recorre el buffer: así la ISR serie no depende del comando.</li>
+  <li><strong>CP7 ej. 3</strong>: pedir la cantidad de muestras (30–90) con un mensaje ASCIIZ; validar; si no es válida, transmitir «Cantidad no válida.» y repetir.</li>
+  <li><strong>CP7 ej. 4</strong> (con paridad): usar el modo 3 (11 bits). Al transmitir: <code>mov A,dato / mov C,P / mov TB8,C</code> (P es la paridad <em>impar</em> del dato: para paridad par TB8 = P; para impar, <code>cpl C</code>). Al recibir: comparar RB8 con la paridad calculada de SBUF.</li>
+  <li><strong>LAB6</strong>: alarma contra incendios: 100 muestras de 0–50 °C cada 2 s (ADC0801), display de temperatura y mensajes por la UART según el rango (≤ 20 °C «Temperatura Baja» + LED; 21–35 °C «Temperatura Normal» + valor; 36–50 °C «Incendio» + LED a 1 Hz); al terminar, esperar el comando 1Ah para reiniciar. En Proteus, usar el <em>Virtual Terminal</em>.</li>
+</ul>
+
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. ¿Cuánto tarda en transmitirse un byte a 1200 bps en modo 1?</p><div class="opts"><button class="opt" type="button">6,7 ms</button><button class="opt" type="button" data-ok>8,3 ms</button><button class="opt" type="button">0,83 ms</button></div><p class="why">10 bits × 0,833 ms.</p></div>
+  <div class="q"><p>2. ¿Qué valor de SCON da modo 1 con recepción habilitada?</p><div class="opts"><button class="opt" type="button">40h</button><button class="opt" type="button" data-ok>50h</button><button class="opt" type="button">90h</button></div><p class="why">SM1 = 1 (bit 6) y REN = 1 (bit 4).</p></div>
+  <div class="q"><p>3. ¿Qué pasa si la ISR serie no limpia TI?</p><div class="opts"><button class="opt" type="button">nada</button><button class="opt" type="button" data-ok>se vuelve a ejecutar la ISR sin fin</button><button class="opt" type="button">se pierde el siguiente byte</button></div><p class="why">TI no se limpia sola.</p></div>
+  <div class="q"><p>4. ¿Por qué cristales de 11,0592 MHz?</p><div class="opts"><button class="opt" type="button">consumen menos</button><button class="opt" type="button" data-ok>dan BR estándar exactos con el Timer 1</button><button class="opt" type="button">son los únicos que admite el 8051</button></div><p class="why">11 059 200/(384·9600) = 3 exactamente (TH1 = 253).</p></div>
+</div>
+
+<h2 id="biblio">Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>MacKenzie y Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007</td><td>4</td><td>4.11 Generación de tasa en baudios</td><td>pp. 106–110 (PDF 121–125)</td><td>Timer 1 como generador de BR</td></tr>
+    <tr><td>MacKenzie y Phan (ídem)</td><td>5</td><td>5.1 Introducción · 5.2 Comunicación serial · 5.3 SBUF · 5.4 SCON · 5.5 Modos · 5.6 Escollos de la comunicación full duplex · 5.7 Inicialización · 5.9 Velocidades en baudios</td><td>pp. 111–125 (PDF 126–140)</td><td>Todo el puerto serie</td></tr>
+    <tr><td>MacKenzie y Phan (ídem)</td><td>6</td><td>6.6 Interrupciones del puerto serial</td><td>pp. 142–143 (PDF 157–158)</td><td>ISR serie</td></tr>
+    <tr><td>Intel, <em>MCS-51 User's Manual</em>, 1994</td><td>2</td><td>SCON · Serial Port Set-up · Generating Baud Rates · Using Timer/Counter 1</td><td>pp. 2-19 a 2-20 (PDF 49–50)</td><td>Registros y fórmulas</td></tr>
+    <tr><td>Intel (ídem)</td><td>3</td><td>Serial Interface · Serial Port Control Register · Baud Rates · More about Modes 0–3</td><td>pp. 3-13 a 3-22 (PDF 121–130)</td><td>Funcionamiento detallado y tabla de BR</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — Career Soch, <a href="https://www.youtube.com/watch?v=uuD15U2nZZg">«SCON register and baud rate calculation in serial communication of 8051»</a> (33:23, inglés).</li>
+  <li><strong>Vídeo</strong> — Saravanan AL, <a href="https://www.youtube.com/watch?v=43mROTIgNTM">«8051 Serial Communication UART, part 1: registers, baud rate &amp; timer mode»</a> (22:41, inglés).</li>
+  <li><strong>Datasheet</strong> — Texas Instruments, <a href="https://www.ti.com/product/MAX232">MAX232</a> (conversor de niveles RS-232 ↔ TTL).</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué no recibo nada si el programa transmite bien?</summary><div><p>Revisa REN = 1, que la ISR limpie RI y que lea SBUF a tiempo. Y que el otro extremo use el mismo BR, el mismo número de bits y la misma paridad.</p></div></details>
+  <details><summary>¿Qué es el «escollo» de la comunicación full duplex?</summary><div><p>Que la ISR atiende a la vez Tx y Rx: si solo mira TI, puede perder recepciones; por eso se pregunta primero por RI y se vuelve a revisar al terminar.</p></div></details>
+  <details><summary>¿Puedo conectar directamente TxD del 8051 al puerto serie del PC?</summary><div><p>A un puerto RS-232 real, no: los niveles son distintos e invertidos. Con un adaptador USB-serie de nivel TTL (3,3 o 5 V), sí.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencias C13 «Puerto serie UART» y C14 «Ejemplo de sistema con comunicación serie», CP7 «Puerto serie en 8051», LAB6 «Sistema de alarma contra incendios con comunicación serie» (Dr. A. J. Cabrera Sarmiento y colectivo, CUJAE). Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

@@ -3,25 +3,140 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Microcontroladores</title>
+  <title>Microcontroladores (8051)</title>
+  <meta name="description" content="Microcontroladores (Microprocesadores I, CUJAE): microprocesador, familia 8051, instrucciones, puertos, ADC, teclado y display, motor de paso, interrupciones, temporizadores, UART y C con SDCC. Teoría, simulador 8051 en el navegador, guías de CP y laboratorios, bibliografía y software.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <link rel="stylesheet" href="css/micro.css">
   <script src="../assets/js/theme.js"></script>
-  <style>:root { --accent: var(--c-micro); }</style>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
 </head>
 <body>
-  <button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
-  <div class="wrap">
-    <header class="site">
-      <p><a href="../">← Todas las asignaturas</a></p>
-      <h1>Microcontroladores</h1>
-      <p>Microprocesador y sistema con µP, familia 8051, repertorio de instrucciones, puertos, interrupciones, temporizadores, puerto serie y programación en C.</p>
-    </header>
-    <main>
-      <div class="callout">Página en preparación. El contenido se irá publicando tema a tema.</div>
-    </main>
-  </div>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="./" aria-current="page">Inicio</a><a href="#temas">Temas</a><a href="simulador.html">Simulador</a><a href="#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Microprocesadores I · Plan E · CUJAE · 4.º año, 1.er semestre · curso 2026-27 por encuentros</p>
+<h1>Microcontroladores: el 8051</h1>
+<p class="lead">Objetivo fundamental: <strong>aprender microcontroladores</strong>. Dominar la estructura y el funcionamiento de un microprocesador, el procesador del 8051, sus periféricos y sus herramientas de desarrollo, y desarrollar el hardware y el software de aplicaciones basadas en él. Una asignatura de <em>razonamiento lógico</em> —«no hay fórmulas que memorizar»— que exige estudio sistemático.</p>
+
+<div class="box idea"><span class="box-title">Empieza por aquí</span>
+<p>Cada tema explica la conferencia, resuelve los ejemplos y guía las CP y laboratorios. El <a href="simulador.html"><strong>simulador 8051</strong></a> ensambla y ejecuta en el navegador los programas de las conferencias (paso a paso, hacia atrás, con puertos, display, timers, interrupciones y terminal serie): úsalo para comprobar todo lo que estudies.</p></div>
+
+<h2 id="temas">Temas</h2>
+<div class="topic-grid">
+  <a href="temas/t1-microprocesador.html"><h3>1 · Microprocesador</h3><p>Codificación y ejecución de instrucciones, UC, ALU, registros, ROM/RAM, buses y ciclos de máquina. C1–C2 · CP1.</p></a>
+  <a href="temas/t2-familia-8051.html"><h3>2 · Familia 8051 y memoria</h3><p>Memoria de programa y de datos, vectores, bancos, zona de bits, pila, SFR y PSW. C3.</p></a>
+  <a href="temas/t3-instrucciones.html"><h3>3 · Instrucciones y herramientas</h3><p>Modos de direccionado, repertorio, subrutinas, directivas, .lst/.hex, demoras, MCU 8051 IDE y Proteus. C4–C4a · CP2 · LAB0–1.</p></a>
+  <a href="temas/t4-puertos-y-aplicaciones.html"><h3>4 · Puertos y aplicaciones</h3><p>Señales, puertos, LED y bocina, encuesta, ADC y unidades de ingeniería, 7 segmentos, teclado, motor de paso. C5–C8 · CP3–4 · LAB2–3.</p></a>
+  <a href="temas/t5-interrupciones.html"><h3>5 · Interrupciones</h3><p>Habilitación, prioridades, vectores, bits ocultos, RET/RETI, IT externas, sistema con IT. C9–C10 · CP5 · LAB4.</p></a>
+  <a href="temas/t6-temporizadores.html"><h3>6 · Temporizadores</h3><p>TMOD, TCON, modos 0–3, recargas, postescalador por SW, sistema con timers. C11–C12 · CP6 · LAB5.</p></a>
+  <a href="temas/t7-puerto-serie.html"><h3>7 · Puerto serie UART</h3><p>Trama asincrónica, SCON, SBUF, baud rate con Timer 1, IT serie, RS-232, sistema con UART. C13–C14 · CP7 · LAB6.</p></a>
+  <a href="temas/t8-programacion-c.html"><h3>8 · Programación en C (SDCC)</h3><p>Tipos, clases de memoria, __at, __interrupt, __using, ASM generado. C15–C16 · CP8.</p></a>
+</div>
+
+<h2 id="plan">Plan del curso por encuentros</h2>
+<p>12 semanas, un encuentro de 2 h por semana:</p>
+<ul>
+  <li><strong>Semanas impares</strong>: encuentro para <strong>orientar</strong> los contenidos y los ejercicios (con énfasis en lo más difícil).</li>
+  <li><strong>Entre encuentros</strong>: estudio de los contenidos y realización <em>individual</em> de los ejercicios.</li>
+  <li><strong>Semanas pares</strong>: <strong>debate</strong> de las soluciones; todos son evaluados. Preguntas más frecuentes: «¿Por qué?» y «¿Qué usted cree?».</li>
+</ul>
+<p>Estudiantes del curso diurno no residentes en La Habana: etapa a distancia (octubre–diciembre) y concentrado presencial (enero–febrero) con debates y evaluación parcial.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Contenido</th><th>Conferencias</th><th>Clase práctica</th><th>Laboratorio</th></tr></thead>
+  <tbody>
+    <tr><td>Microprocesador y ejecución de instrucciones</td><td>C1, C2</td><td>CP1</td><td>—</td></tr>
+    <tr><td>Familia 8051, memoria, instrucciones, herramientas</td><td>C3, C4, C4a</td><td>CP2</td><td>LAB0 (Proteus), LAB1</td></tr>
+    <tr><td>Puertos, ADC, teclado, display, motor de paso</td><td>C5–C8</td><td>CP3, CP4</td><td>LAB2 (ADC0801), LAB3 (teclado y display)</td></tr>
+    <tr><td>Interrupciones</td><td>C9, C10</td><td>CP5</td><td>LAB4 (teclado por IT)</td></tr>
+    <tr><td>Temporizadores</td><td>C11, C12</td><td>CP6</td><td>LAB5 (reloj digital)</td></tr>
+    <tr><td>Puerto serie</td><td>C13, C14</td><td>CP7</td><td>LAB6 (alarma contra incendios)</td></tr>
+    <tr><td>Programación en C</td><td>C15, C16</td><td>CP8</td><td>—</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="evaluacion">Sistema de evaluación</h2>
+<ul>
+  <li><strong>5 encuentros de debate</strong> (todos evaluados).</li>
+  <li><strong>Prueba parcial</strong> en la semana 12.</li>
+  <li><strong>No hay examen final</strong>: la nota es la integración ponderada de todas las evaluaciones.</li>
+  <li>En los laboratorios, el <strong>trabajo previo es imprescindible</strong> para entrar.</li>
+</ul>
+<div class="box warn"><span class="box-title">Sobre el uso de la IA (C0)</span>
+<p>El objetivo es aprender microcontroladores, no dominar una herramienta de IA. Las IA pueden responder mal (varias «desaprobaron» preguntas del curso); si la IA hace el programa, tú no desarrollas habilidades, y en la evaluación responderás tú. Úsala para consolidar, analizando críticamente sus respuestas. Lo mismo vale para esta web: compruébalo todo en el simulador.</p></div>
+
+<h2 id="profesores">Profesores</h2>
+<p>Dr. Alejandro J. Cabrera Sarmiento (Dpto. de Automática y Computación, CUJAE), con Granmel Suárez Alfonso, Alejandro González Barrero y Luís Antonio González Parets. Todos los contenidos (incluidos los vídeos de las conferencias) están en el repositorio de la asignatura en la nube de la CUJAE.</p>
+
+<h2 id="bibliografia">Bibliografía</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Tipo</th><th>Referencia</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td>Texto básico</td><td>I. S. MacKenzie y R. C.-W. Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007 (y la edición en inglés).</td><td>Todo el curso. Basado en el 8051 original de Intel: totalmente aplicable, otro orden y algunos errores menores.</td></tr>
+    <tr><td>Básica</td><td>J. A. González Vázquez, <em>Introducción a los microcontroladores 8051 y 8052</em>.</td><td>Texto en español (ojo con el modo 0 del puerto serie).</td></tr>
+    <tr><td>Manual</td><td>Intel, <em>MCS-51 Microcontroller Family User's Manual</em>, 1994; <em>Set de instrucciones MCS-51</em>.</td><td>Referencia exacta de instrucciones, SFR y periféricos.</td></tr>
+    <tr><td>Complementaria</td><td>Mazidi, Mazidi y McKinlay, <em>The 8051 Microcontroller and Embedded Systems Using Assembly and C</em>, 2.ª ed. (diapositivas de C.-P. Young, NCKU); Ibrahim, <em>Microcontroller Projects in C for the 8051</em>; <em>The Final Word on the 8051</em>; <em>SDCC Compiler User Guide</em> 3.2.1; Kernighan y Ritchie, <em>El lenguaje de programación C</em>.</td><td>Ejemplos en ensamblador y C, SDCC.</td></tr>
+  </tbody>
+</table></div>
+<p>Cada tema tiene su tabla <em>Dónde estudiarlo</em> con capítulo, epígrafe y páginas (impresas y del PDF).</p>
+
+<h2 id="software">Software</h2>
+<h3 id="sw-web">Simulador 8051 en el navegador</h3>
+<p><a href="simulador.html">simulador.html</a>: ensamblador con la sintaxis del curso, ejecución paso a paso / hacia atrás / continua en tiempo real, puntos de ruptura, registros, RAM, SFR, puertos con interruptores, displays de 7 segmentos, frecuencímetro, temporizadores, interrupciones con bits L/H, terminal serie y descarga del <code>.hex</code>. Trae los programas de las conferencias como ejemplos. Además, cada tema tiene calculadoras (demoras, recargas de timers, TH1, códigos de 7 segmentos, LED, ADC → UI, teclado, motor de paso, IE/IP/TMOD/SCON, trama UART).</p>
+
+<h3 id="sw-ide">MCU 8051 IDE (entorno oficial del curso)</h3>
+<ul>
+  <li><strong>Windows</strong>: instalador <code>MCU-8051 IDE 1.4.7</code> del repositorio de la asignatura (carpeta de software).</li>
+  <li><strong>Debian / Ubuntu</strong>: <code>sudo apt install mcu8051ide</code> (<a href="https://packages.debian.org/stable/mcu8051ide">paquete de Debian</a>).</li>
+  <li><strong>Arch / Manjaro</strong>: desde AUR, <code>yay -S mcu8051ide</code> (<a href="https://aur.archlinux.org/packages/mcu8051ide">paquete AUR</a>).</li>
+  <li>Al crear el proyecto: microcontrolador 8751 o 8051, <em>Project → Edit project → Clock (kHz) = 12000</em>. Guía de uso en el <a href="temas/t3-instrucciones.html#mcu8051ide">Tema 3</a>.</li>
+</ul>
+<h3 id="sw-sdcc">SDCC (compilador de C)</h3>
+<ul>
+  <li><strong>Windows</strong>: instalador del repositorio de la asignatura (SDCC 3.2.0a) o el actual de <a href="https://sdcc.sourceforge.net/">sdcc.sourceforge.net</a>; en MCU 8051 IDE se configura la ruta del compilador.</li>
+  <li><strong>Debian / Ubuntu</strong>: <code>sudo apt install sdcc</code> · <strong>Arch</strong>: <code>sudo pacman -S sdcc</code> (<a href="https://archlinux.org/packages/extra/x86_64/sdcc/">paquete</a>) · <strong>macOS</strong>: <code>brew install sdcc</code> (<a href="https://formulae.brew.sh/formula/sdcc">fórmula</a>).</li>
+  <li>Prueba: <code>sdcc -mmcs51 programa.c</code> genera <code>programa.ihx</code>; <code>packihx programa.ihx &gt; programa.hex</code>.</li>
+</ul>
+<h3 id="sw-proteus">Proteus (ISIS)</h3>
+<p>Software comercial de <a href="https://www.labcenter.com/">Labcenter Electronics</a> para Windows; los laboratorios usan Proteus 8 con el ensamblador ASEM-51 (ver <a href="temas/t3-instrucciones.html#proteus">LAB0</a>).</p>
+<h3 id="sw-python">Herramienta de línea de órdenes <code>mcs51calc</code> (Python)</h3>
+<p>Calculadora para el trabajo previo de CP y laboratorios: recargas de timers (con postescalador), TH1 y error de baud rate, demoras con lazos <code>djnz</code>, códigos de 7 segmentos, conversión UC → UI y resistencias de LED. Sin dependencias. Código y pruebas en <a href="software/mcs51calc/">software/mcs51calc/</a>.</p>
+<pre><code>cd micro-controladores/software/mcs51calc
+python3 -m mcs51calc timer 1s --cm 1us            # recarga y postescalador
+python3 -m mcs51calc baud 9600 --fosc 11.0592     # TH1 y error
+python3 -m mcs51calc demora 10 200 250 --cm 1us   # ciclos de la rutina de 3 lazos
+python3 -m mcs51calc seg7 --anodo                 # tabla 0..F</code></pre>
+<p>En Windows usa <code>py</code> en lugar de <code>python3</code>. Con <code>pip install -e .</code> queda el comando <code>mcs51calc</code>.</p>
+
+<h2 id="prerrequisitos">Prerrequisitos</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Concepto</th><th>Repaso</th></tr></thead>
+  <tbody>
+    <tr><td>Binario, hexadecimal, BCD, complemento a 2</td><td><a href="../repaso/electronica-digital.html#numeracion">Electrónica digital</a></td></tr>
+    <tr><td>Biestables, registros, contadores, tercer estado, memorias</td><td><a href="../repaso/electronica-digital.html#secuencial">Electrónica digital</a></td></tr>
+    <tr><td>Transistor como interruptor, niveles lógicos, pull-up</td><td><a href="../repaso/electronica-analogica.html">Electrónica analógica</a></td></tr>
+    <tr><td>Ley de Ohm, RC (RESET, antirrebote)</td><td><a href="../repaso/circuitos.html#rc">Circuitos</a></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué el 8051 si existen ARM y AVR?</summary><div><p>Porque sigue siendo la familia más diversificada (cientos de modelos de muchos fabricantes) y su arquitectura es sencilla y completa para aprender. «Todas las familias de µC son prácticamente iguales»: quien domina una aprende otra rápido.</p></div></details>
+  <details><summary>¿Cómo preparo un debate?</summary><div><p>Resuelve los ejercicios orientados <em>tú mismo</em>, simúlalos, y prepárate para justificar cada decisión: por qué ese modo de direccionado, por qué esa recarga, qué pasa si se cambia una instrucción.</p></div></details>
+  <details><summary>¿El simulador de esta web sustituye a MCU 8051 IDE o Proteus?</summary><div><p>No: es un complemento para estudiar en cualquier dispositivo. Los laboratorios se hacen en Proteus y MCU 8051 IDE; este simulador no modela tiempos dentro del ciclo de máquina, cargas eléctricas ni componentes externos complejos.</p></div></details>
+  <details><summary>¿Ciclo de máquina de 1 µs o de 83 ns?</summary><div><p>En el 8051 original, 12 pulsos de reloj: 1 µs a 12 MHz (lo que suponen casi todos los ejercicios). En muchos 8051 actuales, 1 pulso: 83 ns a 12 MHz. Lee siempre el dato del enunciado.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> C0 «Asignatura Microcontroladores 2026-27, 12 semanas por encuentros» y materiales de la asignatura (Dr. A. J. Cabrera Sarmiento y colectivo, CUJAE). Elaboración propia.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Portal de asignaturas</a></footer>
 </body>
 </html>

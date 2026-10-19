@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>T3 · Repertorio de instrucciones y herramientas — Microcontroladores</title>
+  <meta name="description" content="Modos de direccionado, repertorio de instrucciones del 8051, stack, subrutinas, estructura de un programa en ensamblador, directivas, ficheros .lst y .hex, MCU 8051 IDE y Proteus. Conferencias C4 y C4a, CP2, LAB0 y LAB1.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <link rel="stylesheet" href="../css/micro.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/sim8051.js"></script>
+  <script defer src="../js/micro.js"></script>
+  <style>body { --accent: var(--c-micro); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../../">← Portal</a><span class="title">Microcontroladores · 8051</span>
+  <nav class="tabs" aria-label="Secciones de la asignatura"><a href="../">Inicio</a><a href="../#temas" aria-current="page">Temas</a><a href="../simulador.html">Simulador</a><a href="../#software">Software</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Tema 3 · Conferencias C4 y C4a · CP2 · LAB0 y LAB1</p>
+<h1>Repertorio de instrucciones, programación en ensamblador y herramientas</h1>
+<p class="lead">El 8051 es un procesador <strong>CISC</strong>: tiene instrucciones redundantes (varias maneras de hacer lo mismo) codificadas en 1 a 3 bytes, casi todas de 1 o 2 ciclos de máquina. Aprender su repertorio no es memorizar una tabla: es entender <strong>qué operandos admite cada instrucción y por qué</strong>. El simulador de esta web y el <a href="#encoder">codificador</a> de esta página te dicen al instante si una instrucción existe y cuánto ocupa.</p>
+
+<div class="objectives"><strong>Objetivos (C4, C4a)</strong><ul>
+  <li>Concepto de modo de direccionado; características y escenarios de aplicación de cada modo del 8051.</li>
+  <li>Conocer las principales instrucciones y directivas del ensamblador, su alcance, limitaciones y casos de uso.</li>
+  <li>Conocer la estructura general de un programa en ensamblador.</li>
+  <li>Conocer las funciones de un simulador y saber trabajar con MCU 8051 IDE y Proteus.</li>
+</ul></div>
+
+<div class="box prereq"><span class="box-title">aritmética binaria y complemento a 2</span>
+<p>Suma binaria con acarreo; resta como suma del complemento a 2 (\(-x=\bar x+1\)); un byte con signo va de −128 (80h) a +127 (7Fh). <strong>Acarreo</strong> (CY) = desbordamiento sin signo; <strong>desbordamiento</strong> (OV) = el resultado con signo no cabe. BCD: cada nibble un dígito decimal (0–9). Repaso: <a href="../../repaso/electronica-digital.html#numeracion">numeración y complemento a 2</a> · <a href="t2-familia-8051.html#datos">mapa de memoria (Tema 2)</a>.</p></div>
+
+<h2 id="modos">1. Modos de direccionado</h2>
+<p>Un <strong>modo de direccionado</strong> es la forma de especificar un operando: un registro, una dirección de memoria, una constante o un bit. Una instrucción con dos operandos puede usar un modo para cada uno, y algunos operandos son implícitos.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Modo</th><th>Ejemplo</th><th>Codificación</th><th>Claves</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Registro</strong></td><td class="mono">inc R1</td><td class="mono">09</td><td>R0–R7 se codifican con 3 bits del propio código (1 byte). No se pueden usar dos registros en una instrucción. Ri corresponde a 4 direcciones posibles según el banco.</td></tr>
+    <tr><td><strong>Inmediato</strong></td><td class="mono">mov R1,#40h</td><td class="mono">79 40</td><td>Constante con <code>#</code>, en el byte que sigue al código. Para inicializar variables y SFR.</td></tr>
+    <tr><td><strong>Directo</strong></td><td class="mono">mov P1,#10010011b</td><td class="mono">75 90 93</td><td>La dirección va en un byte. Variables y <strong>únicos para los SFR</strong>. Con dos directos, la fuente se codifica antes que el destino (<code>mov 40h,30h</code> = <code>85 30 40</code>).</td></tr>
+    <tr><td><strong>Indirecto</strong></td><td class="mono">mov @R1,P1</td><td class="mono">A7 90</td><td>Puntero <code>@R0</code>, <code>@R1</code> (o SP, implícito en la pila). Arreglos en RAM. No dos indirectos en una instrucción.</td></tr>
+    <tr><td><strong>Indexado</strong></td><td class="mono">movc A,@A+DPTR</td><td class="mono">93</td><td>Indirecto con suma A+DPTR (o A+PC) a la <em>memoria de programa</em>: tablas de constantes.</td></tr>
+    <tr><td><strong>Relativo</strong></td><td class="mono">jnz sigue</td><td class="mono">70 rel</td><td>Desplazamiento con signo de −128 a +127 bytes desde el PC <em>ya incrementado</em>. Lo calcula el ensamblador.</td></tr>
+    <tr><td><strong>Implícito</strong></td><td class="mono">ret</td><td class="mono">22</td><td>Los operandos (SP, PC) no aparecen.</td></tr>
+    <tr><td><strong>De bit</strong></td><td class="mono">setb P3.1</td><td class="mono">D2 B1</td><td>Solo bits de 20h–2Fh y de los SFR direccionables bit a bit.</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="repertorio">2. El repertorio de instrucciones</h2>
+<p>En las instrucciones de dos operandos <strong>el primero es el destino</strong>. <code>&lt;byte&gt;</code> representa cualquiera de los modos que admita la instrucción (Rn, directo, @Ri, #dato). Ciclo de máquina: 12 pulsos de reloj en el 8051 original, uno en los actuales. Solo <code>mul</code> y <code>div</code> tardan 4 ciclos.</p>
+<h3 id="aritmeticas">2.1 Aritméticas</h3>
+<p><code>add A,&lt;byte&gt;</code> · <code>addc A,&lt;byte&gt;</code> · <code>subb A,&lt;byte&gt;</code> · <code>inc A | &lt;byte&gt; | DPTR</code> · <code>dec A | &lt;byte&gt;</code> · <code>mul AB</code> (B:A = B × A) · <code>div AB</code> (A = cociente, B = resto) · <code>da A</code> (ajuste decimal tras una suma BCD).</p>
+<ul>
+  <li>Todas las sumas y restas tienen <strong>A como destino</strong>.</li>
+  <li><strong>No existe resta sin acarreo</strong>: <code>subb</code> resta también CY. Antes de restar, <code>clr C</code>.</li>
+  <li><code>inc</code>/<code>dec</code> no afectan CY; <code>add</code> sí (por eso un contador BCD se hace con <code>add A,#1</code> + <code>da A</code>, no con <code>inc A</code>).</li>
+</ul>
+<h3 id="logicas">2.2 Lógicas y rotaciones</h3>
+<p><code>anl</code> (AND: poner bits a 0), <code>orl</code> (OR: poner a 1), <code>xrl</code> (XOR: complementar o comparar) con las formas <code>A,&lt;byte&gt;</code>, <code>dir,A</code> y <code>dir,#dato</code>. Las dos últimas permiten aplicar <strong>máscaras directamente a los SFR</strong>: <code>xrl P3,#0Fh</code> complementa P3.0–P3.3. Solo con A: <code>clr A</code>, <code>cpl A</code>, <code>rl A</code>, <code>rr A</code>, <code>rlc A</code>, <code>rrc A</code> (con acarreo: el bit que sale va a CY) y <code>swap A</code> (intercambia nibbles). Las rotaciones mueven <em>un</em> bit; <code>rl A</code> equivale a ×2 si no se pierde el bit alto.</p>
+<h3 id="transferencia">2.3 Transferencia de datos</h3>
+<ul>
+  <li><strong>RAM interna</strong>: <code>mov A,&lt;fuente&gt;</code>, <code>mov &lt;destino&gt;,A</code>, <code>mov &lt;destino&gt;,&lt;fuente&gt;</code> (si no son ambos registro ni ambos indirectos: <code>mov R7,R5</code> no existe), <code>mov DPTR,#dato16</code>, <code>push dir</code>, <code>pop dir</code> (solo direccionado directo: <code>push ACC</code>, nunca <code>push A</code>), <code>xch A,&lt;byte&gt;</code>, <code>xchd A,@Ri</code>.</li>
+  <li><strong>Memoria de datos externa</strong> (o periféricos externos): solo indirecto y siempre con A: <code>movx A,@Ri</code>, <code>movx @Ri,A</code>, <code>movx A,@DPTR</code>, <code>movx @DPTR,A</code>.</li>
+  <li><strong>Memoria de programa</strong> (tablas): <code>movc A,@A+DPTR</code> (A = desplazamiento en la tabla; devuelve en A el contenido) y <code>movc A,@A+PC</code>.</li>
+</ul>
+<div class="example"><h4>Ejemplo 2.1 — Tabla de 7 segmentos con <code>movc</code> (C4)</h4>
+<pre><code>        mov  DPTR,#Tabla_7Seg   ; puntero a la tabla
+        ; en A el dígito a mostrar (p. ej. 2)
+        movc A,@A+DPTR          ; A = contenido de (A + DPTR) = código del 2
+        mov  P1,A               ; mostrar en la lámpara (ánodo común: segmento activo en 0)
+        ORG  200h
+Tabla_7Seg: db 0C0h, 0F9h, 0A4h, …   ; con dp → bit 7 y a → bit 0, el «2» es A4h</code></pre>
+<p>Las tablas sirven para búsquedas (LUT), conversión a unidades de ingeniería y conversión de códigos. Fíjate en el <code>0</code> delante de <code>C0h</code>: un número hexadecimal que empieza por letra debe llevar un 0 delante para que el ensamblador no lo confunda con un símbolo.</p></div>
+<h3 id="booleanas">2.4 Booleanas (de bit)</h3>
+<p><code>anl C,bit</code> · <code>anl C,/bit</code> · <code>orl C,bit</code> · <code>orl C,/bit</code> · <code>mov C,bit</code> · <code>mov bit,C</code> · <code>clr C|bit</code> · <code>setb C|bit</code> · <code>cpl C|bit</code>. CY hace de «acumulador de bits». <strong>No existe XOR de bits</strong> y <strong>no se puede mover de un bit a otro</strong> directamente (<code>mov P2.0,P</code> es un error: hay que pasar por C). XOR por programa (C4):</p>
+<pre><code>        mov  C,bit1
+        jnb  bit2,sigue     ; si bit2 = 0, C = bit1
+        cpl  C              ; si no, el complemento
+sigue:  …                   ; C = bit1 XOR bit2</code></pre>
+<h3 id="control">2.5 Transferencia de control</h3>
+<ul>
+  <li><strong>Incondicional</strong>: <code>ljmp dir16</code> (3 bytes, a cualquier lugar), <code>ajmp dir11</code> (2 bytes, dentro del bloque de 2 kB), <code>sjmp rel</code> (2 bytes, ±127), <code>jmp @A+DPTR</code> (saltos calculados), <code>lcall dir16</code>, <code>acall dir11</code>, <code>ret</code>, <code>reti</code>, <code>nop</code> (no es de control: solo consume un ciclo). Los ensambladores aceptan <code>jmp</code>/<code>call</code> genéricos y eligen la forma.</li>
+  <li><strong>Condicional</strong>: <code>jz</code>/<code>jnz</code> (miran A: no hay bandera Z), <code>jc</code>/<code>jnc</code>, <code>jb</code>/<code>jnb</code>/<code>jbc bit,rel</code>, <code>djnz &lt;byte&gt;,rel</code> (decrementa y salta si no es cero: lazos), <code>cjne A,&lt;byte&gt;,rel</code> y <code>cjne &lt;byte&gt;,#dato,rel</code> (comparar y saltar si no son iguales: resta sin alterar el destino y pone CY = 1 si el primero es <em>menor</em>).</li>
+</ul>
+
+<h2 id="stack">3. Subrutinas y stack</h2>
+<p>La pila es una estructura LIFO imprescindible para anidar subprogramas. <code>call</code> guarda en la pila la dirección de la instrucción siguiente (primero el byte bajo) y actualiza SP; <code>ret</code> saca los dos últimos bytes y los pone en el PC.</p>
+<div class="example"><h4>Ejemplo 3.1 — Stack balanceado y no balanceado (C4)</h4>
+<pre><code>repite: mov  A,P1        ; 122Ch
+        mov  B,P2        ; 122Eh
+        call suma        ; 1231h  → guarda 1234h: [SP+1] = 34h, [SP+2] = 12h
+        jmp  repite      ; 1234h
+suma:   add  A,B         ; 1237h
+        ret              ; 1239h  → PC = 1234h  ✔</code></pre>
+<p>Si <code>suma</code> empieza con <code>push ACC</code> y no hace el <code>pop</code> correspondiente, <code>ret</code> saca el contenido de ACC y un byte de la dirección de retorno: ¡vuelve a una dirección equivocada! <strong>Toda subrutina debe dejar la pila balanceada</strong> (mismo número de <code>push</code> y <code>pop</code>, en orden inverso).</p></div>
+
+<h2 id="programa">4. Estructura de un programa en ensamblador</h2>
+<p>Un programa de µC no tiene sistema operativo: tras un bloque de <strong>inicialización</strong> entra en un <strong>lazo infinito</strong>; además hay <strong>subrutinas</strong> (incluidas las de interrupción). Formato de línea: <code>[etiqueta:] código [op1][,op2] ; comentario</code>. La etiqueta es el nombre simbólico de una dirección (la calcula el ensamblador). Las <strong>directivas</strong> son órdenes al ensamblador (no generan código):</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Directiva</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">ORG dir</td><td>Dirección donde colocar el siguiente byte.</td></tr>
+    <tr><td class="mono">símbolo EQU valor</td><td>Sustituir el símbolo por el valor (como <code>#define</code>): <code>Contador EQU R6</code>, <code>Bocina EQU P3.1</code>.</td></tr>
+    <tr><td class="mono">DB valores</td><td>Bytes constantes en la memoria de programa (tablas, cadenas <code>'Hola',0</code>).</td></tr>
+    <tr><td class="mono">END</td><td>Fin del ensamblaje.</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Flujo de herramientas</strong>: ensamblador (<code>.asm</code> → <code>.obj</code> + <code>.lst</code>) → enlazador (<code>.obj</code> → <code>.hex</code>) → simulador (MCU 8051 IDE, Keil, Proteus) → programador (graba el <code>.hex</code>). El <strong>.lst</strong> muestra dirección, códigos y fuente de cada línea; el <strong>.hex</strong> (formato Intel HEX) es texto: <code>:LLAAAATT…CC</code> = longitud, dirección, tipo (00 datos, 01 fin), datos y suma de comprobación. El simulador de esta web descarga el <code>.hex</code> de tu programa.</p>
+<div class="box idea"><span class="box-title">Recomendaciones para confeccionar un programa (C4)</span>
+<ol><li>Concebir las variables y constantes y su ubicación en memoria.</li><li>Concebir los modos de direccionado a usar.</li><li>Identificar los recursos a inicializar.</li><li>Elaborar el seudocódigo.</li><li>Convertirlo en instrucciones (una línea de seudocódigo puede ser varias instrucciones)… y practicar, practicar, practicar.</li></ol></div>
+
+<h2 id="encoder">5. Codificador de instrucciones</h2>
+<div class="sim" id="w-enc">
+  <div class="sim-title">¿Existe esta instrucción? ¿Cuántos bytes y ciclos?</div>
+  <p class="meta">Escribe instrucciones (una por línea). Prueba las erróneas de la C4: <code>mov R7,R5</code>, <code>mov P2.0,P</code>, <code>add R1,#3</code>, <code>push A</code>.</p>
+  <textarea id="en-src" rows="8" style="width:100%">mov A,#2
+add A,R3
+mov P1,#10010011b
+mov @R1,P1
+movc A,@A+DPTR
+djnz R5,$
+cjne A,#0AAh,$
+mov R7,R5</textarea>
+  <div class="readout" id="en-out"></div>
+</div>
+
+<h2 id="demoras">6. Rutinas de demora por software</h2>
+<p>Con <code>djnz</code> (2 ciclos) se construyen demoras contando ciclos. Para la rutina de la C4a con ciclo de máquina de 1 µs:</p>
+$$N=\underbrace{2}_{\text{call}}+\underbrace{1}_{\text{mov R7}}+R7\left[1+R6\,(1+2R5+2)+2\right]+\underbrace{2}_{\text{ret}}=5+10\,[3+200\,(3+2\cdot250)]=1\,006\,035\ \text{ciclos}\approx1{,}006\ \text{s}$$
+<div class="sim" id="w-delay">
+  <div class="sim-title">Calculadora de demoras con lazos anidados</div>
+  <div class="controls">
+    <label>Niveles <select id="dl-lv"><option value="1">1 (R5)</option><option value="2">2 (R6, R5)</option><option value="3" selected>3 (R7, R6, R5)</option></select></label>
+    <label>R7 <input type="number" id="dl-a" value="10" min="0" max="255" style="width:70px"></label>
+    <label>R6 <input type="number" id="dl-b" value="200" min="0" max="255" style="width:70px"></label>
+    <label>R5 <input type="number" id="dl-c" value="250" min="0" max="255" style="width:70px"></label>
+    <label>Ciclo de máquina (µs) <input type="number" id="dl-mc" value="1" step="0.1" min="0.01" style="width:80px"></label>
+  </div>
+  <div class="readout" id="dl-out"></div>
+</div>
+<p>Inconvenientes (C11): la demora por software ocupa al procesador (no puede hacer otra cosa), depende del cristal y se alarga si hay interrupciones. Para tiempos exactos se usan los <a href="t6-temporizadores.html">temporizadores</a>.</p>
+
+<h2 id="cp2">7. Guía de la CP2: programas simples</h2>
+<p class="meta">Soluciones comprobadas en el simulador de esta web. Escríbelas tú primero.</p>
+<div class="example"><h4>Ejercicio 1 — Subrutina <code>Limpia_RAM</code> (40h–7Fh) en 300h</h4>
+<pre><code>        ORG  300h
+Limpia_RAM:
+        push ACC            ; salvar SOLO lo que se modifica (el PP usa A, PSW, R0…)
+        push PSW
+        push 00h            ; R0 del banco 0 (push no admite "R0": usar su dirección)
+        mov  R0,#40h
+        clr  A
+lazo:   mov  @R0,A          ; direccionado indirecto
+        inc  R0
+        cjne R0,#80h,lazo   ; hasta 7Fh inclusive
+        pop  00h            ; en orden inverso (LIFO)
+        pop  PSW
+        pop  ACC
+        ret</code></pre>
+<p>c) Si <code>call Limpia_RAM</code> está en 20h (3 bytes, <code>LCALL</code>), se guarda 0023h en la pila: SP = 07h → 08h ← 23h, 09h ← 00h; PC ← 0300h. <code>ret</code> recupera 0023h y deja SP = 07h. Ábrelo en el <a href="../simulador.html?ej=1">simulador (ejemplo 2)</a> y míralo paso a paso.</p></div>
+<div class="example"><h4>Ejercicio 2 — Tabla de 100 bytes en 200h</h4>
+<pre><code>; a) cantidad de valores impares → 30h (RAM interna)
+        mov  DPTR,#Tabla
+        mov  R2,#0           ; índice en la tabla
+        mov  30h,#0          ; contador
+lazo:   mov  A,R2
+        movc A,@A+DPTR
+        jnb  ACC.0,par       ; bit 0 = 1 → impar
+        inc  30h
+par:    inc  R2
+        cjne R2,#100,lazo
+
+; b) cantidad de valores > 5Ah → 30h de la memoria de datos EXTERNA
+        mov  R2,#0
+        mov  R3,#0
+lazob:  mov  A,R2
+        movc A,@A+DPTR
+        clr  C
+        subb A,#5Bh          ; CY = 0 si valor ≥ 5Bh (es decir, > 5Ah)
+        jc   noes
+        inc  R3
+noes:   inc  R2
+        cjne R2,#100,lazob
+        mov  A,R3
+        mov  R0,#30h
+        movx @R0,A           ; acceso externo: solo indirecto y con A
+
+; c) valor máximo → R7
+        mov  R2,#0
+        mov  R7,#0           ; máximo provisional
+lazoc:  mov  A,R2
+        movc A,@A+DPTR
+        mov  B,A             ; guardar el valor
+        clr  C
+        subb A,R7            ; CY = 1 si valor &lt; máximo
+        jc   nomax
+        mov  R7,B
+nomax:  inc  R2
+        cjne R2,#100,lazoc
+
+; d) cantidad de unos de cada byte → 40h, 41h, …
+        mov  R2,#0
+        mov  R0,#40h
+lazod:  mov  A,R2
+        movc A,@A+DPTR
+        mov  R3,#8           ; 8 bits
+        mov  R4,#0           ; contador de unos
+bits:   rrc  A               ; el bit menos significativo pasa a CY
+        jnc  cero
+        inc  R4
+cero:   djnz R3,bits
+        mov  A,R4
+        mov  @R0,A
+        inc  R0
+        inc  R2
+        cjne R2,#100,lazod</code></pre>
+<p>e) La tabla no puede empezar en la dirección 1: en 0000h va la primera instrucción (un salto de 2–3 bytes) y se solaparían. Propuesto (valor medio en B): sumar en 16 bits (A y un registro con <code>addc</code>) y dividir entre 100 (dos divisiones de 8 bits o restas sucesivas).</p></div>
+<div class="example"><h4>Ejercicio 3 — Mensaje en el LCD</h4>
+<pre><code>        mov  DPTR,#Msg
+        mov  R2,#0
+otro:   mov  A,R2
+        movc A,@A+DPTR
+        jz   fin             ; cadena terminada en 0 (ASCIIZ)
+        mov  B,A             ; Send_Char_LCD espera el carácter en B
+        call Send_Char_LCD
+        inc  R2
+        sjmp otro
+fin:    …
+Msg:    db 'Inicializando...',0</code></pre></div>
+<div class="example"><h4>Ejercicio 4 — Demoras con reloj de 2 MHz y ciclo de 2 pulsos</h4>
+<p>\(T_{\text{CM}}=2/2\text{ MHz}=1\) µs. a) 250 µs: <code>mov R5,#123 / djnz R5,$ / ret</code> → 2 + 1 + 246 + 2 = 251 ciclos. b) 1 s: tres lazos 10 × 200 × 250 (≈1,006 s) o 10 × 200 × 249 (1,002 s). c) Parpadeo a 1 Hz mientras P2.5 = 0: <code>jb P2.5,$</code> espera el cierre; en el lazo <code>cpl P1.3</code> + demora de 0,5 s, y se repite mientras <code>jnb P2.5,…</code>.</p></div>
+<div class="example"><h4>Ejercicio 5 — Mover 50 bytes de 30h a 40h (zonas solapadas)</h4>
+<p>Origen 30h–61h, destino 40h–71h: <strong>se solapan</strong>. Si se copia desde el principio, al llegar a 40h ya se ha sobrescrito el origen con los primeros bytes (el resultado repite 1…16, 1…16…). Hay que copiar <strong>desde el final</strong>:</p>
+<pre><code>        mov  R0,#30h+49      ; último byte del origen (61h)
+        mov  R1,#40h+49      ; último byte del destino (71h)
+        mov  R2,#50
+mueve:  mov  A,@R0
+        mov  @R1,A
+        dec  R0
+        dec  R1
+        djnz R2,mueve</code></pre></div>
+
+<h2 id="herramientas">8. Herramientas: MCU 8051 IDE y Proteus (C4a, LAB0)</h2>
+<p>Un simulador integra ensamblador, enlazador y simulación de la ejecución; <strong>no</strong> modela los efectos de carga ni el comportamiento dinámico real (tiempos) del hardware. <strong>MCU 8051 IDE</strong> (libre, GPL) admite ensamblador y C (SDCC), permite modificar registros y memoria, deshacer pasos y conectar LED, displays, interruptores… <strong>ISIS Proteus</strong> simula el circuito completo (microcontrolador + componentes + instrumentos virtuales).</p>
+<h3 id="mcu8051ide">8.1 Pasos en MCU 8051 IDE</h3>
+<ol>
+  <li><em>Project → New</em>: nombre, carpeta (créala antes), microcontrolador (p. ej. 8751).</li>
+  <li>Escribir el código, <em>File → Save</em> y añadirlo al proyecto (<em>Add file → Yes</em>).</li>
+  <li><em>Project → Edit project</em>: <em>Clock (kHz) = 12000</em>.</li>
+  <li><em>Tools → Compile</em>: revisa la pestaña <em>Messages</em>, corrige, guarda y repite hasta <em>Compilation successful</em>. Sin errores solo significa «sin faltas de ortografía».</li>
+  <li><em>Simulator → Start</em>; <em>Step</em> (F7) y <em>Step back</em> (Alt+F7). Escribe 55 en R4: ¿por qué aparece 55 también en la dirección 4 de la RAM? (porque R4 del banco 0 <em>es</em> la dirección 04h).</li>
+</ol>
+<div class="box warn"><span class="box-title">«Como un pescado en el congelador»</span><p>Para depurar por simulación es fundamental saber qué debe hacer el procesador con cada instrucción; si no, solo verás números hexadecimales cambiar, «con los ojos abiertos… pero sin ver nada».</p></div>
+<h3 id="proteus">8.2 Pasos en Proteus (LAB0)</h3>
+<ol>
+  <li><em>New Project</em> en una carpeta propia; esquemático DEFAULT, sin PCB; <strong>Create Firmware Project</strong>: familia 8051, controlador 80C51, compilador ASEM-51.</li>
+  <li><strong>Borrar la plantilla de código</strong> que genera Proteus (tiene malas prácticas: <code>Loop: jmp Loop</code> y un <code>org 0100h</code> innecesario).</li>
+  <li>Componentes (botón P): 80C51, LED, RES, SW-SPST…; terminales DEFAULT y GROUND. Comprueba que el componente tenga modelo de simulación.</li>
+  <li>Compilar (Build), ejecutar (Play), depurar con <em>Debug → Start VSM Debugging</em>, paso a paso, puntos de ruptura y ventanas <em>8051 CPU</em> (registros, SFR, RAM).</li>
+  <li>El <code>.pdsprj</code> es un ZIP: dentro están el <code>.asm</code> y el <code>.hex</code> en <code>FIRMWARE/80C51</code>.</li>
+</ol>
+
+<h2 id="lab1">9. Guía del LAB1: programación para el 8051</h2>
+<p><strong>Trabajo previo</strong>: 4 interruptores (activos en 0), 4 LED (activos en 0) y una lámpara de 7 segmentos de ánodo común; mostrar siempre el hexadecimal de los interruptores y hacer <strong>parpadear a 1 Hz</strong> el LED del interruptor de mayor jerarquía activado; 12 MHz con 12 pulsos por ciclo (1 µs). <strong>Restricción</strong>: sin instrucciones de bit.</p>
+<ul>
+  <li>Sin <code>jnb P1.3,…</code>: leer el nibble con <code>mov A,P1</code> / <code>anl A,#0Fh</code> y analizar con máscaras (<code>anl</code> + <code>jz</code>/<code>jnz</code>) o con <code>rlc</code>/<code>rrc</code> + <code>jc</code>/<code>jnc</code>.</li>
+  <li>El parpadeo: en cada medio período (0,5 s) alternar entre «LED encendido» y «todos apagados» con <code>xrl P3,#máscara</code>.</li>
+  <li>b) <strong>Tiempo independiente de la jerarquía</strong>: usar el nibble como índice de una tabla en memoria de programa que contiene directamente la máscara del LED más prioritario para cada una de las 16 combinaciones: <code>movc A,@A+DPTR</code> tarda siempre lo mismo.</li>
+</ul>
+<p>Punto de partida: el ejemplo de la C4a está en el <a href="../simulador.html?ej=0">simulador (ejemplo 1)</a>.</p>
+
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. ¿Cuál de estas instrucciones NO existe?</p><div class="opts"><button class="opt" type="button">mov A,R5</button><button class="opt" type="button" data-ok>mov R7,R5</button><button class="opt" type="button">mov 07h,R5</button></div><p class="why">Dos registros no se pueden codificar en el mismo byte; <code>mov 07h,R5</code> (directo) sí existe.</p></div>
+  <div class="q"><p>2. Después de <code>mov A,#5</code> / <code>cjne A,#7,sig</code>, CY vale…</p><div class="opts"><button class="opt" type="button">0</button><button class="opt" type="button" data-ok>1</button><button class="opt" type="button">no cambia</button></div><p class="why">CJNE pone CY = 1 cuando el primer operando es menor (5 &lt; 7).</p></div>
+  <div class="q"><p>3. ¿Qué hace <code>movc A,@A+DPTR</code> si A = 3 y DPTR = 0200h?</p><div class="opts"><button class="opt" type="button">lee la RAM interna 03h</button><button class="opt" type="button" data-ok>lee el byte de código en 0203h</button><button class="opt" type="button">escribe A en 0203h</button></div><p class="why">Indexado sobre la memoria de programa.</p></div>
+  <div class="q"><p>4. Una subrutina hace <code>push ACC</code> y termina en <code>ret</code> sin <code>pop</code>…</p><div class="opts"><button class="opt" type="button">no pasa nada</button><button class="opt" type="button" data-ok>retorna a una dirección equivocada</button><button class="opt" type="button">el ensamblador da error</button></div><p class="why">La pila no está balanceada: ret toma ACC como parte de la dirección.</p></div>
+</div>
+
+<h2 id="biblio">Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>MacKenzie y Phan, <em>Microcontrolador 8051</em>, 4.ª ed., Pearson, 2007</td><td>3</td><td>3.1 Introducción · 3.2 Modos de direccionamiento · 3.3 Tipos de instrucciones</td><td>pp. 49–86 (PDF 64–101)</td><td>Todo el repertorio con ejemplos</td></tr>
+    <tr><td>MacKenzie y Phan (ídem)</td><td>7</td><td>7.2 Operación de un ensamblador · 7.3 Formato de un programa · 7.5 Directivas del ensamblador · 7.7 Operación del enlazador</td><td>pp. 152–182 (PDF 167–197)</td><td>Ensamblador, directivas, .lst, enlazador</td></tr>
+    <tr><td>MacKenzie y Phan (ídem)</td><td>9</td><td>9.3 Las tres estructuras · 9.4 Sintaxis del seudocódigo · 9.5 Estilo de programación en ensamblador</td><td>pp. 220–246 (PDF 235–261)</td><td>Seudocódigo y estilo</td></tr>
+    <tr><td>Intel, <em>MCS-51 Microcontroller Family User's Manual</em>, 1994</td><td>2</td><td>MCS-51 Instruction Set · Instruction Definitions</td><td>pp. 2-21 a 2-75 (PDF 51–105)</td><td>Definición exacta de cada instrucción, banderas y ciclos</td></tr>
+    <tr><td><em>Set de Instrucciones MCS-51</em> (referencia rápida, en la bibliografía de la asignatura)</td><td>—</td><td>Tabla resumen</td><td>58 pp.</td><td>Consulta rápida de códigos</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — Pablo Pérez, <a href="https://www.youtube.com/watch?v=hnalE4sGguM">«Clase 5: Sumario del conjunto de instrucciones del 8051»</a> (17:20) y <a href="https://www.youtube.com/watch?v=rhJ15kiC9Is">«Clase 6: Tipos de instrucciones del 8051»</a> (40:24).</li>
+  <li><strong>Vídeo</strong> — R. A. Quispe, <a href="https://www.youtube.com/watch?v=BTExEvbgxT4">«03 Direccionamiento inmediato»</a> (15:49), de su curso de 8051.</li>
+  <li><strong>Vídeo</strong> — Silence&amp;Progress, <a href="https://www.youtube.com/watch?v=KanfD-biR4o">«How to start with mcu8051ide»</a> (17:58, inglés): primeros pasos en MCU 8051 IDE.</li>
+  <li><strong>Formato</strong> — <a href="https://en.wikipedia.org/wiki/Intel_HEX">Intel HEX</a> (Wikipedia): estructura de los registros del fichero <code>.hex</code>.</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué <code>push A</code> da error y <code>push ACC</code> no?</summary><div><p><code>push</code> solo admite direccionado directo; <code>A</code> es el nombre del acumulador como registro implícito, y <code>ACC</code> es su dirección de SFR (E0h).</p></div></details>
+  <details><summary>¿Cuándo uso <code>sjmp</code>, <code>ajmp</code> o <code>ljmp</code>?</summary><div><p><code>sjmp</code> para saltos cortos (±127 bytes, 2 bytes), <code>ajmp</code> dentro del mismo bloque de 2 kB (2 bytes), <code>ljmp</code> en cualquier caso (3 bytes). Si usas <code>jmp</code> genérico, el ensamblador decide (en esta web, siempre <code>ljmp</code>).</p></div></details>
+  <details><summary>¿Por qué el 2 en 7 segmentos es A4h en un ejemplo y 24h en otro?</summary><div><p>Depende del bit 7: si el punto decimal está conectado (y apagado en ánodo común) vale 1 → A4h; si el bit 7 no se usa y se deja en 0 → 24h. El resto de bits (a…g = bits 0…6) es igual. Compruébalo con el <a href="t4-puertos-y-aplicaciones.html#siete">constructor de códigos</a>.</p></div></details>
+  <details><summary>¿Qué significa «$» en <code>djnz R5,$</code>?</summary><div><p>La dirección de la instrucción actual: la instrucción salta sobre sí misma mientras R5 ≠ 0.</p></div></details>
+</div>
+<p class="source-note"><strong>Origen:</strong> Conferencias C4 «Repertorio de instrucciones» y C4a «Simuladores de 8051 / MCU8051 + Proteus», CP2 «Elaboración de programas simples para el 8051», LAB0 «Entorno ISIS Proteus» y LAB1 «Programación para el 8051» (Dr. A. J. Cabrera Sarmiento y colectivo, CUJAE). Soluciones de elaboración propia verificadas en el simulador.</p>
+</main></div>
+<footer class="site wrap">Microcontroladores · Material de estudio no oficial · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>
