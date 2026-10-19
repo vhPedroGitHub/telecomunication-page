@@ -1,0 +1,35 @@
+# Materiales con derechos de autor o pesados: viven fuera del repo (ver CLAUDE.md §9)
+*.pdf
+*.ppt
+*.pptx
+*.doc
+*.docx
+*.rtf
+*.xls
+*.xlsx
+*.mkv
+*.mp4
+*.MP4
+*.avi
+*.mov
+*.rar
+*.zip
+*.7z
+*.exe
+
+# Compilación de software complementario
+__pycache__/
+*.pyc
+.venv/
+venv/
+target/
+*.egg-info/
+dist/
+build/
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+_site/
