@@ -50,7 +50,7 @@ las asignaturas enlacen de forma estable. **No cambiar los `id` una vez publicad
 | `circuitos.html` | ✅ fasores · potencia · maxtrans · rc · filtros (+ Bode) |
 | `fisica-em.html`, `electronica-*.html`, `redes.html` | ⬜ |
 
-Bibliografía verificada: Stewart 9ª (PDF = impresa + 31; apéndices A..), Walpole 9ª 2012 (+22),
+Bibliografía verificada: Stewart (el PDF «…9naEd» es en realidad *Cálculo. Trascendentes tempranas*, 8ª ed., 2018; PDF = impresa + 31), Walpole 9ª 2012 (+22),
 Hayt 8ª (+17).
 
 ## Bitácora
