@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repaso · Circuitos</title>
+  <meta name="description" content="Fichas de repaso de circuitos: fasores e impedancia, potencia en AC y valor eficaz, máxima transferencia de potencia, circuitos RC y RL, respuesta en frecuencia y filtros.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <script src="../assets/js/theme.js"></script>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-repaso); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../">← Portal</a><span class="title">Repaso de prerrequisitos</span>
+  <nav class="tabs" aria-label="Fichas"><a href="./">Índice</a><a href="matematica.html">Matemática</a><a href="probabilidad.html">Probabilidad</a><a href="circuitos.html" aria-current="page">Circuitos</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice de fichas"><h2>Fichas</h2><ol data-auto></ol></nav>
+<main class="content">
+<h1>Circuitos en régimen sinusoidal</h1>
+<p class="lead">Fasores, impedancias, potencia y filtros: la base de los sistemas LTI (FC I), del ruido térmico y de las líneas de transmisión (LTyA).</p>
+
+<h2 id="fasores">Fasores e impedancia</h2>
+<p>En régimen sinusoidal permanente todas las tensiones y corrientes tienen la misma frecuencia \(\omega\); basta seguir su amplitud y fase. El <strong>fasor</strong> de \(v(t)=V_m\cos(\omega t+\varphi)\) es \(\mathbf V=V_m\angle\varphi\) (\(v=\operatorname{Re}\{\mathbf Ve^{j\omega t}\}\)). Derivar en el tiempo equivale a multiplicar por \(j\omega\), así que cada elemento tiene una <strong>impedancia</strong> \(\mathbf Z=\mathbf V/\mathbf I\):</p>
+<div class="eq key">$$Z_R=R,\qquad Z_L=j\omega L,\qquad Z_C=\frac{1}{j\omega C}=-\frac{j}{\omega C}$$</div>
+<p>Con impedancias valen todas las técnicas de corriente continua (Kirchhoff, divisores, Thévenin, nodos y mallas) usando aritmética compleja. Admitancia \(Y=1/Z=G+jB\).</p>
+<p class="meta">Dónde estudiarlo: Hayt, Kemmerly y Durbin, <em>Análisis de circuitos en ingeniería</em>, 8.ª ed., McGraw-Hill, 2012: 10.4 «El fasor», p. 383 (PDF 400) y 10.5 «Impedancia y admitancia», p. 389 (PDF 406); en <code>cursos/07-Circuito/Bibliografia/</code>.</p>
+
+<h2 id="potencia">Potencia en AC y valor eficaz</h2>
+$$P=\tfrac12V_mI_m\cos(\varphi_v-\varphi_i)=V_{\text{ef}}I_{\text{ef}}\cos\theta,\qquad V_{\text{ef}}=\frac{V_m}{\sqrt2},\qquad \mathbf S=\mathbf V_{\text{ef}}\mathbf I_{\text{ef}}^{*}=P+jQ$$
+<p>En una resistencia, \(P=V_{\text{ef}}^2/R\). En comunicaciones se usa la <strong>potencia normalizada</strong> (\(R=1\,\Omega\)): un coseno de amplitud \(A\) tiene potencia \(A^2/2\).</p>
+<p class="meta">Dónde estudiarlo: Hayt, 8.ª ed., 11.2 «Potencia promedio», p. 424; 11.3 «Valores eficaces», p. 433; 11.5 «Potencia compleja», p. 441.</p>
+
+<h2 id="maxtrans">Máxima transferencia de potencia</h2>
+<p>Una fuente con impedancia interna \(Z_s=R_s+jX_s\) entrega la máxima potencia a una carga \(Z_L=Z_s^{*}\) (adaptación conjugada): \(P_{\max}=\dfrac{|V_s|^2}{8R_s}\) (con \(V_s\) de pico). En resistivo puro, \(R_L=R_s\). De aquí sale la «DEP disponible» \(kT/2\) del ruido térmico y la obsesión de las líneas de transmisión por la adaptación de impedancias.</p>
+<p class="meta">Dónde estudiarlo: Hayt, 8.ª ed., 5.4 «Transferencia de potencia máxima», p. 152 (PDF 169).</p>
+
+<h2 id="rc">Circuitos RC y RL: respuesta temporal</h2>
+<p>Un RC con escalón en la entrada carga el condensador con constante de tiempo \(\tau=RC\): \(v_C(t)=V(1-e^{-t/\tau})u(t)\). La respuesta impulsiva del RC paso bajo es \(h(t)=\frac1{RC}e^{-t/RC}u(t)\). En RL, \(\tau=L/R\). En \(5\tau\) se alcanza más del 99 % del valor final.</p>
+<p class="meta">Dónde estudiarlo: Hayt, 8.ª ed., 8.3 «Circuito RC sin fuente», p. 272, y 8.8 «Accionamiento de circuitos RC», p. 295.</p>
+
+<h2 id="filtros">Respuesta en frecuencia y filtros</h2>
+<p>La <strong>función de transferencia</strong> \(H(j\omega)=\mathbf V_o/\mathbf V_i\) se obtiene con divisores de impedancia. RC paso bajo (R en serie, C a la salida):</p>
+<div class="eq key">$$H(f)=\frac{1}{1+jf/f_c},\qquad f_c=\frac{1}{2\pi RC},\qquad |H(f_c)|=\frac1{\sqrt2}\ (-3\ \text{dB}),\ \ \angle H(f_c)=-45^\circ$$</div>
+<p>Intercambiando R y C se obtiene el paso alto \(H=\frac{jf/f_c}{1+jf/f_c}\). En un <strong>diagrama de Bode</strong> el paso bajo cae a −20 dB/década por encima de \(f_c\). Filtros de orden \(n\) (Butterworth, Chebyshev) caen \(-20n\) dB/década.</p>
+<div class="sim" id="sim-rcf">
+  <div class="sim-title">Bode de un RC paso bajo</div>
+  <div class="controls">
+    <label>R (kΩ) <input type="range" id="rf-r" min="0.1" max="10" step="0.1" value="1.6" data-out="rf-ro"><output id="rf-ro"></output></label>
+    <label>C (nF) <input type="range" id="rf-c" min="1" max="1000" step="1" value="100" data-out="rf-co"><output id="rf-co"></output></label>
+  </div>
+  <div class="two"><canvas id="rf-c1" aria-label="Módulo en dB"></canvas><canvas id="rf-c2" aria-label="Fase"></canvas></div>
+  <div class="readout" id="rf-out"></div>
+</div>
+<p class="meta">Dónde estudiarlo: Hayt, 8.ª ed., 16.6 «Diagramas de Bode», p. 648, y 16.7 «Diseño de filtros básicos», p. 663. Aplicación: <a href="../fundamentos-comunicaciones-1/temas/tema2-senales-y-sistemas.html#lti">FC I, Tema II §8</a>.</p>
+
+<p class="source-note">Fichas de repaso de elaboración propia. Bibliografía: Hayt 8.ª ed. (cursos/07-Circuito/Bibliografia).</p>
+</main></div>
+<footer class="site wrap">Repaso de prerrequisitos · <a href="./">Índice de fichas</a></footer>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const C = window.Course;
+  const lg = { xfmt: function (v) { return v === Math.round(v) ? "10" + "⁰¹²³⁴⁵⁶⁷⁸⁹"[v] : ""; } };
+  const p1 = new C.Plot(document.getElementById("rf-c1"), Object.assign({ xmin: 1, xmax: 7, ymin: -60, ymax: 5, aspect: 0.6, xstep: 1, ystep: 10, xlabel: "f (Hz)", ylabel: "|H| dB" }, lg));
+  const p2 = new C.Plot(document.getElementById("rf-c2"), Object.assign({ xmin: 1, xmax: 7, ymin: -95, ymax: 5, aspect: 0.6, xstep: 1, ystep: 15, xlabel: "f (Hz)", ylabel: "∠H (°)" }, lg));
+  function draw() {
+    const R = parseFloat(document.getElementById("rf-r").value) * 1e3, Cc = parseFloat(document.getElementById("rf-c").value) * 1e-9, fc = 1 / (2 * Math.PI * R * Cc), l = Math.log10(fc);
+    p1.clear().fn(function (x) { const r = Math.pow(10, x) / fc; return -10 * Math.log10(1 + r * r); }, "--s1", 2).fn(function (x) { return x < l ? 0 : -20 * (x - l); }, "--muted", 1, [4, 4]).vline(l, "--s2", [3, 3], "f_c").hline(-3, "--s2", [3, 3], "−3 dB");
+    p2.clear().fn(function (x) { return -Math.atan(Math.pow(10, x) / fc) * 180 / Math.PI; }, "--s1", 2).vline(l, "--s2", [3, 3]).hline(-45, "--s2", [3, 3], "−45°");
+    document.getElementById("rf-out").textContent = "f_c = 1/(2πRC) = " + (fc >= 1000 ? (fc / 1000).toFixed(3) + " kHz" : fc.toFixed(2) + " Hz") + "   ·   τ = RC = " + (R * Cc * 1e6).toFixed(2) + " µs   ·   B_N (ruido) = π f_c / 2 = " + (Math.PI * fc / 2).toFixed(1) + " Hz";
+  }
+  ["rf-r", "rf-c"].forEach(function (id) { document.getElementById(id).addEventListener("input", draw); });
+  C.onRedraw(draw);
+});
+</script>
+</body>
+</html>

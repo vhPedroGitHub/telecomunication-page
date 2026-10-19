@@ -4,24 +4,188 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fundamentos de las Comunicaciones I</title>
+  <meta name="description" content="Fundamentos de las Comunicaciones I (CUJAE): teoría de la señal y los sistemas, teoría de la información y codificación, transmisión digital en banda base. Teoría, simuladores, ejemplos resueltos, guías de CP y laboratorio, bibliografía con páginas y software.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
   <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
   <script src="../assets/js/theme.js"></script>
-  <style>:root { --accent: var(--c-fc1); }</style>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-fc1); }</style>
 </head>
 <body>
-  <button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
   <div class="wrap">
-    <header class="site">
-      <p><a href="../">← Todas las asignaturas</a></p>
-      <h1>Fundamentos de las Comunicaciones I</h1>
-      <p>Teoría de la información y codificación, señales y sistemas, y comunicación digital en banda base.</p>
-    </header>
-    <main>
-      <div class="callout">Página en preparación. El contenido se irá publicando tema a tema.</div>
-    </main>
+    <a class="home" href="../">← Portal</a>
+    <span class="title">Fundamentos de las Comunicaciones I</span>
+    <nav class="tabs" aria-label="Secciones de la asignatura">
+      <a href="./" aria-current="page">Inicio</a>
+      <a href="temas/tema1-teoria-informacion.html">Tema I</a>
+      <a href="temas/tema2-senales-y-sistemas.html">Tema II</a>
+      <a href="temas/tema3-banda-base.html">Tema III</a>
+      <a href="#software">Software</a>
+    </nav>
   </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Ingeniería en Telecomunicaciones y Electrónica · CUJAE · 4.º año, 1.er semestre · 96 h</p>
+<h1>Fundamentos de las Comunicaciones I</h1>
+<p class="lead">Objetivo de la asignatura: <strong>caracterizar sistemas de comunicación digitales en banda base</strong>, desde el punto de vista teórico y práctico-experimental. (Fundamentos II continúa con las modulaciones analógicas y digitales). Aquí encontrarás cada tema explicado desde cero, con simuladores, ejemplos resueltos de las conferencias y clases prácticas, guías de laboratorio, la bibliografía con capítulo y página, y software para comprobar tus cálculos.</p>
+<div class="box idea"><span class="box-title">Por dónde empezar</span>
+<p>El curso 2026 comienza por el <strong>Tema II (Teoría de la señal y los sistemas)</strong>: las Actividades 2–6 ya impartidas corresponden a él. Después siguen la Teoría de la información (Tema I) y la Transmisión digital en banda base (Tema III), que se apoya en los dos anteriores. Cada página empieza con un recuadro <em>Antes de empezar</em> con los conceptos previos que conviene refrescar.</p></div>
+
+<h2 id="temas">Temas</h2>
+<div class="topic-grid">
+  <a href="temas/tema2-senales-y-sistemas.html">
+    <h3>Tema II · Señales y sistemas</h3>
+    <p>Fasores y espectro de línea · series de Fourier · transformada de Fourier y teoremas · impulsos · convolución · potencia, energía, DEP y autocorrelación · sistemas LTI, distorsión y filtros · señales aleatorias y ruido térmico · Lab. Simulado 2 · Trabajo Práctico.</p>
+  </a>
+  <a href="temas/tema1-teoria-informacion.html">
+    <h3>Tema I · Teoría de la información</h3>
+    <p>Cantidad de información y entropía · teorema de codificación de fuente · códigos de prefijo, Huffman, Shannon-Fano, LZ78 · BSC, capacidad, Shannon-Hartley · repetición, distancia de Hamming, códigos lineales de bloque · convolucionales y Viterbi · PP1 resuelta.</p>
+  </a>
+  <a href="temas/tema3-banda-base.html">
+    <h3>Tema III · Transmisión digital en banda base</h3>
+    <p>Muestreo y aliasing · PCM, cuantificación y SNRq · MDT · DPCM y modulación delta · códigos de línea · ISI y criterios de Nyquist (coseno alzado, duobinario) · probabilidad de error, umbral óptimo y filtro adaptado.</p>
+  </a>
+</div>
+
+<h2 id="plan">Plan de la asignatura</h2>
+<h3 id="plan-actual">Curso 2026 (Actividades)</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th>Actividad</th><th>Contenido</th><th>CP asociadas (ed. anterior)</th><th>Página</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Introducción. Presentación de la asignatura</td><td>—</td><td>esta página</td></tr>
+    <tr><td>2</td><td>Fasores y series de Fourier</td><td>CP 5 (espectro de señales periódicas)</td><td><a href="temas/tema2-senales-y-sistemas.html#fasores">Tema II §2–3</a></td></tr>
+    <tr><td>3</td><td>Transformada de Fourier, impulsos, transformadas en el límite</td><td>CP 6, CP 7</td><td><a href="temas/tema2-senales-y-sistemas.html#tf">Tema II §4–6</a></td></tr>
+    <tr><td>4</td><td>Potencia y energía. Función de autocorrelación</td><td>CP 9</td><td><a href="temas/tema2-senales-y-sistemas.html#potencia">Tema II §7</a></td></tr>
+    <tr><td>5</td><td>Sistemas LTI</td><td>CP 10</td><td><a href="temas/tema2-senales-y-sistemas.html#lti">Tema II §8</a></td></tr>
+    <tr><td>6</td><td>Señales aleatorias. Ruido</td><td>CP 11</td><td><a href="temas/tema2-senales-y-sistemas.html#aleatorias">Tema II §9</a></td></tr>
+  </tbody>
+</table></div>
+<h3 id="plan-anterior">Edición anterior (Conferencias 1–18)</h3>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Tema</th><th>Conferencias</th><th>Clases prácticas</th><th>Laboratorio / evaluación</th></tr></thead>
+  <tbody>
+    <tr><td>I · Teoría de la información</td><td>C2 modelo, información, entropía · C3 codificadores de fuente · C4 codificación de canal · C5 código lineal de bloque · C6 convolucional</td><td>CP 1 entropía · CP 2 Huffman · CP 3 bloque/Hamming · CP 4 convolucional</td><td>Lab. simulado de codificación · PP1</td></tr>
+    <tr><td>II · Señales y sistemas</td><td>C7 fasores y SF · C8 TF · C9 potencia y energía · C10 LTI · C11 señales aleatorias</td><td>CP 5, 6, 7, 9, 10, 11 (falta la CP 8)</td><td>Lab. Simulado 2 · Lab. real (representación espectral) · Trabajo Práctico · PP2</td></tr>
+    <tr><td>III · Banda base</td><td>C12 PCM, MDT · C13 DPCM, DM · C14 códigos de línea (no disponible) · C15 ISI, 1.er criterio · C16 2.º criterio · C17 umbral óptimo · C18 filtro óptimo</td><td>CP 12, 13, 15, 16, 17, 18 (falta la CP 14)</td><td>Lab. simulado de ISI y ruido · PP3</td></tr>
+  </tbody>
+</table></div>
+<p class="meta">Planificación semanal tipo (16 semanas): Tema I en las semanas 1–4 (6 C, 4 CP, 1 LS), PP en la 5; Tema II en las semanas 5–10 (7 C, 8 CP, LR y LS), PP en la 11; Tema III en las 11–16 (8 C, 9 CP, LS). Los laboratorios simulados se hacen en el CETI y el real en el Lab. de Comunicaciones Inalámbricas.</p>
+
+<h2 id="evaluacion">Sistema de evaluación</h2>
+<ul>
+  <li><strong>Evaluaciones de fin de tema</strong> (pruebas parciales): PP1 (semana 6), PP2 (semana 8) y PP3 (semana 12), según la presentación del curso 2026. Consulta siempre la fecha confirmada por el profesor.</li>
+  <li><strong>Evaluaciones regulares</strong>: preguntas orales y escritas en conferencias y clases prácticas (casi siempre sobre el <em>Estudio Independiente</em> orientado en la actividad anterior).</li>
+  <li><strong>Participación en entornos virtuales</strong> (Drive, WhatsApp del grupo).</li>
+  <li><strong>Trabajo Práctico del Tema II</strong> por equipos (espectro de una señal en MATLAB comprobado matemáticamente; ver la <a href="temas/tema2-senales-y-sistemas.html#tp">guía</a>).</li>
+</ul>
+<div class="box warn"><span class="box-title">Consejo</span><p>Las CP se construyen sobre el estudio independiente: los ejercicios "orientados de EI" son exactamente los que se discuten en la clase siguiente. Resolverlos antes (con las soluciones desplegables de cada tema y el software <code>fc1</code> para comprobar) es la mejor preparación para las parciales.</p></div>
+
+<h2 id="profesores">Profesores y contacto</h2>
+<p>Coordinador: <strong>Dr. C. Fidel Ernesto Hernández Montero</strong> (Profesor Titular). Atención directa: Dr. C. Camilo Guillén y MSc. Fernando Hernández. Comunicación por el Drive de la asignatura (conferencias, materiales y bibliografía), WhatsApp del grupo y correo institucional.</p>
+
+<h2 id="bibliografia">Bibliografía</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Tipo</th><th>Referencia</th><th>Uso principal</th></tr></thead>
+  <tbody>
+    <tr><td>Básica</td><td>A. B. Carlson, P. B. Crilly y J. C. Rutledge, <em>Communication Systems: An Introduction to Signals and Noise in Electrical Communication</em>, 4.ª ed., McGraw-Hill, 2002.</td><td>Temas II y III (cap. 2–3, 6, 9, 11–13)</td></tr>
+    <tr><td>Básica</td><td>B. Sklar, <em>Digital Communications: Fundamentals and Applications</em>, 2.ª ed., Prentice Hall, 2001. (El PDF disponible es la reimpresión de Pearson 2014 con P. K. Ray: las páginas de esta web corresponden a esa edición).</td><td>Todo el curso (cap. 1–3, 6–7, 9, 13 y ap. A)</td></tr>
+    <tr><td>Complementaria</td><td>D. J. C. MacKay, <em>Information Theory, Inference, and Learning Algorithms</em>, Cambridge University Press, 2003 (<a href="https://www.inference.org.uk/itila/book.html">lectura en pantalla gratuita</a>).</td><td>Tema I</td></tr>
+    <tr><td>Complementaria</td><td>S. Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001.</td><td>Temas I y III (cap. 3, 4, 9, 10)</td></tr>
+    <tr><td>Complementaria</td><td>L. W. Couch II, <em>Digital and Analog Communication Systems</em>, 8.ª ed., Prentice Hall, 2012.</td><td>Temas II y III (cap. 2, 3, 6, 7)</td></tr>
+  </tbody>
+</table></div>
+<p>Cada tema tiene su tabla <em>Dónde estudiarlo</em> con capítulo, epígrafe y páginas exactas (impresas y del visor PDF).</p>
+
+<h2 id="software">Software complementario</h2>
+<h3 id="sw-web">En el navegador (sin instalar nada)</h3>
+<p>Cada tema incluye simuladores interactivos:</p>
+<ul>
+  <li><strong>Tema II</strong>: fasor giratorio y espectro de línea · sintetizador de series de Fourier (Gibbs) · explorador de la TF · convolución paso a paso · onda cuadrada por un filtro RC · ruido blanco filtrado · <a href="temas/tema2-senales-y-sistemas.html#lab">«foury» en el navegador</a> (el Lab. Simulado 2).</li>
+  <li><strong>Tema I</strong>: calculadora de entropía · constructor de Huffman paso a paso · LZ78 · capacidad BSC y Shannon-Hartley · Hamming (7,4) con errores · codificador convolucional y rejilla de Viterbi.</li>
+  <li><strong>Tema III</strong>: muestreo y aliasing · cuantificador uniforme · modulador delta · códigos de línea y DEP · diagrama de ojo · umbral y \(P_e\) · curvas BER.</li>
+</ul>
+<h3 id="sw-fc1">Paquete Python <code>fc1</code></h3>
+<p>Herramienta de línea de órdenes y biblioteca para comprobar los ejercicios: equivalentes de <code>foury.m</code>, <code>cuadpuls.m</code>, <code>triapuls.m</code> y <code>un_pulse.m</code>; entropía, Huffman, LZ78; Hamming, convolucional y Viterbi; función Q, SNRq, modulación delta, duobinario y probabilidad de error. Sin dependencias obligatorias. Código: <a href="software/fc1/">software/fc1/</a> (incluye pruebas que reproducen los ejemplos resueltos).</p>
+<p><strong>Requisitos</strong>: Python 3.9 o superior. Para gráficas (<code>--plot</code>), numpy y matplotlib.</p>
+<h4>Linux / macOS</h4>
+<pre><code>git clone &lt;este repositorio&gt; &amp;&amp; cd telecomunication-page/fundamentos-comunicaciones-1/software/fc1
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[plot]"        # sin gráficas: pip install -e .
+fc1 --help</code></pre>
+<h4>Windows (PowerShell)</h4>
+<pre><code>cd telecomunication-page\fundamentos-comunicaciones-1\software\fc1
+py -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -e ".[plot]"
+fc1 --help</code></pre>
+<p>Con <a href="https://docs.astral.sh/uv/">uv</a>: <code>uv run python -m fc1 --help</code> desde la carpeta <code>fc1</code>.</p>
+<h4>Ejemplos con su salida</h4>
+<pre><code>$ fc1 huffman 0.4 0.2 0.2 0.1 0.1
+  s1  p = 0.4      00
+  s2  p = 0.2      10
+  s3  p = 0.2      11
+  s4  p = 0.1      010
+  s5  p = 0.1      011
+H = 2.1219   L = 2.2000   eficiencia = 0.9645   varianza = 0.1600
+
+$ fc1 hamming 1110110
+síndrome: 010 | error en bit: 6 | corregida: 1110100 | mensaje: 1110
+
+$ fc1 conv --g 111,101 10011
+11 10 11 11 01 01 11
+
+$ fc1 viterbi --g 111,101 0100010000
+decodificado: 00000 | métrica: 2
+
+$ fc1 pe --s1 2 --sigma 0.7071 --vt 1.5
+Pe = 1.2835e-01
+
+$ fc1 foury cuadpuls 10 100 100 --fs 100
+N = 1000 muestras, fs = 100.0 Hz, resolución = 0.1 Hz
+           0 Hz  ->  0.5000
+         0.5 Hz  ->  0.3183
+         1.5 Hz  ->  0.1061
+         ...</code></pre>
+<h3 id="sw-octave">MATLAB / GNU Octave</h3>
+<p>Las funciones del Lab. Simulado 2 (<code>foury.m</code>, <code>cuadpuls.m</code>…) funcionan sin cambios en <a href="https://octave.org/download">GNU Octave</a>, libre y multiplataforma (Linux: <code>sudo apt install octave</code> o <code>sudo pacman -S octave</code>; Windows/macOS: instalador de la web oficial). Copia los <code>.m</code> en una carpeta, ábrela en Octave y ejecuta, por ejemplo, <code>s = cuadpuls(10,100,100); f = foury(s,100);</code>.</p>
+
+<h2 id="prerrequisitos">Prerrequisitos</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Concepto</th><th>Dónde se usa</th><th>Repaso</th></tr></thead>
+  <tbody>
+    <tr><td>Números complejos, Euler, trigonometría</td><td>Todo el Tema II</td><td><a href="../repaso/matematica.html#complejos">Matemática</a></td></tr>
+    <tr><td>Integrales, series geométricas</td><td>Series y TF</td><td><a href="../repaso/matematica.html#integrales">Matemática</a></td></tr>
+    <tr><td>Logaritmos, decibelios</td><td>Entropía, SNRq, BER</td><td><a href="../repaso/matematica.html#logaritmos">Matemática</a></td></tr>
+    <tr><td>Aritmética módulo 2, matrices</td><td>Códigos de bloque</td><td><a href="../repaso/matematica.html#binario">Matemática</a></td></tr>
+    <tr><td>Probabilidad, variable aleatoria, gaussiana, función Q</td><td>Tema I, ruido, \(P_e\)</td><td><a href="../repaso/probabilidad.html">Probabilidad</a></td></tr>
+    <tr><td>Impedancia, filtros RC, respuesta en frecuencia</td><td>Sistemas LTI, ruido térmico</td><td><a href="../repaso/circuitos.html">Circuitos</a></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="faq">Preguntas frecuentes de la asignatura</h2>
+<div class="faq">
+  <details><summary>¿Por qué el curso 2026 empieza por el Tema II y no por el I?</summary><div><p>Porque la teoría de la información se puede estudiar sin Fourier, pero la transmisión en banda base (Tema III) necesita espectros, filtros y ruido. Empezar por señales y sistemas da antes las herramientas matemáticas. En la presentación del curso los temas aparecen como 1) Teoría de la señal y los sistemas, 2) Teoría de la información, 3) Sistemas de comunicaciones digitales en banda base; en esta web se mantiene la numeración del Programa Analítico (I información, II señales, III banda base).</p></div></details>
+  <details><summary>¿Qué edición de Sklar tengo que usar?</summary><div><p>El programa cita la 2.ª edición (2001); el PDF que circula es la reimpresión de 2014 (Sklar y Ray), con los mismos capítulos pero numeración de páginas distinta. Por eso las guías de las CP citan, por ejemplo, "Sklar p. 711–718" para Fourier, que en la edición de 2014 es el Apéndice A (pp. 1069–1090). En esta web siempre se indica la página de la edición de 2014.</p></div></details>
+  <details><summary>¿Necesito MATLAB?</summary><div><p>No. GNU Octave ejecuta los mismos ficheros <code>.m</code>; además, el simulador «foury» del Tema II y el paquete <code>fc1</code> reproducen el laboratorio.</p></div></details>
+  <details><summary>¿Cómo se relaciona esta asignatura con las demás del semestre?</summary><div><p>Los espectros y el ruido reaparecen en Líneas de Transmisión y Antenas (respuesta en frecuencia, ruido de antena), la codificación y el muestreo en Microcontroladores (ADC, UART, CRC) y en Redes 3 (presupuesto de enlace óptico, BER, códigos de línea como NRZ y 8B/10B).</p></div></details>
+  <details><summary>¿Este material sustituye a las conferencias?</summary><div><p>No: es material de estudio complementario, elaborado a partir de las conferencias y clases prácticas. Ante cualquier discrepancia, manda lo que diga el profesor.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> Actividad 1 (presentación del curso 2026), Programa Analítico FC I (Plan E), Planificación del curso 2025-2026 y materiales de la asignatura. Elaboración propia.</p>
+</main>
+</div>
+<footer class="site wrap">Fundamentos de las Comunicaciones I · Material de estudio no oficial · <a href="../">Portal de asignaturas</a></footer>
 </body>
 </html>

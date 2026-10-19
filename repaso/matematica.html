@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repaso · Matemática</title>
+  <meta name="description" content="Fichas de repaso de matemática para telecomunicaciones: números complejos y Euler, trigonometría, logaritmos y decibelios, integrales útiles, series, funciones hiperbólicas y aritmética módulo 2.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <script src="../assets/js/theme.js"></script>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-repaso); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top"><div class="wrap">
+  <a class="home" href="../">← Portal</a><span class="title">Repaso de prerrequisitos</span>
+  <nav class="tabs" aria-label="Fichas"><a href="./">Índice</a><a href="matematica.html" aria-current="page">Matemática</a><a href="probabilidad.html">Probabilidad</a><a href="circuitos.html">Circuitos</a></nav>
+</div></header>
+<div class="layout">
+<nav class="toc" aria-label="Índice de fichas"><h2>Fichas</h2><ol data-auto></ol></nav>
+<main class="content">
+<h1>Matemática para telecomunicaciones</h1>
+<p class="lead">Fichas cortas para refrescar lo que las asignaturas dan por sabido. No sustituyen al curso de Matemática: recuerdan la idea, la fórmula y un ejemplo, y dicen dónde estudiarlo a fondo.</p>
+
+<h2 id="complejos">Números complejos y fórmula de Euler</h2>
+<p>Un complejo \(z=a+jb\) (en ingeniería se usa \(j\) porque \(i\) es la corriente) es un punto del plano. Se escribe también en <strong>forma polar</strong> \(z=|z|e^{j\theta}=|z|\angle\theta\), con</p>
+$$|z|=\sqrt{a^2+b^2},\qquad \theta=\operatorname{atan2}(b,a),\qquad a=|z|\cos\theta,\ \ b=|z|\sin\theta$$
+<div class="eq key">$$e^{j\theta}=\cos\theta+j\sin\theta\qquad\Rightarrow\qquad \cos\theta=\frac{e^{j\theta}+e^{-j\theta}}{2},\quad \sin\theta=\frac{e^{j\theta}-e^{-j\theta}}{2j}$$<div class="eq-label">Fórmula de Euler</div></div>
+<ul>
+  <li><strong>Sumar</strong>: en forma binómica. <strong>Multiplicar/dividir</strong>: en polar (se multiplican/dividen módulos y se suman/restan ángulos).</li>
+  <li><strong>Conjugado</strong>: \(z^*=a-jb=|z|e^{-j\theta}\); \(zz^*=|z|^2\); \(\operatorname{Re}\{z\}=(z+z^*)/2\).</li>
+  <li>\(j=e^{j\pi/2}\), \(-1=e^{j\pi}\), \(1/j=-j\).</li>
+  <li>Cuidado con el cuadrante: \(\arctan(b/a)\) solo es correcto si \(a\gt0\); para \(-1-j\) el ángulo es −135°, no 45°.</li>
+</ul>
+<div class="example"><h4>Ejemplo</h4><p>\(\dfrac{1}{1+j}=\dfrac{1}{\sqrt2\angle45^\circ}=0{,}707\angle-45^\circ=0{,}5-0{,}5j\). Es la respuesta de un filtro RC a su frecuencia de corte.</p></div>
+<p class="meta">Dónde estudiarlo: Stewart, <em>Cálculo de una variable</em>, 9.ª ed., Cengage, 2021, Apéndice H «Números complejos», p. A57 (PDF 1270), en <code>cursos/02-Matemática/</code>.</p>
+
+<h2 id="trig">Identidades trigonométricas</h2>
+$$\cos a\cos b=\tfrac12[\cos(a-b)+\cos(a+b)],\qquad \sin a\cos b=\tfrac12[\sin(a-b)+\sin(a+b)],\qquad \sin a\sin b=\tfrac12[\cos(a-b)-\cos(a+b)]$$
+$$\cos^2a=\tfrac12(1+\cos2a),\qquad \sin\theta=\cos(\theta-90^\circ),\qquad -\cos\theta=\cos(\theta\pm180^\circ)$$
+<p>La primera es el corazón de la modulación: multiplicar dos cosenos produce las frecuencias suma y diferencia. La segunda fila sirve para escribir cualquier sinusoide como "coseno de amplitud positiva", que es lo que se dibuja en un espectro.</p>
+<p class="meta">Dónde estudiarlo: Stewart, 9.ª ed., Apéndice D «Trigonometría», p. A24.</p>
+
+<h2 id="logaritmos">Logaritmos y decibelios</h2>
+<p>\(\log_b x=y\iff b^y=x\). Leyes: \(\log(xy)=\log x+\log y\), \(\log(x/y)=\log x-\log y\), \(\log x^r=r\log x\). Cambio de base: \(\log_2x=\ln x/\ln2=\log_{10}x/0{,}30103\).</p>
+<div class="eq key">$$G_{\text{dB}}=10\log_{10}\frac{P_2}{P_1}=20\log_{10}\frac{V_2}{V_1}\ (\text{misma impedancia}),\qquad P_{\text{dBm}}=10\log_{10}\frac{P}{1\text{ mW}}$$</div>
+<div class="table-wrap"><table class="compact"><thead><tr><th>Relación de potencias</th><th>2</th><th>4</th><th>10</th><th>100</th><th>1/2</th><th>1/1000</th></tr></thead>
+<tbody><tr><td>dB</td><td>3,01</td><td>6,02</td><td>10</td><td>20</td><td>−3,01</td><td>−30</td></tr></tbody></table></div>
+<p>Ganancias en cascada se <em>suman</em> en dB. 0 dBm = 1 mW; 30 dBm = 1 W. Una relación de dB con dB (dBm − dBm) es dB; dBm + dB es dBm; ¡dBm + dBm no tiene sentido!</p>
+<p class="meta">Dónde estudiarlo: Stewart, 9.ª ed., sección 1.5 «Funciones inversas y logarítmicas», pp. 55–66 (PDF 86–97). Decibelios en telecomunicaciones: Carlson, 4.ª ed., 3.3 «Transmission Loss and Decibels», pp. 99–108.</p>
+
+<h2 id="integrales">Integrales útiles</h2>
+$$\int e^{at}dt=\frac{e^{at}}{a},\qquad \int_{-T/2}^{T/2}e^{-j2\pi ft}dt=\frac{\sin\pi fT}{\pi f}=T\operatorname{sinc}(fT),\qquad \int_{T_0}e^{j2\pi(n-m)t/T_0}dt=\begin{cases}T_0,&n=m\\0,&n\ne m\end{cases}$$
+$$\int t\,e^{at}dt=\frac{e^{at}}{a^2}(at-1),\qquad \int_0^\infty e^{-at}dt=\frac1a\ (a\gt0),\qquad \int_{-\infty}^{\infty}e^{-\pi t^2}dt=1$$
+<p>La integral de un número entero de ciclos de un seno o un coseno es cero: es la razón de que los coeficientes de Fourier "aíslen" una sola frecuencia (ortogonalidad).</p>
+<p class="meta">Dónde estudiarlo: Stewart, 9.ª ed., 5.3–5.5 (pp. 392–421) y 7.1–7.2 (integración por partes e integrales trigonométricas, pp. 472–485).</p>
+
+<h2 id="series">Series geométricas y de Taylor</h2>
+$$\sum_{n=0}^{N-1}r^n=\frac{1-r^N}{1-r},\qquad \sum_{n=0}^{\infty}r^n=\frac{1}{1-r}\ (|r|\lt1),\qquad e^x=\sum\frac{x^n}{n!},\qquad \ln(1+x)\approx x$$
+<p>La suma geométrica aparece en la DFT, en los arreglos de antenas y en los códigos; las aproximaciones de primer orden (\(\sqrt{1+x}\approx1+x/2\), \(\sin x\approx x\)) en casi todos los cálculos de "pequeña señal".</p>
+<p class="meta">Dónde estudiarlo: Stewart, 9.ª ed., 11.2 «Series», p. 707, y 11.10 «Series de Taylor y de Maclaurin», p. 759.</p>
+
+<h2 id="hiperbolicas">Funciones hiperbólicas</h2>
+$$\cosh x=\frac{e^x+e^{-x}}{2},\quad \sinh x=\frac{e^x-e^{-x}}{2},\quad \tanh x=\frac{\sinh x}{\cosh x},\qquad \cosh(jx)=\cos x,\ \ \tanh(jx)=j\tan x$$
+<p>En líneas de transmisión con pérdidas, \(Z_{in}=Z_0\frac{Z_L+Z_0\tanh\gamma l}{Z_0+Z_L\tanh\gamma l}\); sin pérdidas \(\gamma=j\beta\) y la tanh se convierte en \(j\tan\beta l\).</p>
+
+<h2 id="impulso">Impulso y escalón</h2>
+<p>\(u(t)=1\) para \(t\gt0\) y 0 para \(t\lt0\). \(\delta(t)\) es el límite de un pulso de área 1 cuyo ancho tiende a 0: \(\int x(t)\delta(t-t_0)dt=x(t_0)\), \(\delta=du/dt\). Ver la explicación completa en <a href="../fundamentos-comunicaciones-1/temas/tema2-senales-y-sistemas.html#impulsos">FC I, Tema II §5</a>.</p>
+<p class="meta">Dónde estudiarlo: Hayt, <em>Análisis de circuitos en ingeniería</em>, 8.ª ed., 8.5 «La función escalón unitario», p. 282 (PDF 299).</p>
+
+<h2 id="binario">Aritmética módulo 2 y matrices binarias</h2>
+<p>En los códigos de canal se trabaja con bits y la suma es el <strong>O exclusivo</strong> (XOR): \(0+0=0\), \(0+1=1+0=1\), \(1+1=0\). No hay "llevadas" y restar es lo mismo que sumar (\(a+a=0\)). Un producto vector × matriz módulo 2 se hace <strong>sumando (XOR) las filas de la matriz donde el vector tiene un 1</strong>:</p>
+$$[1\ 0\ 1\ 0]\begin{bmatrix}1&0&0&0&1&0&1\\0&1&0&0&1&1&1\\0&0&1&0&1&1&0\\0&0&0&1&0&1&1\end{bmatrix}=\text{fila}_1\oplus\text{fila}_3=[1\ 0\ 1\ 0\ 0\ 1\ 1]$$
+<p>Peso de un vector = número de unos; distancia de Hamming entre dos vectores = peso de su XOR.</p>
+<p class="meta">Aplicación: <a href="../fundamentos-comunicaciones-1/temas/tema1-teoria-informacion.html#lineales">FC I, Tema I §6.4</a>.</p>
+
+<p class="source-note">Fichas de repaso de elaboración propia. Bibliografía de <code>/home/pedro/studies/Carrera/cursos/</code>: Stewart 9.ª ed. (02-Matemática), Hayt 8.ª ed. (07-Circuito).</p>
+</main></div>
+<footer class="site wrap">Repaso de prerrequisitos · <a href="./">Índice de fichas</a></footer>
+</body>
+</html>

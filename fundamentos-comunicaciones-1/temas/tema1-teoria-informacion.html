@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema I · Teoría de la información — FC I</title>
+  <meta name="description" content="Fundamentos de las Comunicaciones I, Tema I: cantidad de información, entropía, codificación de fuente (Huffman, Lempel-Ziv), capacidad de canal y codificación de canal (repetición, Hamming, códigos lineales de bloque y convolucionales con Viterbi).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/tema1.js"></script>
+  <style>
+    body { --accent: var(--c-fc1); }
+    .bits { font-family: var(--font-mono); letter-spacing: .08em; }
+    .bitrow { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0; align-items: center; }
+    .bitrow .lbl { min-width: 150px; font-size: .88rem; color: var(--muted); }
+    .bit { font-family: var(--font-mono); width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); display: grid; place-items: center; font-size: .95rem; }
+    button.bit { cursor: pointer; }
+    .bit.par { border-color: var(--s2); }
+    .bit.err { background: color-mix(in srgb, #c0392b 22%, transparent); border-color: #c0392b; }
+    .bit.fix { background: var(--ok-soft); border-color: var(--ok); }
+    .htable td, .htable th { font-family: var(--font-mono); font-size: .85rem; text-align: center; padding: 3px 6px; }
+    .htable td.sym { font-family: var(--font-sans); text-align: left; }
+  </style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Fundamentos de las Comunicaciones I</span>
+    <nav class="tabs" aria-label="Secciones de la asignatura">
+      <a href="../">Inicio</a>
+      <a href="tema1-teoria-informacion.html" aria-current="page">Tema I</a>
+      <a href="tema2-senales-y-sistemas.html">Tema II</a>
+      <a href="tema3-banda-base.html">Tema III</a>
+      <a href="../#software">Software</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+
+<main class="content">
+<p class="meta">Tema I · Conferencias 2–6 (edición anterior) · CP 1–4 · Prueba Parcial 1</p>
+<h1>Teoría de la información y codificación</h1>
+<p class="lead">En 1948 Claude Shannon respondió dos preguntas que definen toda la ingeniería de comunicaciones: <strong>¿cuántos bits hacen falta, como mínimo, para representar lo que emite una fuente?</strong> y <strong>¿se puede comunicar sin errores por un canal que sí comete errores?</strong> La primera conduce a la <em>codificación de fuente</em> (compresión); la segunda, a la <em>codificación de canal</em> (corrección de errores).</p>
+
+<div class="objectives">
+  <strong>Objetivos (Programa Analítico y Conferencias 2–6)</strong>
+  <ul>
+    <li>Medir la cantidad de información de un mensaje y la entropía de una fuente discreta sin memoria.</li>
+    <li>Aplicar el teorema de codificación de fuente y construir códigos eficientes (prefijo, Huffman, Lempel-Ziv); calcular longitud media, eficiencia y varianza.</li>
+    <li>Caracterizar un canal por su capacidad (canal binario simétrico, Shannon-Hartley) y enunciar el teorema de codificación de canal.</li>
+    <li>Codificar y decodificar con códigos de repetición, de paridad, lineales de bloque (Hamming) y convolucionales (algoritmo de Viterbi).</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">logaritmos en base 2 y probabilidad discreta</span>
+  <p>\(\log_2 x=\dfrac{\ln x}{\ln 2}=\dfrac{\log_{10}x}{0{,}30103}\). Propiedades: \(\log(ab)=\log a+\log b\), \(\log(1/p)=-\log p\), \(\log_2 2^n=n\). En la calculadora: <code>log(x)/log(2)</code>.</p>
+  <p>Una fuente con alfabeto \(\{s_0,\dots,s_{K-1}\}\) tiene probabilidades \(p_k\ge0\) con \(\sum p_k=1\); el <em>valor esperado</em> de una magnitud \(g(s_k)\) es \(E[g]=\sum_k p_k\,g(s_k)\). Sucesos independientes: \(P(A\cap B)=P(A)P(B)\). Repaso: <a href="../../repaso/matematica.html#logaritmos">logaritmos y decibelios</a> · <a href="../../repaso/probabilidad.html#discreta">probabilidad discreta y esperanza</a> · <a href="../../repaso/matematica.html#binario">aritmética módulo 2 y matrices</a>.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="modelo">1. Modelo de sistema de comunicación digital</h2>
+<svg class="diagram" viewBox="0 0 760 170" role="img" aria-label="Diagrama de bloques: fuente, codificador de fuente, codificador de canal, modulador o codificador de línea, canal con ruido, y los bloques inversos en el receptor hasta el destino">
+  <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="accf"/></marker></defs>
+  <g font-size="12">
+    <rect class="box-s" x="6" y="20" width="84" height="40" rx="6"/><text x="48" y="44" text-anchor="middle">Fuente</text>
+    <rect class="box-s" x="116" y="20" width="110" height="40" rx="6"/><text x="171" y="37" text-anchor="middle">Codificador</text><text x="171" y="52" text-anchor="middle">de fuente</text>
+    <rect class="box-s" x="252" y="20" width="110" height="40" rx="6"/><text x="307" y="37" text-anchor="middle">Codificador</text><text x="307" y="52" text-anchor="middle">de canal</text>
+    <rect class="box-s" x="388" y="20" width="130" height="40" rx="6"/><text x="453" y="37" text-anchor="middle">Modulador /</text><text x="453" y="52" text-anchor="middle">cod. de línea</text>
+    <rect class="box-s" x="560" y="56" width="100" height="56" rx="6" style="stroke:var(--accent)"/><text x="610" y="82" text-anchor="middle">Canal</text><text x="610" y="98" text-anchor="middle" class="muted">+ ruido</text>
+    <rect class="box-s" x="388" y="110" width="130" height="40" rx="6"/><text x="453" y="127" text-anchor="middle">Demodulador /</text><text x="453" y="142" text-anchor="middle">decod. de línea</text>
+    <rect class="box-s" x="252" y="110" width="110" height="40" rx="6"/><text x="307" y="127" text-anchor="middle">Decodificador</text><text x="307" y="142" text-anchor="middle">de canal</text>
+    <rect class="box-s" x="116" y="110" width="110" height="40" rx="6"/><text x="171" y="127" text-anchor="middle">Decodificador</text><text x="171" y="142" text-anchor="middle">de fuente</text>
+    <rect class="box-s" x="6" y="110" width="84" height="40" rx="6"/><text x="48" y="134" text-anchor="middle">Destino</text>
+    <path class="stroke" d="M90 40 H114" marker-end="url(#ar)"/><path class="stroke" d="M226 40 H250" marker-end="url(#ar)"/><path class="stroke" d="M362 40 H386" marker-end="url(#ar)"/>
+    <path class="stroke" d="M518 40 H610 V54" marker-end="url(#ar)"/><path class="stroke" d="M610 112 V130 H520" marker-end="url(#ar)"/>
+    <path class="stroke" d="M388 130 H364" marker-end="url(#ar)"/><path class="stroke" d="M252 130 H228" marker-end="url(#ar)"/><path class="stroke" d="M116 130 H92" marker-end="url(#ar)"/>
+    <text x="171" y="12" text-anchor="middle" class="muted">quita redundancia</text><text x="307" y="12" text-anchor="middle" class="muted">añade redundancia</text><text x="453" y="12" text-anchor="middle" class="muted">bits → formas de onda</text>
+  </g>
+</svg>
+<p>Las dos preguntas de la teoría de la información se reparten en los bloques del transmisor:</p>
+<ul>
+  <li><strong>¿Cómo transmitir la información de la manera más eficiente?</strong> → el <strong>codificador de fuente</strong> elimina la redundancia (comprime). Límite: la <em>entropía</em>.</li>
+  <li><strong>¿Cómo comunicarse de forma confiable por un canal no confiable?</strong> → el <strong>codificador de canal</strong> añade redundancia <em>controlada</em> para detectar o corregir errores. Límite: la <em>capacidad del canal</em>.</li>
+</ul>
+<p>Parece contradictorio quitar redundancia para luego añadirla, pero no lo es: la redundancia natural de la fuente (p. ej. las letras del idioma) no está estructurada para corregir errores; la del código de canal sí.</p>
+
+<!-- ============================================================ -->
+<h2 id="info">2. Cantidad de información</h2>
+<p>¿Cuánta información gana quien recibe el mensaje \(s_k\)? La intuición de la Conferencia 2:</p>
+<ul>
+  <li>Un mensaje <strong>poco probable</strong> sorprende mucho ⇒ aporta mucha información ("nieva en La Habana").</li>
+  <li>Un mensaje <strong>seguro</strong> (\(p=1\)) no aporta nada ("mañana sale el sol").</li>
+  <li>Dos mensajes independientes aportan la <strong>suma</strong> de sus informaciones.</li>
+</ul>
+<p>La única función que cumple las tres condiciones es el logaritmo del inverso de la probabilidad:</p>
+<div class="eq key">$$I(s_k)=\log_2\frac{1}{p_k}=-\log_2 p_k\quad[\text{bit}]$$<div class="eq-label">Cantidad de información del mensaje \(s_k\)</div></div>
+<p>Propiedades: \(I=0\) si \(p_k=1\); \(I\ge0\) siempre; \(I(s_k)\gt I(s_i)\) si \(p_k\lt p_i\); \(I(s_ks_i)=I(s_k)+I(s_i)\) si son independientes. Con base 2 la unidad es el <strong>bit</strong>; con \(\ln\), el <em>nat</em>; con \(\log_{10}\), el <em>hartley</em>. Cuidado: "bit" como unidad de información no es lo mismo que "bit" como dígito binario; un dígito binario transporta a lo sumo 1 bit de información (exactamente 1 solo si 0 y 1 son equiprobables).</p>
+<div class="example">
+<h4>Ejemplo 2.1 — CP 1, actividad 1</h4>
+<p>Una fuente emite \(s_0,\dots,s_3\) con \(p=0{,}4;\ 0{,}3;\ 0{,}2;\ 0{,}1\). Información de cada símbolo:</p>
+<p>\(I(s_0)=\log_2(1/0{,}4)=1{,}32\) bit · \(I(s_1)=\log_2(1/0{,}3)=1{,}74\) bit · \(I(s_2)=\log_2 5=2{,}32\) bit · \(I(s_3)=\log_2 10=3{,}32\) bit.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="entropia">3. Entropía de una fuente discreta sin memoria</h2>
+<p>Una fuente <strong>sin memoria</strong> emite símbolos estadísticamente independientes (la probabilidad de un símbolo no depende de los anteriores). Su <strong>entropía</strong> es la información <em>promedio</em> por símbolo:</p>
+<div class="eq key">$$H(\Gamma)=E[I(s_k)]=\sum_{k=0}^{K-1}p_k\log_2\frac{1}{p_k}\quad[\text{bit/símbolo}]$$<div class="eq-label">Entropía</div></div>
+<p><strong>Cotas</strong>: \(0\le H(\Gamma)\le\log_2K\). Vale 0 si un símbolo es seguro (no hay incertidumbre) y \(\log_2K\) si todos son equiprobables (máxima incertidumbre). La entropía mide a la vez la <em>incertidumbre</em> antes de recibir, la <em>información</em> promedio que se gana y —lo más útil— el <strong>número mínimo de bits por símbolo</strong> con que se puede codificar la fuente sin pérdidas.</p>
+<p><strong>Fuente binaria</strong> con \(P(0)=p_0\): \(\mathcal H(p_0)=-p_0\log_2p_0-(1-p_0)\log_2(1-p_0)\), máxima (1 bit) en \(p_0=0{,}5\). <strong>Razón de información</strong>: si la fuente emite \(r\) símbolos/s, \(R=r\,H(\Gamma)\) bit/s.</p>
+<div class="example">
+<h4>Ejemplo 3.1 — CP 1, actividades 2 a 4 y estudio independiente</h4>
+<div class="step"><span class="n">1</span><div><p>\(p=\tfrac13,\tfrac16,\tfrac14,\tfrac14\): \(H=\tfrac13\log_23+\tfrac16\log_26+\tfrac14\cdot2+\tfrac14\cdot2=0{,}528+0{,}431+0{,}5+0{,}5=1{,}959\) bit/símbolo (el material lo redondea a 1,95; el máximo para 4 símbolos sería 2).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Dado imparcial: 6 caras equiprobables ⇒ \(H=\log_26=2{,}585\) bit/símbolo.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>8 símbolos equiprobables ⇒ \(H=\log_28=3\) bit/símbolo. En general, si \(p_k=1/M\): \(H=\sum\frac1M\log_2M=\log_2M\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p>Fuente binaria con \(P(1)=0{,}8\): \(\mathcal H(0{,}8)=0{,}8\log_2\tfrac1{0{,}8}+0{,}2\log_2\tfrac1{0{,}2}=0{,}258+0{,}464=0{,}722\) bit por dígito. Con \(P(1)=0{,}5\): 1 bit por dígito. <strong>Un dígito binario sesgado transporta menos de 1 bit</strong>: ahí está el margen para comprimir.</p></div></div>
+</div>
+<div class="sim" id="sim-ent">
+  <div class="sim-title">Calculadora de entropía</div>
+  <p class="meta">Escribe las probabilidades (o frecuencias: se normalizan solas) separadas por comas o espacios. Debajo, la función de entropía binaria \(\mathcal H(p)\); mueve el punto con el deslizador.</p>
+  <div class="controls">
+    <label style="flex:1 1 320px">Probabilidades <input type="text" id="en-p" value="0.4, 0.3, 0.2, 0.1" style="flex:1"></label>
+    <label>p (fuente binaria) <input type="range" id="en-b" min="0" max="1" step="0.01" value="0.8" data-out="en-bo"><output id="en-bo"></output></label>
+  </div>
+  <div class="two"><canvas id="en-c1" aria-label="Información de cada símbolo"></canvas><canvas id="en-c2" aria-label="Función de entropía binaria"></canvas></div>
+  <div class="readout" id="en-out"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="fuente">4. Codificación de fuente</h2>
+<h3 id="fuente-teorema">4.1 Teorema de codificación de fuente</h3>
+<p>El codificador de fuente asigna a cada símbolo \(s_k\) una <strong>palabra de código</strong> binaria de longitud \(l_k\). Tres medidas de calidad:</p>
+$$\bar L=\sum_k p_kl_k\ \ [\text{bit/símbolo}],\qquad \eta=\frac{H(\Gamma)}{\bar L}\le1,\qquad \sigma^2=\sum_kp_k\,(l_k-\bar L)^2$$
+<div class="box def"><span class="box-title">Teorema de codificación de fuente (Shannon, primer teorema)</span>
+<p>Para una fuente discreta sin memoria de entropía \(H(\Gamma)\), la longitud media de <em>cualquier</em> código de decodificación única cumple \(\bar L\ge H(\Gamma)\). Además existen códigos con \(\bar L\) tan próximo a \(H\) como se quiera (codificando bloques de símbolos). La entropía es el <strong>límite de la compresión sin pérdidas</strong>.</p></div>
+<p>La varianza \(\sigma^2\) no aparece en el teorema pero importa en la práctica: un código de longitud muy variable produce una tasa de bits irregular y exige <em>buffers</em> grandes. Entre dos códigos igual de eficientes se prefiere el de menor varianza.</p>
+<p><strong>Principio de la codificación eficiente</strong>: palabras <em>cortas</em> a los símbolos <em>frecuentes</em> y <em>largas</em> a los <em>raros</em> (como el código Morse: la E, la letra más frecuente del inglés, es un solo punto).</p>
+
+<h3 id="fuente-prefijo">4.2 Decodificación única y códigos de prefijo</h3>
+<p>Un código es útil solo si la secuencia de bits se puede <strong>decodificar de una única manera</strong>. Los <strong>códigos de prefijo</strong> lo garantizan: <em>ninguna palabra es prefijo de otra</em>, así que el receptor reconoce cada palabra en cuanto termina, sin esperar ni retroceder (son decodificables "instantáneamente" y se representan como hojas de un árbol binario).</p>
+<div class="example">
+<h4>Ejemplo 4.1 — Tres códigos para la misma fuente (Conferencia 3)</h4>
+<p>Fuente con \(p=\tfrac12,\tfrac14,\tfrac18,\tfrac18\) ⇒ \(H=1{,}75\) bit/símbolo.</p>
+<div class="table-wrap"><table class="compact">
+<thead><tr><th>Símbolo</th><th>\(p_k\)</th><th>Código I</th><th>Código II</th><th>Código III</th></tr></thead>
+<tbody>
+<tr><td>\(s_0\)</td><td>1/2</td><td class="mono">00</td><td class="mono">0</td><td class="mono">0</td></tr>
+<tr><td>\(s_1\)</td><td>1/4</td><td class="mono">01</td><td class="mono">1</td><td class="mono">10</td></tr>
+<tr><td>\(s_2\)</td><td>1/8</td><td class="mono">10</td><td class="mono">00</td><td class="mono">110</td></tr>
+<tr><td>\(s_3\)</td><td>1/8</td><td class="mono">11</td><td class="mono">11</td><td class="mono">111</td></tr>
+<tr><td colspan="2">\(\bar L\)</td><td>2</td><td>1,25</td><td>1,75</td></tr>
+<tr><td colspan="2">¿Decodificación única?</td><td>Sí (longitud fija)</td><td><strong>No</strong>: «00» = \(s_2\) o \(s_0s_0\)</td><td>Sí (prefijo)</td></tr>
+<tr><td colspan="2">\(\eta\)</td><td>0,875</td><td>— (inútil)</td><td><strong>1</strong></td></tr>
+</tbody></table></div>
+<p>El código II tiene \(\bar L\lt H\), lo que el teorema prohíbe… porque no es decodificable. El código III alcanza \(\eta=1\) porque las probabilidades son potencias de 1/2 y se cumple \(l_k=\log_2(1/p_k)\) exactamente.</p>
+</div>
+<p>Condición necesaria (desigualdad de <strong>Kraft-McMillan</strong>): todo código de decodificación única cumple \(\sum_k2^{-l_k}\le1\); y si se cumple, existe un código de prefijo con esas longitudes.</p>
+
+<h3 id="huffman">4.3 Código de Huffman</h3>
+<p>Huffman (1952) dio el algoritmo que produce el código de prefijo de <strong>mínima longitud media</strong> para una fuente dada. Procedimiento (como en las CP y la PP1):</p>
+<ol>
+  <li>Ordena los símbolos de mayor a menor probabilidad, en columna.</li>
+  <li>Asigna un bit a los dos de <strong>menor</strong> probabilidad (p. ej. 0 al de arriba y 1 al de abajo; la convención se mantiene hasta el final).</li>
+  <li>Combínalos en un "símbolo" nuevo cuya probabilidad es la suma y <strong>reordena</strong> la columna. Si la suma empata con otras probabilidades, colocarla <strong>lo más arriba posible</strong> produce el código de <strong>mínima varianza</strong> (colocarla abajo da la misma \(\bar L\) pero mayor \(\sigma^2\)).</li>
+  <li>Repite hasta que quede un único símbolo de probabilidad 1.</li>
+  <li>La palabra de cada símbolo se lee recorriendo su camino desde el final (la raíz) hacia el principio: es la secuencia de bits asignados <em>en orden inverso</em>.</li>
+</ol>
+<div class="example">
+<h4>Ejemplo 4.2 — Ejercicio 5 de «Ejercicios sobre cantidad de información…» y CP 2</h4>
+<p>\(S=\{s_1,\dots,s_5\}\) con \(p=0{,}4;\ 0{,}2;\ 0{,}2;\ 0{,}1;\ 0{,}1\).</p>
+<div class="step"><span class="n">1</span><div><p>Mínima varianza (suma arriba): \(s_1=\texttt{00}\), \(s_2=\texttt{10}\), \(s_3=\texttt{11}\), \(s_4=\texttt{010}\), \(s_5=\texttt{011}\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>\(\bar L=2(0{,}4)+2(0{,}2)+2(0{,}2)+3(0{,}1)+3(0{,}1)=2{,}2\) bit/símbolo; \(H=2{,}122\) bit/símbolo ⇒ \(\eta=2{,}122/2{,}2=0{,}965\) (el material redondea a 0,95). \(\sigma^2=0{,}16\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Si la suma se coloca <strong>debajo</strong> de las de igual valor (la "Recomendación" de la hoja de ejercicios), las longitudes salen 1, 2, 3, 4, 4: misma \(\bar L=2{,}2\) y misma \(\eta\), pero \(\sigma^2=1{,}36\). Esa es la conclusión que pide la CP 2: <em>la eficiencia es la misma; la varianza es menor cuando los símbolos combinados se suben</em>.</p></div></div>
+<div class="step"><span class="n">4</span><div><p>Con un código de longitud fija (3 bits para 5 símbolos) \(\eta=2{,}122/3=0{,}71\). Huffman ahorra 0,8 bit por símbolo.</p></div></div>
+</div>
+<div class="sim" id="sim-huff">
+  <div class="sim-title">Constructor de códigos de Huffman paso a paso</div>
+  <p class="meta">Introduce probabilidades (se normalizan). Elige dónde colocar la suma en caso de empate y la convención de bits. La tabla muestra cada columna del proceso; abajo, el código resultante y sus medidas. Prueba la fuente del ejemplo con las dos opciones de colocación.</p>
+  <div class="controls">
+    <label style="flex:1 1 300px">Probabilidades <input type="text" id="hf-p" value="0.4 0.2 0.2 0.1 0.1" style="flex:1"></label>
+    <label>Suma en empate <select id="hf-pos"><option value="hi">lo más arriba (mín. varianza)</option><option value="lo">lo más abajo</option></select></label>
+    <label>Bits <select id="hf-bit"><option value="01">0 arriba · 1 abajo</option><option value="10">1 arriba · 0 abajo</option></select></label>
+  </div>
+  <div class="table-wrap" id="hf-steps"></div>
+  <div class="table-wrap" id="hf-code"></div>
+  <div class="readout" id="hf-out"></div>
+</div>
+<p><strong>Shannon-Fano</strong> (mencionado en el programa) es el método previo, de arriba hacia abajo: se divide la lista ordenada en dos grupos de probabilidad lo más parecida posible, se asigna 0 a uno y 1 al otro, y se repite dentro de cada grupo. Es sencillo pero no siempre óptimo; Huffman sí lo es.</p>
+
+<h3 id="lz">4.4 Codificación Lempel-Ziv (LZ78)</h3>
+<p>Huffman necesita conocer las probabilidades de antemano. Lempel-Ziv <strong>no requiere la distribución de probabilidad</strong> (es <em>universal</em>): construye sobre la marcha un <strong>diccionario</strong> de frases ya vistas y sustituye cada frase nueva por <em>(índice de su prefijo en el diccionario, último símbolo)</em>. Es la base de los formatos ZIP/GIF/PNG (variantes LZ77, LZW).</p>
+<ol>
+  <li>Empieza con el diccionario vacío (índice 0 = frase vacía).</li>
+  <li>Lee la frase más larga que ya esté en el diccionario y añádele el siguiente símbolo: esa es una frase nueva.</li>
+  <li>Emite (índice del prefijo, símbolo nuevo) y guarda la frase nueva con el siguiente índice.</li>
+</ol>
+<div class="sim" id="sim-lz">
+  <div class="sim-title">LZ78 paso a paso</div>
+  <p class="meta">Escribe una secuencia (binaria o de letras) y avanza paso a paso. Al final se compara el número de bits de salida con el de la entrada.</p>
+  <div class="controls">
+    <label style="flex:1 1 320px">Secuencia <input type="text" id="lz-in" value="000101110010100101" style="flex:1"></label>
+    <button class="btn" type="button" id="lz-step">Paso ▶</button>
+    <button class="btn ghost" type="button" id="lz-all">Todo</button>
+    <button class="btn ghost" type="button" id="lz-reset">Reiniciar</button>
+  </div>
+  <div class="readout" id="lz-view"></div>
+  <div class="table-wrap" id="lz-table"></div>
+</div>
+
+<h3 id="fuente-ej">4.5 Ejercicios propuestos</h3>
+<ol class="exercises">
+  <li>Una fuente emite 4 símbolos con \(p=0{,}5;\ 0{,}25;\ 0{,}125;\ 0{,}125\) a 1000 símbolos/s. Calcule \(H\), la razón de información y diseñe un código de Huffman.
+    <details class="sol"><summary>Solución</summary><div><p>\(H=1{,}75\) bit/símbolo ⇒ \(R=1750\) bit/s. Huffman: 0, 10, 110, 111 ⇒ \(\bar L=1{,}75\), \(\eta=1\), \(\sigma^2=0{,}6875\).</p></div></details></li>
+  <li>¿Es de prefijo el código {0, 10, 110, 1110, 1011}? Compruebe Kraft.
+    <details class="sol"><summary>Solución</summary><div><p>No: «10» es prefijo de «1011». Kraft: \(\tfrac12+\tfrac14+\tfrac18+\tfrac1{16}+\tfrac1{16}=1\): las longitudes admiten un código de prefijo (p. ej. 0, 10, 110, 1110, 1111), pero este no lo es.</p></div></details></li>
+  <li>Codifique con LZ78 la cadena <code>ABABABA</code>.
+    <details class="sol"><summary>Solución</summary><div><p>Frases: A (0,A), B (0,B), AB (1,B), ABA (3,A). Diccionario: 1=A, 2=B, 3=AB, 4=ABA. Salida: (0,A)(0,B)(1,B)(3,A).</p></div></details></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="canal">5. Canal y capacidad</h2>
+<h3 id="canal-bsc">5.1 Canal binario simétrico (BSC)</h3>
+<p>El modelo de canal más sencillo: entra un bit y sale el mismo bit con probabilidad \(1-f\), o invertido con probabilidad \(f\) (probabilidad de transición o de error), independientemente para cada bit.</p>
+<div class="eq key">$$C_{\text{BSC}}=1-\mathcal H(f)=1+f\log_2f+(1-f)\log_2(1-f)\quad[\text{bit por uso del canal}]$$<div class="eq-label">Capacidad del canal binario simétrico</div></div>
+<p>Si \(f=0\) el canal es perfecto (\(C=1\)); si \(f=0{,}5\) la salida es independiente de la entrada (\(C=0\)): no pasa información. Si \(f\gt0{,}5\) basta invertir los bits. La capacidad es <strong>mayor cuanto menor es la probabilidad de error del canal</strong> (conclusión de la Conferencia 4).</p>
+<h3 id="canal-teorema">5.2 Teorema de codificación de canal</h3>
+<div class="box def"><span class="box-title">Teorema de codificación de canal (Shannon, segundo teorema)</span>
+<p>Si la razón del código \(R=k/n\) (bits de información por bit transmitido) es <strong>menor que la capacidad</strong> \(C\), existen códigos con probabilidad de error tan pequeña como se quiera. Si \(R\gt C\), no. No dice <em>cómo</em> construir esos códigos: eso ocupa a los ingenieros desde 1948 (Hamming, convolucionales, turbo, LDPC, polares).</p></div>
+<h3 id="canal-sh">5.3 Canal gaussiano: Shannon-Hartley y límite de Shannon</h3>
+<p>Para un canal de ancho de banda \(B\) con ruido blanco gaussiano aditivo y relación señal a ruido \(S/N\):</p>
+<div class="eq key">$$C=B\log_2\!\left(1+\frac{S}{N}\right)\ \ [\text{bit/s}],\qquad N=N_0B$$<div class="eq-label">Teorema de Shannon-Hartley</div></div>
+<p>Escribiendo \(S=E_bC\) y haciendo \(B\to\infty\) se obtiene el <strong>límite de Shannon</strong>: para comunicar sin errores hace falta \(E_b/N_0\ge\ln2=0{,}693\) (−1,59 dB). Ningún sistema, por bueno que sea, funciona por debajo.</p>
+<div class="sim" id="sim-cap">
+  <div class="sim-title">Capacidad: BSC y Shannon-Hartley</div>
+  <div class="controls">
+    <label>f (BSC) <input type="range" id="cp-f" min="0" max="0.5" step="0.005" value="0.1" data-out="cp-fo"><output id="cp-fo"></output></label>
+    <label>B (kHz) <input type="number" id="cp-b" value="3.1" min="0.1" step="0.1" style="width:80px"></label>
+    <label>S/N (dB) <input type="range" id="cp-s" min="-10" max="50" step="1" value="30" data-out="cp-so"><output id="cp-so"></output></label>
+  </div>
+  <div class="two"><canvas id="cp-c1" aria-label="Capacidad del BSC en función de f"></canvas><canvas id="cp-c2" aria-label="Capacidad normalizada C/B en función de S/N"></canvas></div>
+  <div class="readout" id="cp-out"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="canalcod">6. Codificación de canal</h2>
+<h3 id="arq">6.1 ARQ y FEC</h3>
+<ul>
+  <li><strong>ARQ</strong> (<em>Automatic Repeat reQuest</em>): el receptor solo <em>detecta</em> errores y pide retransmisión por un canal de retorno (TCP, Wi-Fi). Pocos bits de redundancia, pero necesita realimentación y añade retardo.</li>
+  <li><strong>FEC</strong> (<em>Forward Error Correction</em>): el receptor <em>corrige</em> sin pedir nada (radiodifusión, espacio profundo, memorias). Más redundancia, sin canal de retorno.</li>
+</ul>
+<h3 id="repeticion">6.2 Código de repetición</h3>
+<p>El código \(R_3\) transmite cada bit tres veces (0→000, 1→111): razón \(R=1/3\). El decodificador decide por <strong>voto mayoritario</strong> (supone que, de cada 3, al menos 2 son correctos). Falla si hay 2 o 3 errores en el bloque:</p>
+$$P_e=3f^2(1-f)+f^3\approx3f^2$$
+<p>Con \(f=0{,}1\): \(P_e=0{,}028\), casi 4 veces mejor… pero a costa de enviar el triple. \(R_5,R_7,\dots\) mejoran más \(P_e\) pero la razón tiende a 0. Shannon dice que no hace falta: con \(f=0{,}1\), \(C=0{,}53\), así que existen códigos de razón ≈0,5 con \(P_e\to0\). El "compromiso entre \(P_e\) y razón" de la Conferencia 4 no es fundamental: es una limitación de los códigos sencillos.</p>
+<h3 id="distancia">6.3 Distancia de Hamming y capacidad de corrección</h3>
+<p>Cada palabra de \(n\) bits es un vértice de un hipercubo \(n\)-dimensional. La <strong>distancia de Hamming</strong> \(d(c_i,c_j)\) es el número de posiciones en que difieren; el <strong>peso</strong> \(w(c)\) es el número de unos. La <strong>distancia mínima</strong> \(d_{\min}\) del código es la menor distancia entre dos palabras distintas (en un código lineal, el menor peso de una palabra no nula).</p>
+<div class="eq key">$$\text{detecta hasta } \ell=d_{\min}-1\ \text{errores},\qquad\text{corrige hasta } t=\left\lfloor\frac{d_{\min}-1}{2}\right\rfloor$$</div>
+<p>Idea geométrica: alrededor de cada palabra válida se dibuja una "esfera" de radio \(t\); si no se solapan, una palabra recibida con \(\le t\) errores sigue dentro de la esfera correcta. Ejemplos: \(R_3\) tiene \(d_{\min}=3\) (detecta 2, corrige 1); un bit de paridad da \(d_{\min}=2\) (detecta 1, no corrige).</p>
+
+<h3 id="lineales">6.4 Códigos lineales de bloque \((n,k)\)</h3>
+<p>Cada bloque de \(k\) bits de mensaje \(\mathbf m\) se transforma en una palabra de \(n\) bits \(\mathbf c\); se añaden \(q=n-k\) bits de paridad. Razón \(R=k/n\). Se llama <strong>lineal</strong> porque la suma (XOR) de dos palabras es otra palabra, y <strong>sistemático</strong> si los \(k\) bits del mensaje aparecen tal cual dentro de la palabra.</p>
+<div class="eq key">$$\mathbf c=\mathbf m\,\mathbf G,\qquad \mathbf G=[\,\mathbf I_k\ \vdots\ \mathbf P\,]\ (k\times n),\qquad \mathbf H=[\,\mathbf P^{T}\ \vdots\ \mathbf I_q\,]\ (q\times n),\qquad \mathbf G\mathbf H^T=\mathbf 0$$<div class="eq-label">Matriz generadora y matriz de chequeo de paridad (convención de Carlson; Haykin usa \([\mathbf P\ \vdots\ \mathbf I_k]\), con la paridad delante)</div></div>
+<p>Todas las operaciones son <strong>módulo 2</strong> (1+1=0). Las filas de \(\mathbf G\) deben ser linealmente independientes. Como toda palabra válida cumple \(\mathbf c\mathbf H^T=\mathbf 0\), el receptor calcula el <strong>síndrome</strong> de la palabra recibida \(\mathbf r=\mathbf c+\mathbf e\):</p>
+$$\mathbf s=\mathbf r\,\mathbf H^T=(\mathbf c+\mathbf e)\mathbf H^T=\mathbf e\,\mathbf H^T$$
+<p>El síndrome <strong>depende solo del error</strong>, no del mensaje. Si \(\mathbf s=\mathbf 0\), se acepta \(\mathbf r\). Si hay un solo error en la posición \(i\), \(\mathbf e\) tiene un único 1 y \(\mathbf s\) es la <strong>fila \(i\) de \(\mathbf H^T\)</strong>: basta buscarla e invertir ese bit.</p>
+<p><strong>Códigos de Hamming</strong>: para \(q\ge3\), \(n=2^q-1\), \(k=n-q\), \(d_{\min}=3\). Las filas de \(\mathbf H^T\) son todos los vectores no nulos de \(q\) bits (cada error simple tiene un síndrome distinto): (7,4), (15,11), (31,26)…</p>
+<div class="example">
+<h4>Ejemplo 6.1 — CP 3, ejercicio 1 (Hamming (7,4))</h4>
+<p>\(\mathbf G=[\mathbf I_4\,\vdots\,\mathbf P]\) con filas de \(\mathbf P\): 101, 111, 110, 011.</p>
+<div class="step"><span class="n">a</span><div><p><strong>Capacidad</strong>: \(d_{\min}=3\) ⇒ detecta hasta 2 errores, corrige 1.</p></div></div>
+<div class="step"><span class="n">c</span><div><p><strong>Codificar 1010</strong>: \(\mathbf c=\mathbf m\mathbf G\) = suma (XOR) de las filas 1 y 3 de \(\mathbf G\) (donde el mensaje tiene unos): 1000101 ⊕ 0010110 = <strong>1010 011</strong>. (El "método no convencional" de la hoja de ejercicios es exactamente esto: sumar las filas seleccionadas).</p></div></div>
+<div class="step"><span class="n">d</span><div><p>\(\mathbf H^T=\begin{bmatrix}\mathbf P\\\mathbf I_3\end{bmatrix}\) con filas 101, 111, 110, 011, 100, 010, 001. \(\mathbf c\mathbf H^T\) = filas 1, 3, 6 y 7 de \(\mathbf H^T\): 101⊕110⊕010⊕001 = <strong>000</strong> ✔.</p></div></div>
+<div class="step"><span class="n">e</span><div><p>\(\mathbf G\mathbf H^T=\mathbf I_4\mathbf P+\mathbf P\mathbf I_3=\mathbf P+\mathbf P=\mathbf 0\) (módulo 2, todo número sumado consigo mismo da 0).</p></div></div>
+<div class="step"><span class="n">f</span><div><p>Síndrome <strong>010</strong> = fila 6 de \(\mathbf H^T\) ⇒ error en el <strong>sexto bit</strong>.</p></div></div>
+</div>
+<div class="table-wrap"><table class="compact htable">
+<caption style="text-align:left;font-weight:600;padding:4px 0;font-family:var(--font-sans)">Las 16 palabras del código de la CP 3 (todas, salvo la nula, tienen peso ≥ 3)</caption>
+<tbody>
+<tr><td>0000 000</td><td>0001 011</td><td>0010 110</td><td>0011 101</td><td>0100 111</td><td>0101 100</td><td>0110 001</td><td>0111 010</td></tr>
+<tr><td>1000 101</td><td>1001 110</td><td>1010 011</td><td>1011 000</td><td>1100 010</td><td>1101 001</td><td>1110 100</td><td>1111 111</td></tr>
+</tbody></table></div>
+<div class="example">
+<h4>Ejemplo 6.2 — Conferencia 5 (convención de Haykin)</h4>
+<p>Con \(\mathbf c=[\,b_0b_1b_2\,\vdots\,m_0m_1m_2m_3\,]\) y filas de \(\mathbf P\) 110, 011, 111, 101, se recibe \(\mathbf r=0101101\). El síndrome es \(\mathbf s=\mathbf r\mathbf H^T=010\), que coincide con la fila 2 de \(\mathbf H^T\) ⇒ se invierte el bit 2: \(\mathbf c=\mathbf{0001101}\) (mensaje 1101). Comprobación: \(1101\cdot\mathbf P=110⊕011⊕101=000\) ✔.</p>
+</div>
+<div class="sim" id="sim-ham">
+  <div class="sim-title">Hamming (7,4): codificar, equivocarse y corregir</div>
+  <p class="meta">Pulsa los bits del mensaje para cambiarlos; después pulsa bits de la palabra transmitida para introducir errores en el canal. Con un error el decodificador lo localiza por el síndrome; con dos, «corrige» mal (\(t=1\)). Código de la CP 3.</p>
+  <div class="bitrow"><span class="lbl">Mensaje m</span><span id="hm-m"></span></div>
+  <div class="bitrow"><span class="lbl">Transmitida c = mG</span><span id="hm-c"></span></div>
+  <div class="bitrow"><span class="lbl">Recibida r (pulsa = error)</span><span id="hm-r"></span></div>
+  <div class="bitrow"><span class="lbl">Síndrome s = rHᵀ</span><span id="hm-s"></span></div>
+  <div class="bitrow"><span class="lbl">Corregida ĉ</span><span id="hm-x"></span></div>
+  <div class="readout" id="hm-out"></div>
+</div>
+
+<h3 id="convolucional">6.5 Códigos convolucionales</h3>
+<p>En un código de bloque cada palabra depende solo de su bloque. En un código <strong>convolucional</strong> la salida depende del bit actual <em>y de los \(L\) anteriores</em> (memoria): el codificador es un <strong>registro de desplazamiento</strong> de \(L+1\) celdas con \(n\) sumadores módulo 2. Por cada \(k\) bits de entrada salen \(n\) bits: razón \(k/n\). Notación \((n,k,L)\); la <em>longitud de restricción</em> es \(K=L+1\).</p>
+<p>Cada salida \(j\) es la <strong>convolución</strong> (módulo 2) de la entrada con la respuesta impulsiva \(g^{(j)}\) de esa rama —de ahí el nombre—. En forma polinómica, con \(D\) = retardo de un bit:</p>
+$$c^{(j)}(D)=m(D)\,g^{(j)}(D),\qquad\text{p. ej. } g^{(1)}(D)=1+D+D^2\ (111),\ \ g^{(2)}(D)=1+D^2\ (101)$$
+<p>Representaciones: <strong>árbol de código</strong> (crece exponencialmente), <strong>diagrama de estados</strong> (el estado son los \(L\) bits en memoria: \(2^L\) estados) y <strong>rejilla</strong> o <em>trellis</em> (el diagrama de estados desplegado en el tiempo; es la que se usa para decodificar).</p>
+<div class="example">
+<h4>Ejemplo 6.3 — Codificador (2,1,2) de la Conferencia 6</h4>
+<p>\(g^{(1)}=111\), \(g^{(2)}=101\); entrada 10011.</p>
+<div class="step"><span class="n">1</span><div><p>\(m(D)=1+D^3+D^4\). \(c^{(1)}=(1+D^3+D^4)(1+D+D^2)=1+D+D^2+D^3+D^6\) → <strong>1111001</strong>.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>\(c^{(2)}=(1+D^3+D^4)(1+D^2)=1+D^2+D^3+D^4+D^5+D^6\) → <strong>1011111</strong>.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Se entrelazan (bit de la rama 1, bit de la rama 2): <strong>11 10 11 11 01 01 11</strong>. Los dos últimos pares son la "cola" que vacía el registro (se añaden \(L=2\) ceros a la entrada).</p></div></div>
+</div>
+<h4>Algoritmo de Viterbi</h4>
+<p>Es el decodificador de <strong>máxima verosimilitud</strong>: busca, entre todos los caminos de la rejilla, el que produce la secuencia más parecida (menor distancia de Hamming) a la recibida. El truco que lo hace práctico: si dos caminos llegan al mismo estado, el de peor métrica nunca podrá ganar después, así que se descarta. Pasos:</p>
+<ol>
+  <li><strong>Inicialización</strong>: estado 00 con métrica 0.</li>
+  <li><strong>Paso \(j\to j+1\)</strong>: para cada estado, calcula la métrica de los caminos que entran (métrica del superviviente anterior + distancia entre la rama y los bits recibidos) y conserva solo el menor: el <strong>superviviente</strong>.</li>
+  <li><strong>Final</strong>: el superviviente de menor métrica en el último nivel da la secuencia decodificada.</li>
+</ol>
+<div class="sim" id="sim-vit">
+  <div class="sim-title">Codificador convolucional y decodificador de Viterbi</div>
+  <p class="meta">Define los generadores (en binario, el bit de la izquierda multiplica a la entrada actual), codifica una secuencia, edita los bits recibidos para introducir errores y observa la rejilla: en cada estado se muestra la métrica del superviviente; el camino ganador aparece resaltado.</p>
+  <div class="controls">
+    <label>g₁ <input type="text" id="vt-g1" value="111" size="4"></label>
+    <label>g₂ <input type="text" id="vt-g2" value="101" size="4"></label>
+    <label>g₃ <input type="text" id="vt-g3" value="" size="4" placeholder="(opcional)"></label>
+    <label>Entrada <input type="text" id="vt-in" value="10011" size="10"></label>
+    <label><input type="checkbox" id="vt-tail" checked> añadir cola de ceros</label>
+    <button class="btn" type="button" id="vt-enc">Codificar ↓</button>
+  </div>
+  <div class="controls">
+    <label style="flex:1 1 360px">Recibida <input type="text" id="vt-rx" value="" style="flex:1" class="bits"></label>
+    <button class="btn ghost" type="button" id="vt-err">Meter 1 error al azar</button>
+  </div>
+  <canvas id="vt-c" aria-label="Rejilla del decodificador de Viterbi"></canvas>
+  <div class="readout" id="vt-out"></div>
+</div>
+<div class="example">
+<h4>Ejemplo 6.4 — Viterbi con errores (Conferencia 6)</h4>
+<p>Se transmite la secuencia nula con el codificador (2,1,2). Se recibe <code>01 00 01 00 00</code> (dos errores). Métricas de los supervivientes por nivel (estados 00, 10, 01, 11, con el bit más reciente a la izquierda):</p>
+<p>Nivel 1: 00→1, 10→1 · Nivel 2: 00→1, 10→3, 01→2, 11→2 · Nivel 3: 00→2, … · Nivel 5: 00→<strong>2</strong>. El superviviente de menor métrica termina en 00 con la secuencia <strong>00000</strong>: los dos errores se corrigen. (Puedes reproducirlo en el simulador: entrada 00000 sin cola y recibida <code>0100010000</code>). El caso <code>11 00 01 00 00</code>, que queda como trabajo independiente, se decodifica como 10000.</p>
+</div>
+
+<h3 id="canal-ej">6.6 Ejercicios propuestos</h3>
+<ol class="exercises">
+  <li>Un código tiene las palabras 00000, 01011, 10101, 11110. ¿\(d_{\min}\)? ¿Cuántos errores detecta y corrige?
+    <details class="sol"><summary>Solución</summary><div><p>Pesos de las no nulas: 3, 3, 4 ⇒ \(d_{\min}=3\) (es lineal). Detecta 2, corrige 1.</p></div></details></li>
+  <li>Con el código de la CP 3 se recibe 1110 110. ¿Qué se transmitió?
+    <details class="sol"><summary>Solución</summary><div><p>Unos en las posiciones 1, 2, 3, 5 y 6 ⇒ \(\mathbf s\) = suma de esas filas de \(\mathbf H^T\): 101⊕111⊕110⊕100⊕010 = <strong>010</strong> = fila 6 ⇒ error en el bit 6. Palabra corregida: <strong>1110 100</strong> (está en la tabla: mensaje 1110).</p><p>Pregunta extra: si llegan <em>dos</em> errores, p. ej. 1110 111 (bits 6 y 7 mal), \(\mathbf s=011\) = fila 4 y el decodificador "corrige" el bit 4, entregando 1111 111: otro mensaje. Con \(t=1\) dos errores no se pueden corregir (aunque sí detectar, porque \(\mathbf s\ne0\)).</p></div></details></li>
+  <li>Codifique 1101 con el (2,1,2) de \(g^{(1)}=111\), \(g^{(2)}=101\) (con cola).
+    <details class="sol"><summary>Solución</summary><div><p>\(c^{(1)}=(1+D+D^3)(1+D+D^2)=1+D^4+D^5\)… desarrollando: \(1+D+D^2+D+D^2+D^3+D^3+D^4+D^5=1+D^4+D^5\) → 100011. \(c^{(2)}=(1+D+D^3)(1+D^2)=1+D+D^2+D^5\) → 111001. Entrelazado: <strong>11 01 01 00 10 11</strong>.</p></div></details></li>
+  <li>¿Qué razón de código mínima permite Shannon para un BSC con \(f=0{,}01\)? ¿Y qué \(P_e\) da \(R_3\)?
+    <details class="sol"><summary>Solución</summary><div><p>\(C=1-\mathcal H(0{,}01)=0{,}919\): cualquier \(R\lt0{,}919\) es alcanzable con \(P_e\to0\). \(R_3\) (razón 0,33) da \(P_e=2{,}98\times10^{-4}\).</p></div></details></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="pp1">7. Modelo de Prueba Parcial 1 resuelto</h2>
+<p>Las variantes de la PP1 combinan un <strong>código de Huffman de mínima varianza</strong> con un <strong>codificador convolucional</strong>. Resolvemos una variante representativa (datos de una de ellas, sin información personal).</p>
+<div class="example">
+<h4>Enunciado</h4>
+<p>La fuente emite \(m_1\dots m_6\) con probabilidades \(\tfrac14,\tfrac12,\tfrac18,\tfrac1{16},\tfrac1{32},\tfrac1{32}\). Codificador de fuente: Huffman de mínima varianza, 0 a la rama superior y 1 a la inferior. Codificador de canal: convolucional de razón 1/3 con \(g_1(D)=1+D^2\), \(g_2(D)=1+D+D^2\), \(g_3(D)=1+D+D^2\).</p>
+<p>a) Si se transmiten los mensajes \(m_2\,m_3\,m_5\,m_6\), ¿qué secuencia de bits sale al canal? b) Si al decodificador convolucional (condiciones iniciales nulas) entra <code>001001001001</code>, estime los bits que entraron al codificador de canal.</p>
+<div class="step"><span class="n">1</span><div><p><strong>Huffman.</strong> Ordenadas: \(m_2\,(1/2)\), \(m_1\,(1/4)\), \(m_3\,(1/8)\), \(m_4\,(1/16)\), \(m_5\) y \(m_6\,(1/32)\). Se combinan \(m_5+m_6=1/16\) (colocada arriba de \(m_4\) por empate), luego \(1/16+1/16=1/8\), \(1/8+1/8=1/4\), \(1/4+1/4=1/2\), \(1/2+1/2=1\). Leyendo los caminos al revés:</p>
+<p>\(m_2=\texttt{1}\), \(m_1=\texttt{01}\), \(m_3=\texttt{001}\), \(m_4=\texttt{0001}\), \(m_5=\texttt{00000}\), \(m_6=\texttt{00001}\).</p>
+<p>Como las probabilidades son potencias de 1/2, \(\bar L=H=1{,}9375\) bit/mensaje y \(\eta=1\); \(\sigma^2=1{,}434\). (Con probabilidades diádicas no hay empates que alteren las longitudes, así que la varianza no se puede reducir más).</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Bits de fuente</strong> de \(m_2m_3m_5m_6\): <code>1 001 00000 00001</code> → 14 bits.</p></div></div>
+<div class="step"><span class="n">3</span><div><p><strong>Convolucional.</strong> Para cada bit \(u_k\) salen \((u_k\oplus u_{k-2},\ u_k\oplus u_{k-1}\oplus u_{k-2},\ u_k\oplus u_{k-1}\oplus u_{k-2})\):</p>
+<p class="bits">111 011 111 111 011 111 000 000 000 000 000 000 000 111</p>
+<p>(42 bits). Si se vacía el registro con dos ceros de cola se añaden <code>011 111</code> (48 bits). Indique siempre qué convenio usa.</p></div></div>
+<div class="step"><span class="n">4</span><div><p><strong>Viterbi</strong> sobre <code>001 001 001 001</code>. Observa que con \(g_2=g_3\) las salidas 2 y 3 siempre son iguales, y en cada triplete recibido difieren: cada triplete tiene al menos un error. Métricas mínimas por nivel: 1, 2, 3, 4, siempre en el estado 00 con el camino de ceros. Estimación: <strong>0000</strong> (métrica final 4; el siguiente candidato, 0001, tiene métrica 5).</p></div></div>
+</div>
+<div class="box warn"><span class="box-title">Errores típicos en la PP1</span>
+<ul>
+  <li>Ordenar los mensajes por su nombre (\(m_1,m_2,\dots\)) en vez de por probabilidad.</li>
+  <li>Olvidar invertir el orden de los bits al leer el camino.</li>
+  <li>No mantener la convención (0 arriba / 1 abajo) en todas las columnas.</li>
+  <li>En el convolucional, confundir el orden de los coeficientes: el término independiente (\(1\) en \(1+D^2\)) multiplica al bit <em>actual</em>.</li>
+  <li>En Viterbi, sumar distancias de ramas sin conservar solo un superviviente por estado.</li>
+</ul></div>
+
+<!-- ============================================================ -->
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. Una fuente de 16 símbolos equiprobables tiene entropía…</p><div class="opts">
+    <button class="opt" type="button">16 bit/símbolo</button><button class="opt" type="button" data-ok>4 bit/símbolo</button><button class="opt" type="button">1/16 bit/símbolo</button></div>
+    <p class="why">\(H=\log_2 16=4\).</p></div>
+  <div class="q"><p>2. Si \(\bar L\lt H\) para un código, entonces…</p><div class="opts">
+    <button class="opt" type="button">el código es superóptimo</button><button class="opt" type="button" data-ok>el código no es de decodificación única</button><button class="opt" type="button">la fuente tiene memoria</button></div>
+    <p class="why">El teorema de codificación de fuente garantiza \(\bar L\ge H\) para todo código decodificable.</p></div>
+  <div class="q"><p>3. Colocar la suma "lo más arriba posible" en Huffman…</p><div class="opts">
+    <button class="opt" type="button">mejora la eficiencia</button><button class="opt" type="button" data-ok>reduce la varianza sin cambiar la eficiencia</button><button class="opt" type="button">hace el código no de prefijo</button></div>
+    <p class="why">Ambas variantes son óptimas (misma \(\bar L\)); difieren en \(\sigma^2\).</p></div>
+  <div class="q"><p>4. Un código con \(d_{\min}=5\) corrige…</p><div class="opts">
+    <button class="opt" type="button">1 error</button><button class="opt" type="button" data-ok>2 errores</button><button class="opt" type="button">4 errores</button></div>
+    <p class="why">\(t=\lfloor(5-1)/2\rfloor=2\); detecta hasta 4.</p></div>
+  <div class="q"><p>5. El síndrome de un código lineal depende…</p><div class="opts">
+    <button class="opt" type="button">del mensaje y del error</button><button class="opt" type="button" data-ok>solo del patrón de error</button><button class="opt" type="button">solo del mensaje</button></div>
+    <p class="why">\(\mathbf s=(\mathbf c+\mathbf e)\mathbf H^T=\mathbf e\mathbf H^T\).</p></div>
+  <div class="q"><p>6. Un BSC con \(f=0{,}5\) tiene capacidad…</p><div class="opts">
+    <button class="opt" type="button">0,5 bit/uso</button><button class="opt" type="button">1 bit/uso</button><button class="opt" type="button" data-ok>0</button></div>
+    <p class="why">\(1-\mathcal H(0{,}5)=0\): la salida es independiente de la entrada.</p></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="biblio">Dónde estudiarlo</h2>
+<p class="meta">Páginas impresas; entre paréntesis, página del visor PDF del archivo de <code>05-Bibliografia</code>.</p>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>MacKay, <em>Information Theory, Inference, and Learning Algorithms</em>, Cambridge UP, 2003</td><td>1</td><td>1.1 Perfect communication over an imperfect channel · 1.2 Error-correcting codes for the BSC · 1.3 What performance can the best codes achieve?</td><td>pp. 3–15 (PDF 15–27)</td><td>BSC, \(R_3\), Hamming (7,4), compromiso \(P_e\)–razón</td></tr>
+    <tr><td>MacKay (ídem)</td><td>2</td><td>2.4 Definition of entropy and related functions</td><td>pp. 32–33 (PDF 44–45)</td><td>Información, entropía</td></tr>
+    <tr><td>MacKay (ídem)</td><td>4</td><td>4.1 How to measure the information content · 4.2 Data compression</td><td>pp. 67–76 (PDF 79–88)</td><td>Teorema de codificación de fuente</td></tr>
+    <tr><td>MacKay (ídem)</td><td>5</td><td>5.1 Symbol codes · 5.2 Unique decodeability (Kraft) · 5.5 Huffman coding · 5.6 Disadvantages</td><td>pp. 92–100 (PDF 104–112)</td><td>Códigos de prefijo, Kraft, Huffman</td></tr>
+    <tr><td>MacKay (ídem)</td><td>6</td><td>6.4 Lempel–Ziv coding</td><td>pp. 119–121 (PDF 131–133)</td><td>LZ</td></tr>
+    <tr><td>MacKay (ídem)</td><td>9</td><td>9.5 Information conveyed by a channel · 9.6 The noisy-channel coding theorem</td><td>pp. 149–152 (PDF 161–164)</td><td>Capacidad, teorema de canal</td></tr>
+    <tr><td>Sklar y Ray, <em>Digital Communications</em>, 2.ª ed., Pearson, 2014</td><td>13</td><td>13.7 Source Coding for Digital Data (13.7.1 Properties of Codes, 13.7.2 Huffman Codes)</td><td>pp. 860–867 (PDF 887–894)</td><td>Códigos de prefijo, Huffman (citado en la hoja de ejercicios)</td></tr>
+    <tr><td>Sklar (ídem)</td><td>9</td><td>9.4 Shannon–Hartley Capacity Theorem (9.4.1 Shannon Limit, 9.4.2 Entropy)</td><td>pp. 529–533 (PDF 556–560)</td><td>Capacidad, límite de Shannon</td></tr>
+    <tr><td>Sklar (ídem)</td><td>6</td><td>6.2 Types of Error Control · 6.3 Structured Sequences · 6.4 Linear Block Codes · 6.5 Error-Detecting and Correcting Capability</td><td>pp. 315–348 (PDF 342–375)</td><td>ARQ/FEC, paridad, \(\mathbf G\), \(\mathbf H\), síndrome, \(d_{\min}\)</td></tr>
+    <tr><td>Sklar (ídem)</td><td>7</td><td>7.1 Convolutional Encoding · 7.2 Encoder Representation · 7.3 Decoding (7.3.3–7.3.4 Viterbi y ejemplo)</td><td>pp. 382–408 (PDF 409–435)</td><td>Registro, polinomios, rejilla, Viterbi</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>9</td><td>9.2 Uncertainty, Information, and Entropy · 9.3 Source-Coding Theorem · 9.4 Data Compaction (Huffman, Lempel-Ziv)</td><td>pp. 568–580 (PDF 588–600)</td><td>Información, entropía, Huffman, LZ (los epígrafes 9.3–9.4 que cita la CP 2)</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>9</td><td>9.5 Discrete Memoryless Channels · 9.6 Mutual Information · 9.7 Channel Capacity · 9.8 Channel-Coding Theorem</td><td>pp. 581–592 (PDF 601–612)</td><td>BSC, capacidad, teorema de canal</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>9</td><td>9.10 Information Capacity Theorem</td><td>pp. 597–600 (PDF 617–620)</td><td>Shannon-Hartley</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>10</td><td>10.1 Introduction · 10.2 Discrete-Memoryless Channels (ARQ/FEC) · 10.3 Linear Block Codes (Hamming, tabla 10.1)</td><td>pp. 626–641 (PDF 646–661)</td><td>Códigos de bloque y síndrome (CP 3: «Haykin pp. 632–641»)</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>10</td><td>10.5 Convolutional Codes · 10.6 Maximum Likelihood Decoding of Convolutional Codes</td><td>pp. 654–668 (PDF 674–688)</td><td>Registro, rejilla, Viterbi (CP 4: «Haykin pp. 654–665»)</td></tr>
+    <tr><td>Carlson, Crilly y Rutledge, <em>Communication Systems</em>, 4.ª ed., McGraw-Hill, 2002</td><td>13</td><td>13.1 Error Detection and Correction (desde p. 549) · 13.2 Linear Block Codes (desde p. 560) · 13.3 Convolutional Codes (pp. 575–591)</td><td>pp. 549–591 (PDF 555–597)</td><td>ARQ/FEC, Hamming, convolucionales (CP 3: «Carlson pp. 560–567»)</td></tr>
+    <tr><td>Couch, <em>Digital and Analog Communication Systems</em>, 8.ª ed., 2012</td><td>1</td><td>1–9 Information Measure · 1–10 Channel Capacity and Ideal Communication Systems · 1–11 Coding</td><td>pp. 17–30 (PDF 42–55)</td><td>Resumen de todo el tema</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — PEDECIBA, <a href="https://www.youtube.com/watch?v=vVokVFHz8uA">«¿Qué es la teoría de la información?»</a> (12:09). Introducción divulgativa a las ideas de Shannon.</li>
+  <li><strong>Vídeo</strong> — EnriQuantum, <a href="https://www.youtube.com/watch?v=EwflOWGs3ww">«Shannon y la entropía de la información»</a> (13:22). Por qué la entropía usa logaritmos.</li>
+  <li><strong>Vídeo</strong> — imUVa (Univ. de Valladolid), <a href="https://www.youtube.com/watch?v=2TV2GWJbrwE">«El método de Huffman»</a> (12:24); y Cátedra de Matemática, <a href="https://www.youtube.com/watch?v=DjdmAFFoBnE">«Código de Huffman»</a> (7:03). Ver antes de usar el constructor de la sección 4.3.</li>
+  <li><strong>Vídeo</strong> — <a href="https://www.youtube.com/watch?v=P4MqF-tObkY">«Compresión de datos con LZ78: teoría y ejercicio resuelto»</a> (10:38) y <a href="https://www.youtube.com/watch?v=8Hxo1bPPgCU">«Algoritmo LZW»</a> (18:15, la variante usada en GIF).</li>
+  <li><strong>Vídeo</strong> — internet-class, <a href="https://www.youtube.com/watch?v=ancDN11C2vg">«What is the Shannon capacity theorem?»</a> (5:40, inglés).</li>
+  <li><strong>Vídeo</strong> — UPV, <a href="https://www.youtube.com/watch?v=gQK9nROFX20">«Códigos de Hamming»</a> (7:36); eigenchris, <a href="https://www.youtube.com/watch?v=kO6UlCY6idg">«Error correcting codes 2a: Linear codes — generator matrix»</a> (10:25, inglés).</li>
+  <li><strong>Vídeo</strong> — UPV, <a href="https://www.youtube.com/watch?v=pQMxFYcgIoA">«Decodificación óptima de secuencias: algoritmo de Viterbi»</a> (13:08); C. A. Amaya, <a href="https://www.youtube.com/watch?v=ZnCbur8zQiU">«Trellis y Viterbi»</a> (32:24; ejercicio largo resuelto en rejilla).</li>
+  <li><strong>Libro libre</strong> — D. MacKay, <a href="https://www.inference.org.uk/itila/book.html">ITILA</a>: el autor permite leerlo en pantalla gratis; incluye sus <a href="https://www.inference.org.uk/itprnn_lectures/">16 clases en vídeo</a> (Cambridge).</li>
+  <li><strong>Artículos fundacionales</strong> — C. E. Shannon, «A Mathematical Theory of Communication», <em>Bell Syst. Tech. J.</em> 27 (1948), <a href="https://doi.org/10.1002/j.1538-7305.1948.tb01338.x">doi:10.1002/j.1538-7305.1948.tb01338.x</a> · R. W. Hamming, «Error detecting and error correcting codes», <em>BSTJ</em> 29 (1950), <a href="https://doi.org/10.1002/j.1538-7305.1950.tb00463.x">doi:10.1002/j.1538-7305.1950.tb00463.x</a> · D. A. Huffman, «A Method for the Construction of Minimum-Redundancy Codes», <em>Proc. IRE</em> 40 (1952), <a href="https://doi.org/10.1109/JRPROC.1952.273898">doi:10.1109/JRPROC.1952.273898</a> · A. J. Viterbi, «Error bounds for convolutional codes and an asymptotically optimum decoding algorithm», <em>IEEE Trans. IT</em> 13 (1967), <a href="https://doi.org/10.1109/TIT.1967.1054010">doi:10.1109/TIT.1967.1054010</a> · J. Ziv y A. Lempel, «Compression of individual sequences via variable-rate coding», <em>IEEE Trans. IT</em> 24 (1978), <a href="https://doi.org/10.1109/TIT.1978.1055934">doi:10.1109/TIT.1978.1055934</a> (el LZ78).</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué logaritmo en base 2?</summary><div><p>Porque así la unidad es la información de una elección entre dos opciones equiprobables (un "sí/no"): 1 bit. Cualquier otra base solo cambia la unidad (nats, hartleys), como pasar de metros a pies.</p></div></details>
+  <details><summary>¿La entropía depende de qué símbolos son o solo de sus probabilidades?</summary><div><p>Solo de las probabilidades. Una fuente que emite {A, B} con 0,9/0,1 tiene la misma entropía que otra que emite {perro, gato} con 0,9/0,1.</p></div></details>
+  <details><summary>¿Qué significa que una fuente "tiene memoria"?</summary><div><p>Que la probabilidad de un símbolo depende de los anteriores (en español, tras «q» casi siempre viene «u»). Su entropía real es menor que la calculada con las probabilidades de símbolos aislados; los compresores como LZ aprovechan esa dependencia sin conocerla.</p></div></details>
+  <details><summary>¿Huffman siempre da \(\eta=1\)?</summary><div><p>Solo si todas las probabilidades son potencias de 1/2. En general \(H\le\bar L\lt H+1\). Para acercarse más se codifican bloques de símbolos (extensión de la fuente).</p></div></details>
+  <details><summary>¿Por qué el código de canal no "gasta" ancho de banda para nada?</summary><div><p>Sí lo gasta: con razón \(k/n\) hay que transmitir \(n/k\) veces más bits por segundo. A cambio se puede trabajar con menor potencia para la misma probabilidad de error (ganancia de codificación). Es un intercambio potencia ↔ ancho de banda.</p></div></details>
+  <details><summary>¿Cuál es la diferencia práctica entre bloque y convolucional?</summary><div><p>Los de bloque procesan bloques independientes y se decodifican con álgebra (síndrome); los convolucionales procesan un flujo continuo, tienen memoria y se decodifican con Viterbi, que además aprovecha fácilmente la "decisión suave" (las tensiones recibidas, no solo los bits). GSM, Wi-Fi (802.11a/g) y las sondas espaciales usaron convolucionales con \(K=7\).</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> Conferencias 2 (modelo de sistema, información, entropía, codificación de fuente), 3 (codificadores de fuente: prefijo, Huffman, LZ78), 4 (codificación de canal, BSC, repetición), 5 (códigos lineales de bloque, Hamming) y 6 (convolucionales, Viterbi) de la edición anterior; CP 1–4; «Ejercicios sobre cantidad de información, entropía y codificación de fuente»; «Ejercicios de codificación Hamming»; variantes de la Prueba Parcial 1; vídeos «Recurso orientador» 01–04. Explicaciones, figuras y simuladores son elaboración propia.</p>
+</main>
+</div>
+<footer class="site wrap">Fundamentos de las Comunicaciones I · Material de estudio no oficial elaborado a partir de los materiales del curso · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

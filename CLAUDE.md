@@ -179,17 +179,21 @@ El repo es **público**. Los materiales fuente están **fuera** del repo a prop�
 |---|---|---|
 | Líneas de Transmisión y Antenas | 🟡 iniciada | `index.html` con Tema I (teoría general de LTx, carta de Smith interactiva, λ/4) |
 | Microcontroladores | ⬜ pendiente | solo estructura |
-| Fundamentos de las Comunicaciones I | ⬜ pendiente | solo estructura |
+| Fundamentos de las Comunicaciones I | 🟡 casi completa | Temas I–III con 20 simuladores + `software/fc1`; faltan Conf. 14, más variantes de PP |
 | Redes 3 | ⬜ pendiente | solo estructura |
 | Gestión y Seguridad de Redes | ⬜ pendiente | solo estructura |
 | Estudios Sociales de la CyT | ⛔ sin materiales | carpeta fuente vacía |
-| Repaso de prerrequisitos | ⬜ pendiente | ver `repaso/CLAUDE.md` |
+| Repaso de prerrequisitos | 🟡 iniciada | matemática, probabilidad, circuitos |
 | Portal raíz + CI/CD | ✅ hecho | `index.html`, `assets/css/base.css`, workflow |
 
 Leyenda: ✅ completo · 🟡 en progreso · ⬜ pendiente · ⛔ bloqueado.
 
 ## 12. Bitácora global
 
+- **2026-10-19** — Infraestructura común: `assets/css/course.css` y `assets/js/course.js` (KaTeX 0.16.11
+  con macros, índice lateral automático, quiz, graficador canvas que respeta el tema). FC I completa
+  (ver su CLAUDE.md). Fichas de repaso. Verificación: Chromium headless (errores JS/KaTeX, desborde en
+  390 px) y comprobación de enlaces (YouTube por oEmbed).
 - **2026-10-18** — Reformulación del proyecto: de una página única (Micro) a monorepo de todo el
   semestre. Se reorganizaron los materiales fuente con el esquema `00…08` (detalle en cada
   `CLAUDE.md`), se eliminaron duplicados exactos, se movieron los `.git` anidados de

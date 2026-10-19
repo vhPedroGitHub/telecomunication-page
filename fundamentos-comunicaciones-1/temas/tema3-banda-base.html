@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema III · Transmisión digital en banda base — FC I</title>
+  <meta name="description" content="Fundamentos de las Comunicaciones I, Tema III: muestreo y aliasing, PCM, cuantificación y SNRq, MDT, DPCM y modulación delta, códigos de línea, ISI y criterios de Nyquist, duobinario, probabilidad de error, umbral óptimo y filtro adaptado.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/tema3.js"></script>
+  <style>body { --accent: var(--c-fc1); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Fundamentos de las Comunicaciones I</span>
+    <nav class="tabs" aria-label="Secciones de la asignatura">
+      <a href="../">Inicio</a>
+      <a href="tema1-teoria-informacion.html">Tema I</a>
+      <a href="tema2-senales-y-sistemas.html">Tema II</a>
+      <a href="tema3-banda-base.html" aria-current="page">Tema III</a>
+      <a href="../#software">Software</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+
+<main class="content">
+<p class="meta">Tema III · Conferencias 12–18 (edición anterior) · CP 12, 13, 15–18</p>
+<h1>Transmisión digital en banda base</h1>
+<p class="lead">Aquí se juntan los dos temas anteriores. Convertimos una señal analógica en bits (<strong>PCM</strong>: muestreo, cuantificación y codificación), los convertimos en una forma de onda (<strong>códigos de línea</strong>) y los mandamos por un canal real que la <em>distorsiona</em> (interferencia intersímbolo, <strong>ISI</strong>) y le <em>suma ruido</em> (<strong>probabilidad de error</strong>). Para cada problema hay una solución: Nyquist contra la ISI y el filtro adaptado contra el ruido.</p>
+
+<div class="objectives">
+  <strong>Objetivos (Programa Analítico y Conferencias 12–18)</strong>
+  <ul>
+    <li>Caracterizar el muestreo, la cuantificación y la codificación de una señal analógica (PCM); calcular SNRq y frecuencia de bits; multiplexar por división en tiempo.</li>
+    <li>Caracterizar la DPCM y la modulación delta (ruido granular y sobrecarga de pendiente).</li>
+    <li>Comparar códigos de línea por espectro, componente de DC, sincronismo y ancho de banda.</li>
+    <li>Explicar la ISI y eliminarla con el 1.er criterio de Nyquist (paso bajo ideal, coseno alzado) o controlarla con el 2.º (duobinario, precodificación).</li>
+    <li>Calcular la probabilidad de error en banda base con ruido gaussiano: umbral óptimo, función Q y filtro adaptado.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">espectros, impulsos y la gaussiana</span>
+  <p>Necesitas del Tema II: el espectro de una señal multiplicada por un tren de impulsos (\(x(t)\sum\delta(t-kT_s)\leftrightarrow f_s\sum X(f-nf_s)\)), el par \(\Pi\leftrightarrow\operatorname{sinc}\), la respuesta de un filtro y la DEP del ruido blanco \(N_0/2\). De probabilidad: la densidad gaussiana y su cola, la <strong>función Q</strong>:</p>
+  $$Q(z)=\frac{1}{\sqrt{2\pi}}\int_z^\infty e^{-\lambda^2/2}d\lambda=\tfrac12\operatorname{erfc}\!\left(\tfrac{z}{\sqrt2}\right),\qquad P(X\gt a)=Q\!\left(\tfrac{a-m}{\sigma}\right)$$
+  <p>Repaso: <a href="tema2-senales-y-sistemas.html#impulsos">impulsos (Tema II)</a> · <a href="../../repaso/probabilidad.html#gauss">gaussiana y función Q</a> · <a href="../../repaso/matematica.html#logaritmos">decibelios</a>.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="pcm">1. PCM: de la señal analógica a los bits</h2>
+<p>La <strong>modulación por codificación de pulsos</strong> (PCM) consta de tres procesos, cada uno con una lectura en términos del Tema I:</p>
+<ol>
+  <li><strong>Muestreo</strong>: tiempo continuo → tiempo discreto. Sin pérdida si se respeta Nyquist.</li>
+  <li><strong>Cuantificación</strong>: alfabeto infinito (cualquier amplitud) → alfabeto finito de \(L\) niveles. <em>Siempre</em> introduce un error (ruido de cuantificación): se puede reducir, no eliminar.</li>
+  <li><strong>Codificación</strong>: cada nivel → una palabra de \(n=\log_2L\) bits (un codificador de fuente de longitud fija).</li>
+</ol>
+
+<h3 id="muestreo">1.1 Muestreo y teorema de Nyquist</h3>
+<p>Muestrear idealmente es multiplicar el mensaje \(x(t)\), de ancho de banda \(W\), por un tren de impulsos de período \(T_s=1/f_s\). Por lo visto en el <a href="tema2-senales-y-sistemas.html#impulsos">Tema II (CP 7)</a>:</p>
+<div class="eq key">$$x_\delta(t)=x(t)\sum_k\delta(t-kT_s)=\sum_kx(kT_s)\,\delta(t-kT_s)\quad\Longleftrightarrow\quad X_\delta(f)=f_s\sum_{n=-\infty}^{\infty}X(f-nf_s)$$<div class="eq-label">Espectro de la señal muestreada: réplicas del mensaje cada \(f_s\)</div></div>
+<ul>
+  <li>Si \(f_s\ge2W\), las réplicas no se tocan y un <strong>filtro paso bajo reconstructor</strong> de ancho de banda \(B\) con \(W\le B\le f_s-W\) recupera \(x(t)\) exactamente. Con un paso bajo ideal la reconstrucción equivale a interpolar con sincs: \(x(t)=\sum_kx(kT_s)\operatorname{sinc}(f_st-k)\).</li>
+  <li>\(f_s=2W\) es la <strong>frecuencia de Nyquist</strong> (mínima). En la práctica se muestrea algo por encima (voz telefónica: \(W=3{,}4\) kHz, \(f_s=8\) kHz) para dejar una banda de guarda que permita filtros reales.</li>
+  <li>Si \(f_s\lt2W\) las réplicas se solapan: <strong>aliasing</strong>. Una componente de frecuencia \(f\gt f_s/2\) aparece reconstruida en \(|f-kf_s|\) (se "dobla"). El daño es irreversible.</li>
+</ul>
+<div class="box warn"><span class="box-title">El aliasing también lo provocan las señales que no quieres (CP 12, ej. 2)</span>
+<p>Un sensor con \(W=5\) kHz se muestrea a \(f_s=15\) kHz (\(\gt2W\)), pero le llegan interferencias de 6,5 y 13 kHz. La de 6,5 kHz está por debajo de \(f_s/2=7{,}5\) kHz: no se dobla y el reconstructor de 5 kHz la elimina. La de <strong>13 kHz se dobla a \(15-13=2\) kHz</strong>, dentro de la banda del mensaje: ¡aliasing aunque \(f_s\gt2W\)! Solución: un <strong>filtro antialiasing</strong> (paso bajo de ancho \(W\)) <em>antes</em> del muestreador.</p></div>
+<p><strong>Muestreo práctico (PAM)</strong>: se usan pulsos de duración \(\tau\) en lugar de impulsos. Con muestreo natural las réplicas quedan pesadas por \(\frac{\tau}{T_s}\operatorname{sinc}(nf_s\tau)\); con muestreo de cresta plana (<em>sample-and-hold</em>) el espectro queda multiplicado por \(\tau\operatorname{sinc}(f\tau)\) (<em>efecto de apertura</em>), que se compensa con un ecualizador.</p>
+<p><strong>Señales paso banda</strong> (CP 12, TI 2): una señal de 10 kHz de ancho centrada en 100 kHz (95–105 kHz) no necesita \(f_s=210\) kHz. Por el teorema de muestreo paso banda, \(f_{s,\min}=\dfrac{2f_H}{\lfloor f_H/B\rfloor}=\dfrac{2\cdot105}{10}=21\) kHz (cercano al límite teórico \(2B=20\) kHz).</p>
+<div class="sim" id="sim-samp">
+  <div class="sim-title">Muestreo, reconstrucción y aliasing</div>
+  <p class="meta">Un coseno de frecuencia \(f\) muestreado a \(f_s\). Arriba: señal (gris), muestras y la señal que reconstruye un paso bajo ideal de corte \(f_s/2\). Abajo: espectro con las réplicas en \(nf_s\pm f\) y la ventana del filtro. Sube \(f\) por encima de \(f_s/2\) y mira aparecer el "alias".</p>
+  <div class="controls">
+    <label>f (kHz) <input type="range" id="sm-f" min="0.2" max="12" step="0.1" value="3" data-out="sm-fo"><output id="sm-fo"></output></label>
+    <label>f<sub>s</sub> (kHz) <input type="range" id="sm-s" min="2" max="24" step="0.5" value="8" data-out="sm-so"><output id="sm-so"></output></label>
+  </div>
+  <canvas id="sm-c1" aria-label="Señal, muestras y reconstrucción"></canvas>
+  <canvas id="sm-c2" aria-label="Espectro de la señal muestreada"></canvas>
+  <div class="readout" id="sm-out"></div>
+</div>
+
+<h3 id="cuant">1.2 Cuantificación uniforme y ruido de cuantificación</h3>
+<p>Un cuantificador uniforme divide el rango \([-m_p,\,m_p]\) en \(L\) intervalos de tamaño \(\Delta=2m_p/L\) y sustituye cada muestra por el centro de su intervalo. El error \(q=x_q-x\) está entre \(-\Delta/2\) y \(\Delta/2\); si la señal es "activa" se modela como uniformemente distribuido:</p>
+<div class="eq">$$\sigma_q^2=E[q^2]=\frac1\Delta\int_{-\Delta/2}^{\Delta/2}q^2dq=\frac{\Delta^2}{12}=\frac{m_p^2}{3L^2}$$</div>
+<div class="eq key">$$\text{SNR}_q=\frac{\overline{x^2}}{\sigma_q^2}=3L^2\frac{\overline{x^2}}{m_p^2};\qquad\text{sinusoide a plena escala: } \text{SNR}_q=\tfrac32L^2\ \Rightarrow\ \text{SNR}_q\,[\text{dB}]=1{,}76+6{,}02\,n$$<div class="eq-label">Relación señal a ruido de cuantificación — "regla de los 6 dB": cada bit añadido mejora 6 dB</div></div>
+<p><strong>Cuantificación no uniforme</strong> (Conferencia 13): la voz tiene muchas muestras pequeñas y pocas grandes; con pasos uniformes, las señales débiles salen con mala SNRq. Se comprime la señal (ley μ en EE. UU./Japón, ley A en Europa y Cuba, ITU-T G.711), se cuantifica uniformemente y se expande en el receptor (<em>companding</em>). Resultado: SNRq casi constante en un rango dinámico de ~40 dB.</p>
+<div class="sim" id="sim-q">
+  <div class="sim-title">Cuantificador uniforme</div>
+  <p class="meta">Sinusoide de amplitud \(A\) cuantificada con \(n\) bits en el rango \(\pm m_p=\pm1\). Compara la SNRq medida con la fórmula \(1{,}76+6{,}02n+20\log(A/m_p)\). Si \(A\gt1\) el cuantificador satura (recorte) y la SNRq se desploma.</p>
+  <div class="controls">
+    <label>n (bits) <input type="range" id="qz-n" min="1" max="8" step="1" value="3" data-out="qz-no"><output id="qz-no"></output></label>
+    <label>A/m<sub>p</sub> <input type="range" id="qz-a" min="0.05" max="1.4" step="0.05" value="1" data-out="qz-ao"><output id="qz-ao"></output></label>
+  </div>
+  <canvas id="qz-c1" aria-label="Señal y señal cuantificada"></canvas>
+  <canvas id="qz-c2" aria-label="Error de cuantificación"></canvas>
+  <div class="readout" id="qz-out"></div>
+</div>
+
+<h3 id="codif">1.3 Codificación, frecuencia de bits y MDT</h3>
+<p>Con \(n\) bits por muestra y \(f_s\) muestras/s: \(R_b=n\,f_s\) bit/s. El decodificador PCM convierte cada palabra en una muestra PAM y el filtro paso bajo reconstruye la señal. <strong>Eficiencia de la codificación</strong> (CP 12, inciso i): si solo aparecen ciertas palabras con ciertas probabilidades, la entropía de esas palabras \(H\) comparada con \(n\) da \(\eta=H/n\); la PCM de longitud fija desperdicia bits cuando la señal no recorre todos los niveles por igual.</p>
+<p><strong>Multiplexación por división en tiempo</strong> (MDT/TDM): para enviar \(N\) señales por un mismo canal se intercalan sus palabras en una <em>trama</em>; un conmutador (muestreador rotatorio) toma una muestra de cada canal por período \(T_s\). Frecuencia de salida: \(R=N\,n\,f_s\) (más bits de sincronismo de trama). En el receptor un demultiplexor sincronizado reparte las palabras y cada canal tiene su decodificador y filtro reconstructor. Ejemplos normalizados: E1 (ITU-T G.704): 32 intervalos × 8 bits × 8 kHz = 2,048 Mbit/s; T1: 24 × 8 × 8 kHz + 8 kbit/s de trama = 1,544 Mbit/s.</p>
+<div class="example">
+<h4>Ejemplo 1.1 — Diseño de un digitalizador (CP 12, ej. 4 y TI 5)</h4>
+<div class="step"><span class="n">1</span><div><p><strong>MDT</strong>: 4 señales, \(f_s=10\) kHz, \(n=8\): \(R=4\cdot8\cdot10^4=320\) kbit/s. El sistema inverso: sincronizador de trama → demultiplexor (conmutador sincronizado) → 4 decodificadores PCM → 4 filtros reconstructores de 5 kHz.</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Requisito SNRq ≥ 40 dB</strong> para una señal de \(W=10\) kHz (sinusoidal a plena escala): \(1{,}76+6{,}02n\ge40\Rightarrow n\ge6{,}35\Rightarrow n=7\) bits. Muestreo a la menor frecuencia posible: \(f_s=2W=20\) kHz ⇒ \(R_b=140\) kbit/s. Para recuperar: decodificador PCM + paso bajo de 10 kHz.</p></div></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="dpcm">2. DPCM y modulación delta</h2>
+<h3 id="dpcm-idea">2.1 DPCM</h3>
+<p>Las muestras de una señal sobremuestreada se parecen mucho a sus vecinas. En lugar de cuantificar \(x[k]\) (rango \(\pm m_p\), Conferencia 13: p. ej. ±10), se cuantifica la <strong>diferencia</strong> \(d[k]=x[k]-\hat x[k]\) respecto de una <strong>predicción</strong> \(\hat x[k]\) (rango mucho menor, p. ej. ±1). Para el mismo número de niveles, \(\Delta\) es mucho menor ⇒ menos ruido de cuantificación (o, para la misma SNRq, menos bits).</p>
+<p>Detalle clave: la predicción se calcula a partir de las muestras <em>ya cuantificadas</em> (el predictor está dentro de un lazo en el transmisor, idéntico al del receptor). Si se predijera con las muestras originales, los errores de cuantificación se <strong>acumularían</strong> en el receptor, que solo conoce las cuantificadas.</p>
+<h3 id="dm">2.2 Modulación delta (DM)</h3>
+<p>Es la DPCM más simple: cuantificador de <strong>2 niveles</strong> (\(\pm\delta\)) y <strong>1 bit</strong> por muestra; el predictor es un retardo (acumulador). En cada instante: si \(x[k]\ge x_q[k-1]\) se envía 1 y la escalera sube \(\delta\); si no, 0 y baja \(\delta\). El receptor es solo un acumulador seguido de un paso bajo. \(R_b=f_s\) (se compensa muestreando mucho más rápido que Nyquist).</p>
+<ul>
+  <li><strong>Sobrecarga de pendiente</strong>: la escalera sube como máximo \(\delta f_s\) por segundo. Si la señal varía más rápido, la escalera "se queda atrás". Para no sobrecargar: \(\delta f_s\ge\max|dx/dt|\); para \(A\cos2\pi f_mt\): \(\delta f_s\ge2\pi f_mA\).</li>
+  <li><strong>Ruido granular</strong>: cuando la señal está casi plana, la escalera oscila \(\pm\delta\) alrededor de ella. Crece con \(\delta\).</li>
+  <li>Hay un \(\delta\) <strong>óptimo</strong> que equilibra ambos; la DM <em>adaptativa</em> cambia \(\delta\) según la señal.</li>
+</ul>
+<div class="example">
+<h4>Ejemplo 2.1 — CP 13, ejercicio 1</h4>
+<p>DM con \(f_s=8000\) muestras/s, \(\delta=0{,}4\), \(x(t)=\cos(2\pi\,1000t)\).</p>
+<div class="step"><span class="n">1</span><div><p>Muestras de un período (8 muestras): 1; 0,707; 0; −0,707; −1; −0,707; 0; 0,707. Partiendo del acumulador en 0: bits <strong>1 1 0 0 0 0 1 1</strong>; acumulador 0,4; 0,8; 0,4; 0; −0,4; −0,8; −0,4; 0.</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Sobrecarga</strong>: pendiente máxima de la señal \(2\pi\cdot1000\cdot1=6283\) s⁻¹; pendiente máxima de la escalera \(\delta f_s=3200\) s⁻¹ ⇒ hay sobrecarga alrededor de los cruces por cero, donde la señal es más empinada. Soluciones: \(\delta\ge2\pi f_m/f_s=0{,}785\) o \(f_s\ge2\pi f_m/\delta=15{,}7\) kHz.</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Frecuencia de bits: \(R_b=f_s=8\) kbit/s.</p></div></div>
+</div>
+<div class="sim" id="sim-dm">
+  <div class="sim-title">Modulador delta: escalera, bits y sobrecarga</div>
+  <p class="meta">Las zonas sombreadas son las de <strong>sobrecarga de pendiente</strong> (la escalera no alcanza a la señal). Con los valores por defecto (los de la CP 13) aparece sobrecarga; prueba \(\delta=0{,}8\) o \(f_s=16\) kHz.</p>
+  <div class="controls">
+    <label>f<sub>m</sub> (kHz) <input type="range" id="dm-f" min="0.2" max="3" step="0.1" value="1" data-out="dm-fo"><output id="dm-fo"></output></label>
+    <label>A <input type="range" id="dm-a" min="0.2" max="2" step="0.1" value="1" data-out="dm-ao"><output id="dm-ao"></output></label>
+    <label>f<sub>s</sub> (kHz) <input type="range" id="dm-s" min="4" max="64" step="1" value="8" data-out="dm-so"><output id="dm-so"></output></label>
+    <label>δ <input type="range" id="dm-d" min="0.02" max="1" step="0.02" value="0.4" data-out="dm-do"><output id="dm-do"></output></label>
+  </div>
+  <canvas id="dm-c1" aria-label="Señal y escalera del modulador delta"></canvas>
+  <div class="readout" id="dm-out"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="lineas">3. Códigos de línea y repetidor regenerativo</h2>
+<p class="meta">La Conferencia 14 (códigos de línea) no está entre los materiales; esta sección se basa en el Programa, las CP 15–16 y la bibliografía (Couch 3–5, Sklar 2.8).</p>
+<p>Un <strong>código de línea</strong> asigna a cada bit una forma de onda. Se elige según: <strong>componente de DC</strong> (los acoplamientos por transformador o condensador no la dejan pasar), <strong>ancho de banda</strong>, <strong>contenido de transiciones</strong> (para que el receptor recupere el reloj: autosincronismo), <strong>detección de errores</strong> y <strong>sensibilidad a la inversión de polaridad</strong>.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Código</th><th>Regla</th><th>DC</th><th>1.er nulo del espectro</th><th>Comentario</th></tr></thead>
+  <tbody>
+    <tr><td>Unipolar NRZ</td><td>1 → +A todo el bit; 0 → 0</td><td>Sí (\(A^2/4\))</td><td>\(R_b\)</td><td>Simple; DC y largas rachas sin transiciones.</td></tr>
+    <tr><td>Polar NRZ</td><td>1 → +A; 0 → −A</td><td>No (si equiprobable)</td><td>\(R_b\)</td><td>Mejor \(P_e\) para igual potencia.</td></tr>
+    <tr><td>Unipolar RZ</td><td>1 → +A medio bit; 0 → 0</td><td>Sí</td><td>\(2R_b\)</td><td>Tiene raya espectral en \(R_b\): facilita el reloj.</td></tr>
+    <tr><td>Polar RZ</td><td>1 → +A medio bit; 0 → −A medio bit</td><td>No</td><td>\(2R_b\)</td><td>Siempre hay transición.</td></tr>
+    <tr><td>Bipolar (AMI)</td><td>0 → 0; 1 → ±A alternando</td><td><strong>No</strong> (nulo en \(f=0\))</td><td>\(R_b\)</td><td>Detecta errores (violaciones de alternancia); insensible a la polaridad. Rachas de ceros → HDB3/B8ZS.</td></tr>
+    <tr><td>Manchester (bifase)</td><td>1 → +A/−A; 0 → −A/+A (mitad y mitad)</td><td>No</td><td>\(2R_b\)</td><td>Transición en mitad de cada bit: autosincronizado (Ethernet 10BASE-T). Doble ancho de banda.</td></tr>
+    <tr><td>Diferencial (NRZ-I)</td><td>1 → cambia el nivel; 0 → lo mantiene</td><td>Depende</td><td>\(R_b\)</td><td>La información está en las transiciones: inmune a la inversión de polaridad.</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Señalización multinivel (M-aria)</strong>: agrupando \(k=\log_2M\) bits por símbolo, la velocidad de símbolos es \(R_s=R_b/\log_2M\) baudios y el ancho de banda baja en ese factor (a costa de más potencia para la misma \(P_e\)).</p>
+<p><strong>Repetidor regenerativo</strong>: en un enlace largo, cada cierto tramo un repetidor <em>ecualiza</em> el pulso, <em>recupera el reloj</em>, <em>decide</em> (0 o 1) y <em>regenera</em> pulsos limpios. A diferencia de un amplificador analógico, no acumula ruido: solo acumula errores de decisión, \(P_{e,\text{total}}\approx m\,P_e\) para \(m\) tramos.</p>
+<div class="sim" id="sim-lc">
+  <div class="sim-title">Generador de códigos de línea y su DEP</div>
+  <div class="controls">
+    <label>Bits <input type="text" id="lc-b" value="1011000011" class="bits" size="16"></label>
+    <label>Código <select id="lc-c">
+      <option value="unrz">Unipolar NRZ</option><option value="pnrz">Polar NRZ</option><option value="urz">Unipolar RZ</option><option value="prz">Polar RZ</option><option value="ami">Bipolar AMI</option><option value="man">Manchester</option><option value="nrzi">Diferencial (NRZ-I)</option>
+    </select></label>
+  </div>
+  <canvas id="lc-c1" aria-label="Forma de onda del código de línea"></canvas>
+  <canvas id="lc-c2" aria-label="Densidad espectral de potencia del código"></canvas>
+  <div class="readout" id="lc-out"></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="isi">4. Interferencia intersímbolo y 1.er criterio de Nyquist</h2>
+<p>Un canal real es un filtro paso bajo: <strong>el pulso más rápido que puede salir de él es su respuesta impulsiva</strong>. Si enviamos pulsos más rápidos que eso, cada pulso se "derrama" sobre los vecinos y en los instantes de muestreo se suman restos de otros símbolos: es la <strong>ISI</strong>. Junto con el ruido, es la otra gran limitación de la transmisión digital.</p>
+<p>No hace falta que los pulsos no se solapen: basta que <strong>cada pulso valga cero en los instantes de muestreo de los demás</strong>. Si \(p(t)\) es el pulso a la salida del canal equivalente (transmisor + canal + receptor) y se muestrea cada \(T=1/R_s\):</p>
+<div class="eq key">$$p(kT)=\begin{cases}1,&k=0\\0,&k\ne0\end{cases}\qquad\Longleftrightarrow\qquad\sum_{n=-\infty}^{\infty}P\!\left(f-\frac nT\right)=T\ \ (\text{constante})$$<div class="eq-label">1.er criterio de Nyquist (ISI nula)</div></div>
+<ul>
+  <li><strong>Paso bajo ideal</strong> de ancho \(B\): \(p(t)=\operatorname{sinc}(2Bt)\), ceros cada \(1/2B\). Sin ISI si \(R_s=2B\): <strong>\(B_{\min}=R_s/2\)</strong> (ancho de banda de Nyquist). Irrealizable y muy sensible al error de sincronismo (las colas decaen como \(1/t\)).</li>
+  <li><strong>Coseno alzado</strong> con factor de caída (<em>roll-off</em>) \(0\le r\le1\): la transición del espectro se suaviza con medio período de coseno; las colas decaen como \(1/t^3\).</li>
+</ul>
+<div class="eq">$$P(f)=\begin{cases}T,&|f|\le\frac{1-r}{2T}\\[2pt]\frac T2\left\{1+\cos\left[\frac{\pi T}{r}\left(|f|-\frac{1-r}{2T}\right)\right]\right\},&\frac{1-r}{2T}\lt|f|\le\frac{1+r}{2T}\\[2pt]0,&\text{resto}\end{cases}\qquad p(t)=\operatorname{sinc}\!\left(\tfrac tT\right)\frac{\cos(\pi rt/T)}{1-(2rt/T)^2}$$</div>
+<div class="eq key">$$B=\frac{(1+r)\,R_s}{2}\qquad\Longleftrightarrow\qquad R_{s,\max}=\frac{2B}{1+r}$$<div class="eq-label">Ancho de banda absoluto del coseno alzado</div></div>
+<p>El <strong>filtro igualador</strong> (ecualizador) se coloca en el receptor para que el conjunto transmisor-canal-receptor se parezca a uno de estos filtros. El <strong>diagrama de ojo</strong> (superponer muchos tramos de la señal recibida) permite ver la ISI: cuanto más abierto el ojo, menos ISI y más margen frente al ruido.</p>
+<div class="sim" id="sim-eye">
+  <div class="sim-title">Diagrama de ojo con pulsos de coseno alzado</div>
+  <p class="meta">Señal polar de bits aleatorios con pulsos de coseno alzado diseñados para \(R_s\). Si se transmite <em>más rápido</em> que el diseño (factor &gt; 1) aparece ISI y el ojo se cierra; el ruido lo emborrona. Con \(r\) grande el ojo es más tolerante al error de temporización (más ancho en horizontal).</p>
+  <div class="controls">
+    <label>r (roll-off) <input type="range" id="ey-r" min="0" max="1" step="0.05" value="0.5" data-out="ey-ro"><output id="ey-ro"></output></label>
+    <label>R<sub>s</sub> real / diseño <input type="range" id="ey-k" min="0.8" max="1.6" step="0.02" value="1" data-out="ey-ko"><output id="ey-ko"></output></label>
+    <label>σ ruido <input type="range" id="ey-n" min="0" max="0.4" step="0.01" value="0.03" data-out="ey-no"><output id="ey-no"></output></label>
+    <label>Pulso <select id="ey-p"><option value="rc">Coseno alzado</option><option value="duo">Duobinario (coseno)</option></select></label>
+  </div>
+  <div class="two"><canvas id="ey-c1" aria-label="Pulso y sus ceros"></canvas><canvas id="ey-c2" aria-label="Diagrama de ojo"></canvas></div>
+  <div class="readout" id="ey-out"></div>
+</div>
+<div class="example">
+<h4>Ejemplo 4.1 — CP 15</h4>
+<div class="step"><span class="n">1</span><div><p><strong>Ej. 1</strong>: NRZ unipolar a \(f_b=3\) kb/s por un canal paso bajo ideal: \(B_{\min}=R_s/2=1{,}5\) kHz.</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Ej. 3</strong> (4 PCM de 4 bits, multiplexadas, AMI, coseno alzado \(r=0{,}7\), \(B=20\) kHz): \(R_{s,\max}=2B/(1+r)=40/1{,}7=23{,}5\) kbaud.</p>
+<p>a) Inversión de polaridad: en AMI el 1 es "hay pulso" (de cualquier signo) y el 0 "no hay pulso" ⇒ <strong>no afecta</strong>. b) Acoplamiento por transformador: AMI <strong>no tiene DC</strong> (su espectro se anula en \(f=0\)) ⇒ sí se puede. c) Manchester tiene dos semipulsos por bit (\(R_s=2R_b\)): \(R_{b,\max}=11{,}8\) kb/s. d) Con AMI (\(R_s=R_b\)): \(R_{b,\max}=23{,}5\) kb/s en total, es decir \(5{,}88\) kb/s por cada sistema PCM.</p></div></div>
+<div class="step"><span class="n">3</span><div><p><strong>Ej. 2</strong> (\(W=20\) kHz, 5 bits, RZ unipolar, coseno alzado \(r=0{,}7\), \(B=255\) kHz): \(R_{s,\max}=2\cdot255/1{,}7=300\) kbaud. Si se toma, como en el apartado c), que un formato RZ (pulsos de medio bit) necesita \(R_s=2R_b\): \(R_{b,\max}=150\) kb/s ⇒ \(f_{s,\max}=150/5=30\) kHz, ¡<strong>menor</strong> que \(2W=40\) kHz! Con RZ no se puede cumplir a la vez "sin ISI" y "sin aliasing". Con NRZ (\(R_s=R_b\)): \(f_{s,\max}=60\) kHz, que sí es válido. Moraleja: los formatos de medio bit cuestan el doble de ancho de banda.</p></div></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="duobinario">5. 2.º criterio de Nyquist: señalización duobinaria</h2>
+<p>El 1.er criterio exige \(B\ge R_s/2\) con filtros irrealizables (\(r=0\)) o más ancho de banda (\(r\gt0\)). El 2.º criterio (codificación de <strong>nivel correlativo</strong>) <em>acepta</em> una ISI <strong>controlada</strong> y conocida, y la deshace en el receptor. El caso más sencillo, el <strong>duobinario</strong>, suma cada símbolo con el anterior:</p>
+<div class="eq">$$c_k=a_k+a_{k-1},\qquad a_k=\pm A\ \Rightarrow\ c_k\in\{-2A,\,0,\,+2A\}$$</div>
+<p>Esto equivale a un filtro \(H(f)=1+e^{-j2\pi fT}\) seguido del paso bajo ideal; juntos forman el <strong>filtro coseno</strong>:</p>
+<div class="eq key">$$H_{\text{eq}}(f)=2T\cos(\pi fT)\,e^{-j\pi fT},\ \ |f|\le\frac{1}{2T}\qquad\Rightarrow\qquad B=\frac{R_b}{2}\ \text{con un filtro realizable}$$</div>
+<p><strong>Decodificación</strong>: \(\hat a_k=c_k-\hat a_{k-1}\). Problema: si un \(\hat a_k\) sale mal, el error se <strong>propaga</strong> a los siguientes. <strong>Precodificación</strong>: antes del codificador se hace \(d_k=b_k\oplus d_{k-1}\) (codificación diferencial); entonces el receptor decide bit a bit sin memoria: \(|c_k|\approx0\Rightarrow b_k=1\); \(|c_k|\approx2A\Rightarrow b_k=0\). Un error de decisión afecta solo a ese bit.</p>
+<div class="example">
+<h4>Ejemplo 5.1 — CP 16, ejercicio 1</h4>
+<p>\(W=20\) kHz, PCM de 5 bits, polar NRZ, canal equivalente: filtro coseno de \(B=255\) kHz. Bits transmitidos 11010100. Se supone un símbolo de referencia inicial \(a_{-1}=-A\) (bit 0).</p>
+<div class="step"><span class="n">a</span><div><p>\(R_{b,\max}=2B=510\) kb/s ⇒ \(f_{s,\max}=510/5=102\) kHz (frente a 60 kHz con el coseno alzado \(r=0{,}7\) de la CP 15: el duobinario aprovecha mejor el ancho de banda).</p></div></div>
+<div class="step"><span class="n">b</span><div><p>Receptor: filtro → muestreador cada \(T_b\) → decisor de 3 niveles → \(\hat a_k=c_k-\hat a_{k-1}\) → bits.</p></div></div>
+<div class="step"><span class="n">c</span><div><p>\(a=+,+,-,+,-,+,-,-\) ⇒ muestras \(c/A\): <strong>0, 2, 0, 0, 0, 0, 0, −2</strong>. Decodificando se recupera 11010100.</p></div></div>
+<div class="step"><span class="n">d</span><div><p>Si la 4.ª muestra recibe ruido \(-2A\) (0 → −2A): se decodifica <strong>1100 1010</strong>: el error en el bit 4 se propaga a los bits 5, 6 y 7.</p></div></div>
+<div class="step"><span class="n">e</span><div><p><strong>Con precodificación</strong> (TI 4, \(d_{-1}=0\)): \(d=1,0,0,1,1,0,0,0\); muestras \(c/A\): 0, 0, −2, 0, 2, 0, −2, −2 ⇒ decisión \(|c|\): 11010100 ✔. Con el mismo ruido en la 4.ª muestra (0 → −2A) se obtiene 1100 0100: <strong>un solo bit erróneo</strong>.</p></div></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="ruido">6. Ruido en banda base: probabilidad de error y umbral óptimo</h2>
+<p>Modelo (Conferencia 17): el receptor filtra la señal recibida \(r(t)=s_i(t)+n(t)\) y la muestra en \(t_0\). La muestra es \(r_0=s_{i0}+n_0\), donde \(n_0\) es gaussiana de media 0 y varianza \(\sigma^2\) (potencia de ruido a la salida del filtro). El decisor compara con un umbral \(V_T\): mayor → "1", menor → "0".</p>
+<div class="eq key">$$P_e=P(0)\,Q\!\left(\frac{V_T-s_{00}}{\sigma}\right)+P(1)\,Q\!\left(\frac{s_{10}-V_T}{\sigma}\right)$$<div class="eq-label">Probabilidad de error de bit (señalización binaria, ruido gaussiano)</div></div>
+<p>Con símbolos equiprobables el <strong>umbral óptimo</strong> está a la mitad entre niveles, \(V_T=(s_{00}+s_{10})/2\), y entonces</p>
+<div class="eq">$$P_e=Q\!\left(\frac{s_{10}-s_{00}}{2\sigma}\right)$$</div>
+<p>Con un paso bajo de ancho \(B\) y ruido blanco \(N_0/2\): \(\sigma^2=N_0B\). Todo se reduce a calcular la distancia entre niveles y la desviación típica del ruido.</p>
+<div class="sim" id="sim-pe">
+  <div class="sim-title">Umbral de decisión y probabilidad de error</div>
+  <p class="meta">Las dos campanas son las densidades de la muestra cuando se envía "0" (nivel \(s_0\)) y "1" (nivel \(s_1\)). Las áreas sombreadas a cada lado del umbral son los errores. Mueve \(V_T\): el mínimo de \(P_e\) está en el punto medio (si los símbolos son equiprobables).</p>
+  <div class="controls">
+    <label>Formato <select id="pe-f"><option value="u">Unipolar (0, +A)</option><option value="p">Polar (−A, +A)</option></select></label>
+    <label>A (V) <input type="range" id="pe-a" min="0.5" max="4" step="0.1" value="2" data-out="pe-ao"><output id="pe-ao"></output></label>
+    <label>σ (V) <input type="range" id="pe-s" min="0.1" max="1.5" step="0.01" value="0.71" data-out="pe-so"><output id="pe-so"></output></label>
+    <label>V<sub>T</sub> (V) <input type="range" id="pe-t" min="-3" max="4" step="0.05" value="1.5" data-out="pe-to"><output id="pe-to"></output></label>
+  </div>
+  <canvas id="pe-c1" aria-label="Densidades gaussianas y umbral"></canvas>
+  <div class="readout" id="pe-out"></div>
+</div>
+<div class="example">
+<h4>Ejemplo 6.1 — CP 17 (detección no óptima: filtro paso bajo)</h4>
+<p>Unipolar NRZ (0, +2 V), \(f_b=100\) kHz, paso bajo de entrada de 500 kHz, ruido con DEP de \(5\times10^{-7}\) V²/Hz (se interpreta como DEP bilateral \(N_0/2\)).</p>
+<div class="step"><span class="n">0</span><div><p>\(\sigma^2=\frac{N_0}{2}\cdot2B=5\times10^{-7}\cdot10^6=0{,}5\) V² ⇒ \(\sigma=0{,}707\) V.</p></div></div>
+<div class="step"><span class="n">a</span><div><p>\(V_T=1{,}5\) V (no centrado): \(P_e=\tfrac12Q\!\left(\tfrac{1{,}5}{0{,}707}\right)+\tfrac12Q\!\left(\tfrac{0{,}5}{0{,}707}\right)=\tfrac12(0{,}0169)+\tfrac12(0{,}2398)=\mathbf{0{,}128}\).</p></div></div>
+<div class="step"><span class="n">b</span><div><p>\(V_T=1\) V (óptimo): \(P_e=Q(1/0{,}707)=Q(1{,}414)=\mathbf{0{,}0786}\).</p></div></div>
+<div class="step"><span class="n">c</span><div><p>Polar NRZ (−2, +2), \(V_T=0\): \(P_e=Q(2/0{,}707)=Q(2{,}83)=\mathbf{2{,}3\times10^{-3}}\). Doblar la distancia entre niveles mejora la \(P_e\) en más de un orden de magnitud.</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Ej. 2</strong>: \(\sigma^2=0{,}01\) V² (\(\sigma=0{,}1\)). a) \(P_e\le10^{-8}\) ⇒ \(Q(A/2\sigma)=10^{-8}\) ⇒ \(A/2\sigma=5{,}612\) ⇒ \(A=\mathbf{1{,}12}\) V. b) Si la tasa empeora a \(10^{-6}\) con la misma \(A\): \(A/2\sigma'=4{,}753\) ⇒ \(\sigma'=0{,}118\) V, \(\sigma'^2=\mathbf{0{,}0139}\) V² (la interferencia añadida, si es independiente, aporta \(0{,}0039\) V²).</p></div></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="adaptado">7. Filtro adaptado (detección óptima)</h2>
+<p>¿Qué filtro de recepción \(h(t)\) minimiza la \(P_e\)? Como \(P_e\) depende de \(\frac{s_{10}-s_{00}}{2\sigma}\), hay que <strong>maximizar la relación señal-ruido en el instante de muestreo</strong> \(t_0\). Con la desigualdad de Schwarz (Conferencia 18), \(\left|\int H(f)S(f)e^{j2\pi ft_0}df\right|^2\le\int|H|^2df\int|S|^2df\), con igualdad cuando \(H\propto S^*e^{-j2\pi ft_0}\):</p>
+<div class="eq key">$$h(t)=K\,s(t_0-t)\qquad\Rightarrow\qquad\left(\frac SN\right)_{\max}=\frac{2E_s}{N_0}$$<div class="eq-label">Filtro adaptado: la respuesta impulsiva es la señal invertida en el tiempo y retardada</div></div>
+<p>Para señalización binaria se adapta a la <strong>diferencia</strong> \(s_d=s_1-s_0\), con energía \(E_d=\int_0^{T_b}[s_1(t)-s_0(t)]^2dt\), y resulta</p>
+<div class="eq key">$$P_e=Q\!\left(\sqrt{\frac{E_d}{2N_0}}\right):\qquad\text{unipolar: }P_e=Q\!\left(\sqrt{\tfrac{E_b}{N_0}}\right),\qquad\text{polar: }P_e=Q\!\left(\sqrt{\tfrac{2E_b}{N_0}}\right)$$<div class="eq-label">Probabilidad de error con filtro adaptado (\(E_b\): energía media por bit)</div></div>
+<p>Para pulsos rectangulares, \(h(t)\) es otro rectángulo de duración \(T_b\): el filtro adaptado es un <strong>integrador</strong> (<em>integrate-and-dump</em>: integra durante el bit, muestrea al final y se descarga). Equivalente: el <strong>receptor de correlación</strong>, que multiplica por la forma de onda esperada e integra.</p>
+<div class="example">
+<h4>Ejemplo 7.1 — CP 18 (detección óptima con filtro integrador)</h4>
+<p>Mismos datos que la CP 17: unipolar (0, +2 V), \(f_b=100\) kHz ⇒ \(T_b=10\) µs; \(N_0/2=5\times10^{-7}\) ⇒ \(N_0=10^{-6}\) V²/Hz.</p>
+<div class="step"><span class="n">a</span><div><p>\(E_d=A^2T_b=4\cdot10^{-5}\) ⇒ \(P_e=Q\!\left(\sqrt{4\cdot10^{-5}/2\cdot10^{-6}}\right)=Q(\sqrt{20})=Q(4{,}47)=\mathbf{3{,}9\times10^{-6}}\), frente a 0,0786 con el paso bajo de 500 kHz: <strong>cuatro órdenes de magnitud mejor</strong>.</p></div></div>
+<div class="step"><span class="n">b</span><div><p>Polar (−2, +2): \(E_d=(2A)^2T_b=1{,}6\cdot10^{-4}\) ⇒ \(P_e=Q(\sqrt{80})=Q(8{,}94)\approx\mathbf{1{,}9\times10^{-19}}\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Ej. 2</strong> (varianza dada a la salida del filtro, 0,01 V²): si se da \(\sigma^2\) <em>en el decisor</em>, la fórmula es la misma que en la CP 17 y \(A=1{,}12\) V (con el integrador normalizado por \(1/T_b\), que entrega la amplitud del pulso). La ventaja del filtro adaptado no está en la fórmula del decisor sino en que, <strong>para el mismo \(N_0\)</strong>, deja a la salida una varianza mucho menor: \(\sigma^2=N_0/(2T_b)=0{,}05\) V² frente a \(N_0B=0{,}5\) V² del paso bajo de 500 kHz.</p></div></div>
+</div>
+<div class="sim" id="sim-ber">
+  <div class="sim-title">BER frente a E<sub>b</sub>/N<sub>0</sub></div>
+  <p class="meta">Curvas teóricas con filtro adaptado. El polar necesita 3 dB menos que el unipolar para la misma \(P_e\). La línea vertical es el límite de Shannon (−1,59 dB).</p>
+  <div class="controls"><label>E<sub>b</sub>/N<sub>0</sub> (dB) <input type="range" id="br-e" min="-2" max="16" step="0.1" value="9.6" data-out="br-eo"><output id="br-eo"></output></label></div>
+  <canvas id="br-c1" aria-label="Curvas de BER"></canvas>
+  <div class="readout" id="br-out"></div>
+</div>
+
+<h2 id="ejercicios">8. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Una señal de voz (\(W=3{,}4\) kHz) se muestrea a 8 kHz con PCM de 8 bits. ¿\(R_b\)? ¿SNRq máxima? ¿Ancho de banda mínimo sin ISI con coseno alzado \(r=0{,}5\)?
+    <details class="sol"><summary>Solución</summary><div><p>\(R_b=64\) kbit/s; SNRq \(=1{,}76+48{,}2=49{,}9\) dB; \(B=(1+0{,}5)\cdot64/2=48\) kHz (polar NRZ).</p></div></details></li>
+  <li>Represente el espectro resultante del muestreo impulsivo de \(x(t)=\cos(2\pi\,3\,\text{kHz}\,t)\) a 5 kHz. ¿Qué se reconstruye con un paso bajo de 2,5 kHz?
+    <details class="sol"><summary>Solución</summary><div><p>Líneas en \(n\cdot5\pm3\) kHz: ±2, ±3, ±7, ±8… kHz. El paso bajo deja pasar ±2 kHz: se reconstruye un coseno de <strong>2 kHz</strong> (alias).</p></div></details></li>
+  <li>Una señal PCM (\(f_b=1\) kb/s) va por un canal equivalente coseno de 3 kHz (CP 16 EI 1). ¿Mayor frecuencia de bits posible?
+    <details class="sol"><summary>Solución</summary><div><p>Con duobinario \(R_b=2B=6\) kb/s: se podría transmitir hasta 6 veces más rápido que la señal actual.</p></div></details></li>
+  <li>6 señales (\(W=4\) kHz), 8 bits, multiplexadas, RZ polar, por (a) coseno alzado \(r=0{,}6\) de 3,94 MHz o (b) coseno de 3,94 MHz (CP 16 EI 2). ¿En cuál se puede ir más rápido?
+    <details class="sol"><summary>Solución</summary><div><p>Se necesitan \(6\cdot8\cdot8\,\text{k}=384\) kb/s. (a) \(R_s\le2B/1{,}6=4{,}93\) Mbaud ⇒ con RZ (\(R_s=2R_b\)) \(R_b\le2{,}46\) Mb/s. (b) \(R_s\le2B=7{,}88\) Mbaud ⇒ \(R_b\le3{,}94\) Mb/s. Ambos bastan; el filtro coseno permite mayor velocidad.</p></div></details></li>
+  <li>DM con \(f_s=32\) kHz para \(x=2\cos(2\pi\,800t)\). ¿\(\delta\) mínimo sin sobrecarga?
+    <details class="sol"><summary>Solución</summary><div><p>\(\delta\ge2\pi\cdot800\cdot2/32000=0{,}314\).</p></div></details></li>
+  <li>Con filtro adaptado y polar NRZ, ¿qué \(E_b/N_0\) da \(P_e=10^{-6}\)?
+    <details class="sol"><summary>Solución</summary><div><p>\(\sqrt{2E_b/N_0}=4{,}753\) ⇒ \(E_b/N_0=11{,}3\) ⇒ 10,5 dB. Unipolar: 13,5 dB.</p></div></details></li>
+</ol>
+
+<h2 id="lab">9. Guía del Laboratorio Simulado de ISI y ruido</h2>
+<p>El Programa prevé un laboratorio simulado (MATLAB/Octave) sobre ISI y ruido en banda base. Procedimiento recomendado, reproducible con el software <code>fc1</code> de la asignatura o con los simuladores de esta página:</p>
+<ol>
+  <li>Generar bits aleatorios equiprobables y formar la señal (polar NRZ) con \(N\) muestras por bit.</li>
+  <li>Filtrar con un coseno alzado (o con un RC, para ver ISI) y dibujar el <strong>diagrama de ojo</strong> (tramos de 2 bits superpuestos).</li>
+  <li>Añadir ruido gaussiano con varianza \(\sigma^2=N_0f_m/2\) por muestra (\(f_m\): frecuencia de muestreo de la simulación) para un \(E_b/N_0\) dado.</li>
+  <li>Detectar con filtro paso bajo y con filtro adaptado (integrador); contar errores y comparar con \(Q(\cdot)\). Para estimar \(P_e=10^{-k}\) con fiabilidad hacen falta al menos \(10^{k+2}\) bits.</li>
+</ol>
+<div class="box warn"><span class="box-title">Errores típicos</span>
+<ul>
+  <li>Confundir DEP unilateral y bilateral: \(\sigma^2=N_0B\) usa \(N_0\) (bilateral \(N_0/2\) sobre \(2B\)).</li>
+  <li>Usar \(R_b\) en vez de \(R_s\) en Nyquist con códigos de medio bit (RZ, Manchester) o multinivel.</li>
+  <li>Calcular \(Q(x)\) con \(x\) en dB. El argumento es una relación de amplitudes (adimensional).</li>
+  <li>En DM, comparar la pendiente con la amplitud en vez de con \(2\pi f_mA\).</li>
+</ul></div>
+
+<!-- ============================================================ -->
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. Una señal de 4 kHz muestreada a 6 kHz se reconstruye como…</p><div class="opts">
+    <button class="opt" type="button">4 kHz</button><button class="opt" type="button" data-ok>2 kHz</button><button class="opt" type="button">10 kHz</button></div>
+    <p class="why">\(f_s/2=3\) kHz \(\lt4\) kHz ⇒ alias en \(6-4=2\) kHz.</p></div>
+  <div class="q"><p>2. Pasar de 8 a 10 bits en PCM mejora la SNRq en…</p><div class="opts">
+    <button class="opt" type="button">2 dB</button><button class="opt" type="button" data-ok>12 dB</button><button class="opt" type="button">20 dB</button></div>
+    <p class="why">6,02 dB por bit.</p></div>
+  <div class="q"><p>3. ¿Qué código permite acoplamiento por transformador y es insensible a la polaridad?</p><div class="opts">
+    <button class="opt" type="button">Unipolar NRZ</button><button class="opt" type="button" data-ok>AMI</button><button class="opt" type="button">Polar NRZ</button></div>
+    <p class="why">AMI no tiene DC y el "1" es la presencia de pulso de cualquier signo.</p></div>
+  <div class="q"><p>4. Con coseno alzado \(r=1\) y \(B=10\) kHz, la máxima velocidad de símbolos sin ISI es…</p><div class="opts">
+    <button class="opt" type="button">20 kbaud</button><button class="opt" type="button" data-ok>10 kbaud</button><button class="opt" type="button">5 kbaud</button></div>
+    <p class="why">\(R_s=2B/(1+r)=10\) kbaud.</p></div>
+  <div class="q"><p>5. La precodificación en el duobinario sirve para…</p><div class="opts">
+    <button class="opt" type="button">reducir el ancho de banda</button><button class="opt" type="button" data-ok>evitar la propagación de errores</button><button class="opt" type="button">eliminar la DC</button></div>
+    <p class="why">Con precodificación cada bit se decide sin depender del anterior.</p></div>
+  <div class="q"><p>6. El filtro adaptado a un pulso rectangular es…</p><div class="opts">
+    <button class="opt" type="button">un paso alto</button><button class="opt" type="button" data-ok>un integrador durante el bit</button><button class="opt" type="button">un paso bajo ideal de ancho \(R_b\)</button></div>
+    <p class="why">\(h(t)=s(T_b-t)\) es otro rectángulo: integrar y descargar.</p></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="biblio">Dónde estudiarlo</h2>
+<p class="meta">Páginas impresas; entre paréntesis, página del visor PDF del archivo de <code>05-Bibliografia</code>.</p>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>Sklar y Ray, <em>Digital Communications</em>, 2.ª ed., Pearson, 2014</td><td>2</td><td>2.4 Formatting Analog Information (2.4.1 Sampling Theorem, 2.4.2 Aliasing) · 2.5 Sources of Corruption · 2.6 PCM · 2.7 Uniform and Nonuniform Quantization</td><td>pp. 62–85 (PDF 89–112)</td><td>Muestreo, aliasing, SNRq, compansión (los epígrafes que cita la CP 12)</td></tr>
+    <tr><td>Sklar (ídem)</td><td>2</td><td>2.8 Baseband Transmission (2.8.2 PCM Waveform Types, 2.8.3 Spectral Attributes, 2.8.5 M-ary) · 2.9 Correlative Coding (duobinario, precodificación)</td><td>pp. 85–100 (PDF 112–127)</td><td>Códigos de línea, duobinario</td></tr>
+    <tr><td>Sklar (ídem)</td><td>3</td><td>3.2 Detection of Binary Signals in Gaussian Noise (3.2.2 Matched Filter, 3.2.5 Error Probability) · 3.3 Intersymbol Interference · 3.4.2 Eye Pattern</td><td>pp. 119–152 (PDF 146–179)</td><td>Filtro adaptado, \(P_e\), ISI, coseno alzado, ojo</td></tr>
+    <tr><td>Sklar (ídem)</td><td>13</td><td>13.2 Amplitude Quantizing · 13.3 Differential PCM (13.3.3 Delta Modulation)</td><td>pp. 812–851 (PDF 839–878)</td><td>Cuantificación, DPCM, DM</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>3</td><td>3.2 Sampling Process · 3.3 PAM · 3.6 Quantization Process · 3.7 PCM · 3.8 Noise Considerations in PCM · 3.9 Time-Division Multiplexing</td><td>pp. 185–214 (PDF 205–234)</td><td>Muestreo, cuantificación, PCM, MDT (CP 12: «Haykin 3.2–3.8»)</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>3</td><td>3.12 Delta Modulation · 3.14 Differential Pulse-Code Modulation</td><td>pp. 219–222 y desde 227 (PDF 239–242, 247)</td><td>DM, DPCM (CP 13: «Haykin 3.12»)</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>4</td><td>4.2 Matched Filter · 4.3 Error Rate Due to Noise</td><td>pp. 249–258 (PDF 269–278)</td><td>Filtro adaptado, \(P_e\)</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>4</td><td>4.4 Intersymbol Interference · 4.5 Nyquist's Criterion for Distortionless Baseband Binary Transmission</td><td>pp. 259–266 (PDF 279–286)</td><td>ISI, 1.er criterio (CP 15: «Haykin 259–271»)</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>4</td><td>4.6 Correlative-Level Coding</td><td>pp. 267–274 (PDF 287–294)</td><td>Duobinario, precodificación (Conf. 16: «Haykin 267–274»)</td></tr>
+    <tr><td>Carlson, Crilly y Rutledge, <em>Communication Systems</em>, 4.ª ed., McGraw-Hill, 2002</td><td>6</td><td>6.1 Sampling Theory and Practice · 6.2 Pulse-Amplitude Modulation</td><td>pp. 235–248 (PDF 245–258)</td><td>Muestreo, aliasing, PAM (CP 12: «Carlson 6.1–6.3»)</td></tr>
+    <tr><td>Carlson (ídem)</td><td>9</td><td>9.4 Baseband Signal Transmission with Noise · 9.5 Baseband Pulse Transmission with Noise</td><td>pp. 381–390 (PDF 388–397)</td><td>S/N en banda base, filtro adaptado</td></tr>
+    <tr><td>Carlson (ídem)</td><td>11</td><td>11.2 Noise and Errors (repetidores regenerativos, filtro adaptado) · 11.3 Bandlimited Digital PAM Systems (Nyquist)</td><td>pp. 448–460 y desde 461 (PDF 454–467)</td><td>\(P_e\), repetidor regenerativo, conformación de Nyquist</td></tr>
+    <tr><td>Carlson (ídem)</td><td>12</td><td>12.1 Pulse-Code Modulation · 12.2 PCM with Noise · 12.3 Delta Modulation and Predictive Coding</td><td>pp. 495–522 (PDF 501–528)</td><td>PCM, SNRq, DM, DPCM (CP 12–13: «Carlson 12.1–12.3»)</td></tr>
+    <tr><td>Couch, <em>Digital and Analog Communication Systems</em>, 8.ª ed., 2012</td><td>3</td><td>3–2 PAM · 3–3 PCM · 3–4 Digital Signaling · 3–5 Line Codes and Spectra · 3–6 Intersymbol Interference · 3–7 DPCM · 3–8 Delta Modulation · 3–9 TDM</td><td>pp. 133–219 (PDF 158–244)</td><td>Todo el tema (la CP 13 cita 3–7 y 3–8; la Conf. 15, pp. 185–191)</td></tr>
+    <tr><td>Couch (ídem)</td><td>6</td><td>6–8 Matched Filters</td><td>pp. 464–475 (PDF 489–500)</td><td>Filtro adaptado, Schwarz (Conf. 18: pp. 464–470)</td></tr>
+    <tr><td>Couch (ídem)</td><td>7</td><td>7–1 Error Probabilities for Binary Signaling · 7–2 Performance of Baseband Binary Systems</td><td>pp. 493–504 (PDF 518–529)</td><td>Umbral óptimo, función Q, unipolar/polar (CP 17–18: pp. 491–512)</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — UPV, <a href="https://www.youtube.com/watch?v=eNZv07rkdIU">«Muestreo: frecuencia de muestreo de Nyquist»</a> (5:10) y <a href="https://www.youtube.com/watch?v=9GxcNyGQsuk">«Muestreo / cuantificación / codificación»</a> (9:54).</li>
+  <li><strong>Vídeo</strong> — AwesomeAcoustics, <a href="https://www.youtube.com/watch?v=NH84nQYhi-0">«¿Qué es el efecto alias (aliasing) y el teorema de Nyquist?»</a> (3:41).</li>
+  <li><strong>Vídeo</strong> — Electrónica FP, <a href="https://www.youtube.com/watch?v=mAHhGZlKuCM">«Cuantificación. Conversión analógico-digital, parte 3»</a> (8:20).</li>
+  <li><strong>Vídeo</strong> — Engineering Made Easy, <a href="https://www.youtube.com/watch?v=fFO_TPrgTs0">«Modulación delta: sobrecarga de pendiente y ruido granular»</a> (12:17, inglés).</li>
+  <li><strong>Vídeo</strong> — R. Brionez, <a href="https://www.youtube.com/watch?v=bkBX2D46G88">«3.1 Códigos de línea»</a> (9:39).</li>
+  <li><strong>Vídeo</strong> — UPV, <a href="https://www.youtube.com/watch?v=B-ZeorOjQn8">«Interferencia entre símbolos»</a> (9:33) y <a href="https://www.youtube.com/watch?v=dqnktGcUlTU">«Diagrama de ojos»</a> (9:20).</li>
+  <li><strong>Vídeo</strong> — Iain Explains, <a href="https://www.youtube.com/watch?v=ROhgIWBteQQ">«What is an eye diagram?»</a> (12:32, inglés) y <a href="https://www.youtube.com/watch?v=6VBRoJj7aJQ">«How are erf(.), Q(.) and Gaussian tails related?»</a> (11:29, inglés).</li>
+  <li><strong>Vídeo</strong> — A. Muqaibel, <a href="https://www.youtube.com/watch?v=SiqqDMlFqdM">«Controlled ISI: duobinary signaling»</a> (19:18, inglés).</li>
+  <li><strong>Vídeo</strong> — O. W. Rivas, <a href="https://www.youtube.com/watch?v=cKspoRQls-o">«Filtro adaptado a la señal»</a> (11:47).</li>
+  <li><strong>Norma</strong> — ITU-T <a href="https://www.itu.int/rec/T-REC-G.711">G.711</a> (PCM de voz a 64 kbit/s, leyes A y μ) y <a href="https://www.itu.int/rec/T-REC-G.704">G.704</a> (estructura de trama E1).</li>
+  <li><strong>Artículos históricos</strong> — H. Nyquist, «Certain topics in telegraph transmission theory», <em>Trans. AIEE</em> 47 (1928), <a href="https://doi.org/10.1109/T-AIEE.1928.5055024">doi:10.1109/T-AIEE.1928.5055024</a> (origen de los criterios de Nyquist) · C. E. Shannon, «Communication in the presence of noise», <em>Proc. IRE</em> 37 (1949), <a href="https://doi.org/10.1109/JRPROC.1949.232969">doi:10.1109/JRPROC.1949.232969</a> (teorema de muestreo y capacidad).</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué no muestrear siempre muy por encima de Nyquist?</summary><div><p>Porque \(R_b=nf_s\): más muestras por segundo significan más bits y más ancho de banda. Se muestrea "un poco" por encima para poder usar filtros reales (banda de guarda). La DM es la excepción: muestrea muy rápido pero con 1 bit.</p></div></details>
+  <details><summary>¿El ruido de cuantificación es ruido "de verdad"?</summary><div><p>Es un error determinístico (depende de la muestra), pero si la señal recorre muchos niveles se comporta como un ruido uniforme de varianza \(\Delta^2/12\), independiente de la señal. Para señales muy pequeñas o periódicas esa aproximación falla (se oye como distorsión; se combate con <em>dither</em>).</p></div></details>
+  <details><summary>¿Qué diferencia hay entre bit/s y baudio?</summary><div><p>Bit/s cuenta bits; baudio cuenta símbolos (cambios de forma de onda) por segundo. En binario NRZ coinciden. En M-ario, \(R_s=R_b/\log_2M\); en RZ o Manchester el canal "ve" el doble de cambios que bits.</p></div></details>
+  <details><summary>¿Por qué el umbral óptimo es el punto medio?</summary><div><p>Porque con símbolos equiprobables y ruido gaussiano simétrico, el punto donde las dos campanas se cruzan está a la mitad. Si \(P(1)\ne P(0)\), el umbral se desplaza hacia el nivel menos probable.</p></div></details>
+  <details><summary>Si el filtro adaptado es tan bueno, ¿por qué se usan pasos bajos?</summary><div><p>El filtro adaptado requiere conocer la forma del pulso y sincronismo de bit preciso (saber cuándo empieza y termina cada bit). Un paso bajo es más simple y tolera mejor los desajustes; en sistemas modernos se usa el filtro adaptado (en forma de "raíz de coseno alzado" en transmisor y receptor, que cumple a la vez Nyquist y filtro adaptado).</p></div></details>
+  <details><summary>¿Qué relación hay entre \(E_b/N_0\) y S/N?</summary><div><p>\(S/N=\frac{E_bR_b}{N_0B}\). Con \(B=R_b/2\) (Nyquist): \(S/N=2E_b/N_0\). \(E_b/N_0\) permite comparar sistemas con distintas velocidades y anchos de banda.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> Conferencias 12 (PCM, MDT), 13 (DPCM, modulación delta), 15 (ISI, 1.er criterio), 16 (2.º criterio, duobinario), 17 (ruido, umbral óptimo) y 18 (filtro adaptado) de la edición anterior; CP 12, 13, 15, 16, 17 y 18; Programa Analítico (códigos de línea, repetidor regenerativo, laboratorio de ISI y ruido). La Conferencia 14 no estaba disponible. Explicaciones, figuras y simuladores son elaboración propia.</p>
+</main>
+</div>
+<footer class="site wrap">Fundamentos de las Comunicaciones I · Material de estudio no oficial elaborado a partir de los materiales del curso · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

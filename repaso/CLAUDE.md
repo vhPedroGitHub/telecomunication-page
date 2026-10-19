@@ -44,9 +44,18 @@ las asignaturas enlacen de forma estable. **No cambiar los `id` una vez publicad
 
 | Página | Estado |
 |---|---|
-| `index.html` (índice de repaso) | 🟡 marcador |
-| todas las fichas | ⬜ |
+| `index.html` (índice de repaso) | ✅ tarjetas |
+| `matematica.html` | ✅ complejos · trig · logaritmos/dB · integrales · series · hiperbólicas · impulso · binario |
+| `probabilidad.html` | ✅ discreta · va · gauss (+ calculadora Q) · procesos |
+| `circuitos.html` | ✅ fasores · potencia · maxtrans · rc · filtros (+ Bode) |
+| `fisica-em.html`, `electronica-*.html`, `redes.html` | ⬜ |
+
+Bibliografía verificada: Stewart 9ª (PDF = impresa + 31; apéndices A..), Walpole 9ª 2012 (+22),
+Hayt 8ª (+17).
 
 ## Bitácora
 
+- **2026-10-19** — Publicadas `matematica.html`, `probabilidad.html` y `circuitos.html` (ids: complejos, trig,
+  logaritmos, integrales, series, hiperbolicas, impulso, binario · discreta, va, gauss, procesos · fasores,
+  potencia, maxtrans, rc, filtros).
 - **2026-10-18** — Creada la sección y la planificación de fichas.

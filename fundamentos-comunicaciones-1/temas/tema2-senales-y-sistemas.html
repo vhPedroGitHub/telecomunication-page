@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema II · Señales y sistemas — FC I</title>
+  <meta name="description" content="Fundamentos de las Comunicaciones I, Tema II: fasores, series y transformada de Fourier, impulsos, convolución, potencia y energía, autocorrelación, sistemas LTI, señales aleatorias y ruido.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/tema2.js"></script>
+  <style>body { --accent: var(--c-fc1); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Fundamentos de las Comunicaciones I</span>
+    <nav class="tabs" aria-label="Secciones de la asignatura">
+      <a href="../">Inicio</a>
+      <a href="tema1-teoria-informacion.html">Tema I</a>
+      <a href="tema2-senales-y-sistemas.html" aria-current="page">Tema II</a>
+      <a href="tema3-banda-base.html">Tema III</a>
+      <a href="../#software">Software</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+
+<main class="content">
+<p class="meta">Tema II · Curso 2026 · Actividades 2–6 (Conferencias 7–11 de la edición anterior)</p>
+<h1>Teoría de la señal y los sistemas</h1>
+<p class="lead">Antes de transmitir información hay que saber <em>describir</em> las señales y <em>predecir</em> qué les hace el canal. Este tema construye las dos herramientas que usarás el resto de la carrera: el <strong>espectro</strong> (series y transformada de Fourier) y la <strong>respuesta de un sistema lineal</strong> (convolución y función transferencial), y termina con la señal que nunca falta: el <strong>ruido</strong>.</p>
+
+<div class="objectives">
+  <strong>Objetivos (Programa Analítico y Actividades 2–6)</strong>
+  <ul>
+    <li>Caracterizar señales determinísticas periódicas desde el punto de vista espectral (series de Fourier).</li>
+    <li>Caracterizar señales de energía desde el punto de vista espectral (transformada de Fourier, impulsos, transformadas en el límite).</li>
+    <li>Caracterizar señales en términos de potencia y energía; densidades espectrales y función de autocorrelación.</li>
+    <li>Caracterizar los efectos que los sistemas LTI generan sobre las señales (respuesta impulsiva, función transferencial, distorsión, filtros).</li>
+    <li>Caracterizar señales aleatorias en el tiempo y la frecuencia; ruido térmico y ruido blanco.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">números complejos, Euler y trigonometría</span>
+  <p>Todo el tema descansa en la fórmula de Euler. Un número complejo \(z = a + jb = |z|e^{j\theta}\) tiene módulo \(|z|=\sqrt{a^2+b^2}\) y fase \(\theta=\arctan(b/a)\) (cuidado con el cuadrante). Multiplicar complejos <em>multiplica módulos y suma fases</em>.</p>
+  $$e^{j\theta}=\cos\theta+j\sin\theta,\qquad \cos\theta=\frac{e^{j\theta}+e^{-j\theta}}{2},\qquad \sin\theta=\frac{e^{j\theta}-e^{-j\theta}}{2j}$$
+  <p>También usarás \(\cos a\cos b=\tfrac12[\cos(a-b)+\cos(a+b)]\) y la integral \(\int e^{j\omega t}dt = e^{j\omega t}/(j\omega)\). Repaso: <a href="../../repaso/matematica.html#complejos">números complejos y Euler</a> · <a href="../../repaso/matematica.html#trig">identidades trigonométricas</a> · <a href="../../repaso/matematica.html#integrales">integrales útiles</a>.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="clasificacion">1. Clasificación de señales</h2>
+<p>Una <strong>señal</strong> es una magnitud física (tensión, corriente, campo) que varía con el tiempo y transporta información. Las clasificaremos de tres maneras, porque cada clase pide una herramienta distinta:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Criterio</th><th>Clases</th><th>Herramienta espectral</th></tr></thead>
+  <tbody>
+    <tr><td>Descripción matemática</td><td><strong>Determinística</strong> (se conoce \(x(t)\) para todo \(t\)) · <strong>Aleatoria</strong> (solo se conocen promedios estadísticos)</td><td>Fourier · Densidad espectral de potencia de un proceso</td></tr>
+    <tr><td>Repetición</td><td><strong>Periódica</strong>: \(x(t)=x(t+T_0)\ \forall t\) (existe de \(-\infty\) a \(+\infty\)) · <strong>No periódica</strong></td><td>Serie de Fourier · Transformada de Fourier</td></tr>
+    <tr><td>Duración / tamaño</td><td><strong>Energía</strong>: \(0\lt E\lt\infty\) (y \(P=0\)) · <strong>Potencia</strong>: \(0\lt P\lt\infty\) (y \(E=\infty\))</td><td>Densidad espectral de energía · de potencia</td></tr>
+  </tbody>
+</table></div>
+<div class="box idea"><span class="box-title">Idea clave</span>
+<p>Ninguna señal real es periódica: toda señal empieza y termina. La señal periódica es un <em>modelo</em> muy útil (un coseno de laboratorio, un reloj digital); la señal de energía es el modelo de un pulso aislado. Una señal <strong>no puede</strong> ser de energía y de potencia a la vez.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="fasores">2. Fasores y espectro de línea</h2>
+<p>El punto de partida del profesor es una frase que conviene memorizar: <em>«un coseno en el dominio del tiempo es un punto (o línea) en el dominio de la frecuencia»</em>. Veamos por qué.</p>
+<p>Un coseno \(x(t)=A\cos(2\pi f_0 t+\varphi)\) es la parte real de un <strong>fasor</strong> que gira: \(x(t)=\operatorname{Re}\{A e^{j\varphi} e^{j2\pi f_0 t}\}\). Si usamos Euler en lugar de "tomar la parte real", aparecen <em>dos</em> fasores que giran en sentidos opuestos:</p>
+<div class="eq key">
+$$A\cos(2\pi f_0 t+\varphi)=\underbrace{\tfrac{A}{2}e^{j\varphi}}_{\text{en }+f_0}\,e^{j2\pi f_0 t}+\underbrace{\tfrac{A}{2}e^{-j\varphi}}_{\text{en }-f_0}\,e^{j2\pi(-f_0) t}$$
+<div class="eq-label">Representación bilateral (de dos lados) de un coseno</div>
+</div>
+<p>Por eso el <strong>espectro bilateral</strong> de un coseno tiene dos líneas:</p>
+<ul>
+  <li><strong>Espectro de amplitud</strong>: dos líneas de altura \(A/2\) en \(+f_0\) y \(-f_0\) (función <em>par</em>).</li>
+  <li><strong>Espectro de fase</strong>: \(+\varphi\) en \(+f_0\) y \(-\varphi\) en \(-f_0\) (función <em>impar</em>).</li>
+</ul>
+<p>Y al revés: <em>«un par de líneas conjugadas en \(\pm f_0\) es, en el tiempo, un coseno»</em>. Las frecuencias negativas no son "físicas": son la contabilidad necesaria para que la suma de dos fasores complejos dé una señal real.</p>
+<div class="box warn"><span class="box-title">Convenciones (errores típicos)</span>
+<ul>
+  <li>Antes de dibujar, escribe la señal como <strong>coseno con amplitud positiva</strong>: \(\sin\theta=\cos(\theta-90^\circ)\) y \(-\cos\theta=\cos(\theta\pm180^\circ)\).</li>
+  <li>Una constante \(A_0\) es un "coseno de frecuencia 0": una sola línea de altura \(A_0\) (no \(A_0/2\)) en \(f=0\).</li>
+  <li>En el espectro <em>unilateral</em> (de un lado) la línea mide \(A\); en el bilateral mide \(A/2\). En este curso se usa el bilateral.</li>
+</ul></div>
+
+<div class="sim" id="sim-fasor">
+  <div class="sim-title">Fasor giratorio y su espectro de línea</div>
+  <p class="meta">Mueve amplitud, frecuencia y fase. A la izquierda, los dos fasores \(\tfrac A2e^{\pm j(2\pi f_0t+\varphi)}\) y su suma (siempre real, sobre el eje horizontal); a la derecha, el espectro bilateral de amplitud y fase.</p>
+  <div class="controls">
+    <label>A <input type="range" min="0.2" max="2" step="0.1" value="1.4" id="fz-A" data-out="fz-Ao"><output id="fz-Ao"></output></label>
+    <label>f₀ (Hz) <input type="range" min="1" max="4" step="1" value="2" id="fz-f" data-out="fz-fo"><output id="fz-fo"></output></label>
+    <label>φ (°) <input type="range" min="-180" max="180" step="15" value="45" id="fz-p" data-out="fz-po"><output id="fz-po"></output></label>
+    <button class="btn ghost" type="button" id="fz-play">⏸ Pausa</button>
+  </div>
+  <div class="two">
+    <canvas id="fz-c1" aria-label="Fasores girando en el plano complejo"></canvas>
+    <div><canvas id="fz-c2" aria-label="Espectro de amplitud"></canvas><canvas id="fz-c3" aria-label="Espectro de fase"></canvas></div>
+  </div>
+  <canvas id="fz-c4" aria-label="Señal en el tiempo"></canvas>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="series">3. Series de Fourier: espectro de señales periódicas</h2>
+<h3 id="series-idea">3.1 La idea: toda señal periódica es una suma de cosenos</h3>
+<p>Fourier mostró que una señal periódica de período \(T_0\) (que cumpla las condiciones de Dirichlet: lo cumplen todas las señales físicas) puede escribirse como una constante más cosenos de frecuencias <strong>múltiplos enteros</strong> de la <strong>frecuencia fundamental</strong> \(f_0=1/T_0\) (los <em>armónicos</em>):</p>
+$$x(t)=A_0+A_1\cos(2\pi f_0t+\varphi_1)+A_2\cos(2\pi\,2f_0t+\varphi_2)+\dots=A_0+\sum_{n=1}^{\infty}A_n\cos(2\pi nf_0t+\varphi_n)$$
+<p>Aplicando a cada coseno la representación bilateral de la sección anterior y llamando</p>
+$$C_0=A_0,\qquad C_n=\tfrac{A_n}{2}e^{j\varphi_n}\ (n\gt 0),\qquad C_{-n}=\tfrac{A_n}{2}e^{-j\varphi_n}=C_n^{*}$$
+<p>se obtiene la <strong>forma exponencial</strong>, que es la que usaremos siempre:</p>
+<div class="eq key">
+$$x(t)=\sum_{n=-\infty}^{\infty}C_n\,e^{j2\pi nf_0t},\qquad C_n=\frac{1}{T_0}\int_{T_0}x(t)\,e^{-j2\pi nf_0t}\,dt$$
+<div class="eq-label">Serie exponencial de Fourier y coeficientes \(C_n\)</div>
+</div>
+<p>Lectura física: <strong>cada \(C_n\) es un número complejo</strong> cuyo módulo \(|C_n|\) es la altura de la línea en \(nf_0\) y cuyo ángulo \(\arg C_n\) es la fase de esa componente. El espectro de una señal periódica es, por tanto, <strong>discreto</strong>: líneas separadas \(f_0\). La integral se hace sobre <em>cualquier</em> período (de \(0\) a \(T_0\), o de \(-T_0/2\) a \(T_0/2\), lo que sea más cómodo).</p>
+<p>¿De dónde sale la fórmula de \(C_n\)? De la <strong>ortogonalidad</strong> de las exponenciales: \(\frac{1}{T_0}\int_{T_0}e^{j2\pi(n-m)f_0t}dt\) vale 1 si \(n=m\) y 0 si \(n\ne m\). Al multiplicar la serie por \(e^{-j2\pi mf_0t}\) e integrar, "sobrevive" solo \(C_m\).</p>
+
+<h3 id="series-prop">3.2 Propiedades de los \(C_n\)</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th>Propiedad</th><th>Expresión</th><th>Para qué sirve</th></tr></thead>
+  <tbody>
+    <tr><td>Simetría hermítica (señal real)</td><td>\(C_{-n}=C_n^{*}\): \(|C_{-n}|=|C_n|\), \(\arg C_{-n}=-\arg C_n\)</td><td>Amplitud par, fase impar: basta calcular \(n\ge0\).</td></tr>
+    <tr><td>Valor medio (componente de DC)</td><td>\(C_0=\frac1{T_0}\int_{T_0}x\,dt=\langle x(t)\rangle\)</td><td>Sumar una constante solo cambia la línea en \(f=0\).</td></tr>
+    <tr><td>Señal par</td><td>\(x(-t)=x(t)\Rightarrow C_n\) reales</td><td>Fase 0° o 180°.</td></tr>
+    <tr><td>Señal impar</td><td>\(x(-t)=-x(t)\Rightarrow C_n\) imaginarios puros, \(C_0=0\)</td><td>Fase ±90°.</td></tr>
+    <tr><td>Simetría de media onda</td><td>\(x(t\pm T_0/2)=-x(t)\Rightarrow C_n=0\) para \(n\) par</td><td>Solo armónicos impares.</td></tr>
+    <tr><td>Desplazamiento en el tiempo</td><td>\(x(t-t_d)\to C_n e^{-j2\pi nf_0t_d}\)</td><td>Un retardo no cambia las amplitudes, solo añade fase lineal.</td></tr>
+    <tr><td>Teorema de Parseval (potencia)</td><td>\(P=\frac1{T_0}\int_{T_0}|x|^2dt=\sum_n|C_n|^2\)</td><td>La potencia se reparte entre las líneas.</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="series-tren">3.3 El caso más importante: el tren de pulsos rectangulares</h3>
+<p>Define primero dos funciones que aparecerán sin descanso:</p>
+$$\Pi\!\left(\tfrac{t}{\tau}\right)=\begin{cases}1,&|t|\lt\tau/2\\0,&|t|\gt\tau/2\end{cases}\qquad\qquad \operatorname{sinc}(\lambda)=\frac{\sin\pi\lambda}{\pi\lambda},\ \ \operatorname{sinc}(0)=1$$
+<p>La sinc se anula en todos los enteros \(\lambda=\pm1,\pm2,\dots\) y su lóbulo principal tiene ancho 2.</p>
+
+<div class="example">
+<h4>Ejemplo 3.1 — Espectro del tren de pulsos (CP 5, ejercicio 1)</h4>
+<p>Tren de pulsos de amplitud \(A\), duración \(\tau\), período \(T_0\), centrado en \(t=0\). Halle \(C_n\) y dibuje el espectro.</p>
+<div class="step"><span class="n">1</span><div><p>Integramos sobre el período \([-T_0/2,T_0/2]\), donde la señal vale \(A\) solo en \(|t|\lt\tau/2\):</p>
+$$C_n=\frac1{T_0}\int_{-\tau/2}^{\tau/2}A\,e^{-j2\pi nf_0t}dt=\frac{A}{T_0}\,\frac{e^{-j\pi nf_0\tau}-e^{j\pi nf_0\tau}}{-j2\pi nf_0}=\frac{A}{T_0}\,\frac{\sin(\pi nf_0\tau)}{\pi nf_0}$$</div></div>
+<div class="step"><span class="n">2</span><div><p>Multiplicando y dividiendo por \(\tau\) aparece la sinc:</p>
+<div class="eq key">$$C_n=\frac{A\tau}{T_0}\operatorname{sinc}(nf_0\tau)$$</div></div></div>
+<div class="step"><span class="n">3</span><div><p><strong>Interpretación.</strong> Las líneas están en \(nf_0\) (separadas \(1/T_0\)); sus alturas siguen la <em>envolvente</em> \(\frac{A\tau}{T_0}\operatorname{sinc}(f\tau)\), que se anula en \(f=k/\tau\). El ancho del lóbulo principal es \(1/\tau\): <strong>pulsos más estrechos ⇒ espectro más ancho</strong>. Los \(C_n\) son reales (señal par): fase 0° donde la sinc es positiva y 180° donde es negativa.</p></div></div>
+<div class="step"><span class="n">4</span><div><p><strong>Con números</strong> (CP 5, ej. 2): \(T_0=1\) ms, \(\tau=0{,}5\) ms, \(A=4\) V ⇒ \(f_0=1\) kHz, ciclo útil \(\tau/T_0=1/2\):</p>
+$$C_n=2\operatorname{sinc}(n/2):\quad C_0=2,\ \ C_{\pm1}=\tfrac{4}{\pi}\approx1{,}273,\ \ C_{\pm2}=0,\ \ C_{\pm3}=-\tfrac{4}{3\pi}\approx-0{,}424,\ \ C_{\pm5}\approx0{,}255$$
+<p>Los armónicos pares desaparecen porque los ceros de la envolvente (\(f=k/\tau=2k\) kHz) caen justo sobre ellos.</p></div></div>
+<div class="step"><span class="n">5</span><div><p><strong>Comprobación con Parseval.</strong> En el tiempo: \(P=\frac{1}{T_0}\int|x|^2dt=A^2\tau/T_0=16\cdot0{,}5=8\) W. En frecuencia: \(C_0^2+2\sum_{n\ \text{impar}}\left(\frac{4}{n\pi}\right)^2=4+\frac{32}{\pi^2}\cdot\frac{\pi^2}{8}=4+4=8\) W ✔.</p></div></div>
+<div class="step"><span class="n">6</span><div><p><strong>Efecto de la DC</strong> (CP 5, ej. 3). Si a la señal le restamos 2 V (su valor medio), solo cambia \(C_0\): pasa de 2 a 0. Las demás líneas no se mueven. Restar una constante desplaza la forma de onda verticalmente; en el espectro únicamente "borra" o modifica la línea en \(f=0\).</p></div></div>
+</div>
+
+<div class="example">
+<h4>Ejemplo 3.2 — Un coseno calculado "por la integral" (Resumen de Series de Fourier, Ej. 1)</h4>
+<p>Halle los \(C_n\) de \(x(t)=A\cos(2\pi f_1t+\theta)\) aplicando la definición.</p>
+<div class="step"><span class="n">1</span><div><p>Aquí \(f_0=f_1\). Sustituyendo el coseno por Euler:</p>
+$$C_n=\frac{A}{2T_1}\int_0^{T_1}\!\left[e^{j\theta}e^{j2\pi(1-n)f_1t}+e^{-j\theta}e^{-j2\pi(1+n)f_1t}\right]dt$$</div></div>
+<div class="step"><span class="n">2</span><div><p>Por ortogonalidad, la primera integral vale \(T_1\) solo si \(n=1\) y la segunda solo si \(n=-1\). En los demás casos dan 0 (se integra un número entero de ciclos).</p></div></div>
+<div class="step"><span class="n">3</span><div>$$C_1=\tfrac{A}{2}e^{j\theta},\qquad C_{-1}=\tfrac{A}{2}e^{-j\theta},\qquad C_n=0\ \text{en otro caso}$$<p>Exactamente lo que dice la representación fasorial: la serie de Fourier de un coseno es el propio coseno.</p></div></div>
+</div>
+
+<div class="example">
+<h4>Ejemplo 3.3 — Tren de pulsos desplazado (ER-1, parte II)</h4>
+<p>Si el tren del Ejemplo 3.1 se retarda \(T'\), \(\hat x(t)=x(t-T')\). Sin integrar: por la propiedad de desplazamiento,</p>
+$$\hat C_n=C_n\,e^{-j2\pi nf_0T'}=\frac{A\tau}{T_0}\operatorname{sinc}(nf_0\tau)\,e^{-j2\pi nf_0T'}$$
+<p><strong>Mismo espectro de amplitud</strong>, fase lineal \(-2\pi nf_0T'\) añadida. Por ejemplo, el tren que empieza en \(t=0\) (pulso de \(0\) a \(\tau\)) corresponde a \(T'=\tau/2\).</p>
+</div>
+
+<div class="sim" id="sim-fs">
+  <div class="sim-title">Sintetizador de series de Fourier (fenómeno de Gibbs incluido)</div>
+  <p class="meta">Elige la forma de onda, el ciclo útil y cuántos armónicos sumar. Arriba, la señal ideal (gris) y la suma parcial \(\sum_{|n|\le N}C_ne^{j2\pi nf_0t}\) (color); abajo, \(|C_n|\) con la envolvente. Observa el sobreimpulso de ≈9 % junto a los saltos que <em>no</em> desaparece al aumentar \(N\) (Gibbs).</p>
+  <div class="controls">
+    <label>Forma <select id="fs-w"><option value="rect">Tren de pulsos rectangulares</option><option value="tri">Tren de pulsos triangulares</option><option value="saw">Diente de sierra</option></select></label>
+    <label>Ciclo útil τ/T₀ <input type="range" min="0.05" max="0.95" step="0.05" value="0.5" id="fs-d" data-out="fs-do"><output id="fs-do"></output></label>
+    <label>N armónicos <input type="range" min="0" max="60" step="1" value="7" id="fs-n" data-out="fs-no"><output id="fs-no"></output></label>
+  </div>
+  <canvas id="fs-c1" aria-label="Señal y suma parcial"></canvas>
+  <canvas id="fs-c2" aria-label="Espectro de amplitud de líneas"></canvas>
+  <div class="readout" id="fs-out"></div>
+</div>
+
+<h3 id="series-ej">3.4 Ejercicios propuestos</h3>
+<ol class="exercises">
+  <li>Dibuje el espectro bilateral de amplitud y fase de \(x(t)=3+2\cos(2\pi t)+5\cos(2\pi5t)+4\cos(2\pi3t)\) (es la señal de prueba del Laboratorio Simulado 2).
+    <details class="sol"><summary>Solución</summary><div><p>Líneas: \(3\) en \(f=0\); \(1\) en \(\pm1\) Hz; \(2\) en \(\pm3\) Hz; \(2{,}5\) en \(\pm5\) Hz. Todas las fases son 0. Potencia: \(9+2(1+4+6{,}25)=31{,}5\) W.</p></div></details></li>
+  <li>Para \(x(t)=4\sin(2\pi\,100t)-2\cos(2\pi\,300t)\), calcule \(C_{\pm1}\) y \(C_{\pm3}\) (\(f_0=100\) Hz).
+    <details class="sol"><summary>Solución</summary><div><p>\(4\sin\theta=4\cos(\theta-90^\circ)\Rightarrow C_{1}=2e^{-j90^\circ}=-2j\), \(C_{-1}=2j\). \(-2\cos\theta=2\cos(\theta+180^\circ)\Rightarrow C_{\pm3}=1\cdot e^{\pm j180^\circ}=-1\).</p></div></details></li>
+  <li>Un tren de pulsos tiene \(A=1\) V y ciclo útil \(1/4\). ¿Qué armónicos se anulan? ¿Qué fracción de la potencia total está en la DC?
+    <details class="sol"><summary>Solución</summary><div><p>\(C_n=\tfrac14\operatorname{sinc}(n/4)\): se anulan \(n=4,8,12,\dots\). \(P=A^2\tau/T_0=0{,}25\) W y \(C_0^2=1/16=0{,}0625\) W ⇒ 25 % en DC.</p></div></details></li>
+  <li>Demuestre que un tren de pulsos con ciclo útil 50 % al que se le resta su valor medio tiene simetría de media onda, y deduzca qué armónicos contiene.
+    <details class="sol"><summary>Solución</summary><div><p>Restando \(A/2\) la señal vale \(+A/2\) durante medio período y \(-A/2\) el otro medio: \(x(t+T_0/2)=-x(t)\). Por la propiedad de media onda solo hay armónicos impares (y \(C_0=0\)), lo que coincide con \(C_n=\tfrac A2\operatorname{sinc}(n/2)\) para \(n\ne0\).</p></div></details></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="tf">4. Transformada de Fourier: espectro de señales de energía</h2>
+<h3 id="tf-limite">4.1 De la serie a la transformada</h3>
+<p>¿Qué pasa con el espectro del tren de pulsos si alejamos los pulsos (\(T_0\to\infty\)) hasta quedarnos con <em>un solo</em> pulso? Las líneas, separadas \(f_0=1/T_0\), se juntan hasta formar un continuo, y sus alturas \(A\tau/T_0\) tienden a cero. Para no perder la información se mira \(T_0C_n\) (que no tiende a cero) y se cambia \(nf_0\to f\):</p>
+$$T_0C_n=\int_{-T_0/2}^{T_0/2}x(t)e^{-j2\pi nf_0t}dt\ \xrightarrow[T_0\to\infty]{}\ X(f)=\int_{-\infty}^{\infty}x(t)e^{-j2\pi ft}dt$$
+<div class="eq key">
+$$X(f)=\mathcal F\{x(t)\}=\int_{-\infty}^{\infty}x(t)\,e^{-j2\pi ft}\,dt\qquad\Longleftrightarrow\qquad x(t)=\int_{-\infty}^{\infty}X(f)\,e^{j2\pi ft}\,df$$
+<div class="eq-label">Transformada de Fourier directa e inversa</div>
+</div>
+<p><strong>Cómo leerla</strong> (la "receta" del profesor: <em>calcular el valor de alguna componente espectral</em>): \(X(f)\) es una <strong>densidad espectral</strong> de amplitud (V/Hz). \(|X(f)|\) dice cuánta "cantidad de coseno" de frecuencia \(f\) hay por unidad de ancho de banda y \(\arg X(f)\) su fase. El espectro de una señal no periódica es <strong>continuo</strong>. Para una señal real, \(X(-f)=X^*(f)\): amplitud par, fase impar, igual que con los \(C_n\).</p>
+<div class="box def"><span class="box-title">Relación entre las dos herramientas</span>
+<p>Si \(x_{T_0}(t)\) es la repetición periódica de un pulso \(p(t)\) con transformada \(P(f)\), entonces \(C_n=\frac{1}{T_0}P(nf_0)\). <strong>Los \(C_n\) son muestras de la transformada del pulso básico</strong>. Así se reutiliza cualquier transformada conocida para obtener series de Fourier sin integrar.</p></div>
+
+<div class="example">
+<h4>Ejemplo 4.1 — Pulso rectangular (Actividad 3, Ejemplo 1)</h4>
+<div class="step"><span class="n">1</span><div>$$X(f)=\int_{-\tau/2}^{\tau/2}A\,e^{-j2\pi ft}dt=A\frac{\sin\pi f\tau}{\pi f}=A\tau\operatorname{sinc}(f\tau)$$</div></div>
+<div class="step"><span class="n">2</span><div><p>\(X(f)\) es real: positiva (fase 0) en el lóbulo principal \(|f|\lt1/\tau\) y alternando de signo (fase ±180°) en los lóbulos siguientes. \(X(0)=A\tau\) es el <strong>área del pulso</strong> (propiedad general: \(X(0)=\int x\,dt\)).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>El primer cero está en \(f=1/\tau\). Es la regla de oro del ancho de banda: <strong>\(B\approx1/\tau\)</strong>. Un pulso de 1 µs ocupa del orden de 1 MHz.</p></div></div>
+</div>
+
+<h3 id="tf-teoremas">4.2 Teoremas (propiedades) de la transformada</h3>
+<p>Con una tabla corta de pares y estos teoremas se resuelven casi todos los ejercicios <em>sin calcular integrales</em> (Estudio Independiente de la Actividad 3):</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Teorema</th><th>Tiempo</th><th>Frecuencia</th><th>Interpretación</th></tr></thead>
+  <tbody>
+    <tr><td>Linealidad</td><td>\(a\,x(t)+b\,y(t)\)</td><td>\(aX(f)+bY(f)\)</td><td>El espectro de una suma es la suma de espectros.</td></tr>
+    <tr><td>Desplazamiento en el tiempo</td><td>\(x(t-t_d)\)</td><td>\(X(f)e^{-j2\pi ft_d}\)</td><td>Retardar no cambia \(|X|\); añade fase lineal \(-2\pi ft_d\).</td></tr>
+    <tr><td>Desplazamiento en frecuencia (modulación)</td><td>\(x(t)e^{j2\pi f_ct}\) · \(x(t)\cos 2\pi f_ct\)</td><td>\(X(f-f_c)\) · \(\tfrac12[X(f-f_c)+X(f+f_c)]\)</td><td>Multiplicar por un coseno traslada el espectro a \(\pm f_c\).</td></tr>
+    <tr><td>Cambio de escala</td><td>\(x(\alpha t)\)</td><td>\(\frac{1}{|\alpha|}X\!\left(\frac f\alpha\right)\)</td><td>Comprimir en el tiempo expande en frecuencia.</td></tr>
+    <tr><td>Dualidad</td><td>\(X(t)\)</td><td>\(x(-f)\)</td><td>Si \(\Pi\leftrightarrow\operatorname{sinc}\), entonces \(\operatorname{sinc}\leftrightarrow\Pi\).</td></tr>
+    <tr><td>Derivada</td><td>\(\frac{d^n x}{dt^n}\)</td><td>\((j2\pi f)^nX(f)\)</td><td>Útil para señales hechas de rectas (triángulos, trapecios).</td></tr>
+    <tr><td>Integración</td><td>\(\int_{-\infty}^t x(\lambda)d\lambda\)</td><td>\(\frac{X(f)}{j2\pi f}+\tfrac12X(0)\delta(f)\)</td><td>Inverso de la derivada.</td></tr>
+    <tr><td>Convolución</td><td>\(x(t)*y(t)\)</td><td>\(X(f)\,Y(f)\)</td><td>La base del análisis de sistemas LTI.</td></tr>
+    <tr><td>Multiplicación</td><td>\(x(t)\,y(t)\)</td><td>\(X(f)*Y(f)\)</td><td>Muestreo, modulación, ventaneo.</td></tr>
+    <tr><td>Rayleigh (energía)</td><td colspan="2">\(E=\int|x(t)|^2dt=\int|X(f)|^2df\)</td><td>La energía se reparte en frecuencia según \(|X(f)|^2\).</td></tr>
+  </tbody>
+</table></div>
+<div class="table-wrap"><table class="compact">
+  <caption style="text-align:left;font-weight:600;padding:4px 0">Pares que conviene saber de memoria</caption>
+  <thead><tr><th>\(x(t)\)</th><th>\(X(f)\)</th></tr></thead>
+  <tbody>
+    <tr><td>\(A\,\Pi(t/\tau)\)</td><td>\(A\tau\operatorname{sinc}(f\tau)\)</td></tr>
+    <tr><td>\(A\,\Lambda(t/\tau)\) (triángulo de base \(2\tau\))</td><td>\(A\tau\operatorname{sinc}^2(f\tau)\)</td></tr>
+    <tr><td>\(2W\operatorname{sinc}(2Wt)\)</td><td>\(\Pi(f/2W)\)</td></tr>
+    <tr><td>\(e^{-bt}u(t),\ b\gt0\)</td><td>\(\dfrac{1}{b+j2\pi f}\)</td></tr>
+    <tr><td>\(e^{-\pi t^2}\)</td><td>\(e^{-\pi f^2}\)</td></tr>
+    <tr><td>\(\delta(t)\) · \(1\)</td><td>\(1\) · \(\delta(f)\)</td></tr>
+    <tr><td>\(\cos(2\pi f_0t)\)</td><td>\(\tfrac12[\delta(f-f_0)+\delta(f+f_0)]\)</td></tr>
+    <tr><td>\(\sum_k\delta(t-kT_s)\)</td><td>\(f_s\sum_n\delta(f-nf_s)\)</td></tr>
+  </tbody>
+</table></div>
+
+<div class="example">
+<h4>Ejemplo 4.2 — Pulso de radiofrecuencia (Resumen de TF, Ejemplos 1 y 2)</h4>
+<p>Halle el espectro de \(x(t)=\Pi(t/T_1)\cos(2\pi f_1t)\) (un "trozo" de coseno de duración \(T_1\)).</p>
+<div class="step"><span class="n">1</span><div><p><strong>Vía teoremas</strong>: llamamos \(y(t)=\Pi(t/T_1)\Rightarrow Y(f)=T_1\operatorname{sinc}(fT_1)\). Por modulación:</p>
+$$X(f)=\tfrac12[Y(f-f_1)+Y(f+f_1)]=\tfrac{T_1}{2}\left\{\operatorname{sinc}[(f-f_1)T_1]+\operatorname{sinc}[(f+f_1)T_1]\right\}$$</div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Lectura</strong>: dos sincs centradas en \(\pm f_1\), de ancho de lóbulo \(2/T_1\). Si \(T_1\) crece (más ciclos del coseno), las sincs se estrechan y en el límite \(T_1\to\infty\) se convierten en los impulsos del coseno puro. Un coseno "de duración finita" ya no es una línea: es una banda de ancho \(\sim2/T_1\).</p></div></div>
+</div>
+
+<div class="example">
+<h4>Ejemplo 4.3 — Triángulo por el teorema de la derivada (ER-2)</h4>
+<div class="step"><span class="n">1</span><div><p>\(x(t)=A\Lambda(t/\tau)\) sube de 0 a \(A\) en \([-\tau,0]\) y baja en \([0,\tau]\). Su derivada son dos pulsos rectangulares de altura \(\pm A/\tau\):</p>
+$$\frac{dx}{dt}=\frac{A}{\tau}\Pi\!\left(\frac{t+\tau/2}{\tau}\right)-\frac{A}{\tau}\Pi\!\left(\frac{t-\tau/2}{\tau}\right)$$</div></div>
+<div class="step"><span class="n">2</span><div><p>Transformamos con desplazamiento en el tiempo: \(\mathcal F\{dx/dt\}=A\operatorname{sinc}(f\tau)\left(e^{j\pi f\tau}-e^{-j\pi f\tau}\right)=2jA\operatorname{sinc}(f\tau)\sin(\pi f\tau)\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Dividimos por \(j2\pi f\) (teorema de la derivada al revés):</p>$$X(f)=\frac{2jA\operatorname{sinc}(f\tau)\sin(\pi f\tau)}{j2\pi f}=A\tau\operatorname{sinc}(f\tau)\frac{\sin\pi f\tau}{\pi f\tau}=A\tau\operatorname{sinc}^2(f\tau)$$<p>Sin una sola integral. Observa que el triángulo (sin saltos) tiene un espectro que decae como \(1/f^2\), más rápido que el rectángulo (\(1/f\)): <strong>cuanto más suave la señal, más compacto su espectro</strong>.</p></div></div>
+</div>
+
+<div class="sim" id="sim-tf">
+  <div class="sim-title">Explorador de la transformada de Fourier</div>
+  <p class="meta">Un pulso de ancho τ, retardado \(t_d\) y, opcionalmente, multiplicado por un coseno de frecuencia \(f_c\). Comprueba los teoremas: el retardo no altera \(|X(f)|\) pero gira la fase; la modulación traslada el espectro a \(\pm f_c\); estrechar el pulso ensancha el espectro.</p>
+  <div class="controls">
+    <label>Pulso <select id="tf-s"><option value="rect">Rectangular</option><option value="tri">Triangular</option><option value="gauss">Gaussiano</option></select></label>
+    <label>τ (ms) <input type="range" min="0.2" max="4" step="0.1" value="1" id="tf-t" data-out="tf-to"><output id="tf-to"></output></label>
+    <label>t<sub>d</sub> (ms) <input type="range" min="-3" max="3" step="0.1" value="0" id="tf-d" data-out="tf-do"><output id="tf-do"></output></label>
+    <label>f<sub>c</sub> (kHz) <input type="range" min="0" max="5" step="0.5" value="0" id="tf-f" data-out="tf-fo"><output id="tf-fo"></output></label>
+  </div>
+  <canvas id="tf-c1" aria-label="Pulso en el tiempo"></canvas>
+  <div class="two"><canvas id="tf-c2" aria-label="Magnitud de X(f)"></canvas><canvas id="tf-c3" aria-label="Fase de X(f)"></canvas></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="impulsos">5. Impulsos y transformadas en el límite</h2>
+<p>Problema que plantea la Actividad 3: ¿cuál es el espectro de una <strong>constante</strong>? No es periódica en sentido útil ni de energía (\(E=\infty\)), así que la integral de Fourier no converge. La salida es el <strong>impulso de Dirac</strong>.</p>
+<h3 id="impulsos-def">5.1 El impulso unitario</h3>
+<p>Imagina un pulso rectangular de ancho \(a\) y altura \(1/a\) (área 1). Si \(a\to0\) se hace infinitamente alto y estrecho pero conserva área 1: eso es \(\delta(t)\). No es una función ordinaria; se define por lo que hace dentro de una integral:</p>
+$$\delta(t)=\lim_{a\to0}\tfrac1a\Pi(t/a),\qquad \int_{-\infty}^{\infty}\delta(t)\,dt=1,\qquad \int_{-\infty}^{\infty}x(t)\,\delta(t-t_0)\,dt=x(t_0)\ \ (\text{cribado})$$
+<p>Operaciones útiles: \(x(t)\delta(t-t_0)=x(t_0)\delta(t-t_0)\) · \(x(t)*\delta(t-t_0)=x(t-t_0)\) (convolucionar con un impulso <em>traslada</em>) · \(\delta(\alpha t)=\delta(t)/|\alpha|\) · \(u(t)=\int_{-\infty}^t\delta\), es decir \(\delta=du/dt\).</p>
+<p>Se dibuja como una flecha cuya <strong>altura indica el área (peso)</strong>, no el valor.</p>
+
+<h3 id="impulsos-tl">5.2 Transformadas en el límite</h3>
+<div class="step"><span class="n">1</span><div><p>\(\mathcal F\{\delta(t)\}=\int\delta(t)e^{-j2\pi ft}dt=1\): un impulso contiene <strong>todas las frecuencias con igual amplitud</strong>.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Por dualidad, una constante \(A\) tiene transformada \(A\,\delta(f)\): toda la "cantidad de señal" concentrada en \(f=0\). Puedes verlo también como límite: \(A\,\Pi(t/T)\leftrightarrow AT\operatorname{sinc}(fT)\), y cuando \(T\to\infty\) la sinc se hace un impulso de área \(A\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Por modulación: \(A\cos(2\pi f_0t+\varphi)\leftrightarrow\tfrac A2e^{j\varphi}\delta(f-f_0)+\tfrac A2e^{-j\varphi}\delta(f+f_0)\). Las "líneas" del espectro de línea son, en lenguaje de transformadas, <strong>impulsos</strong>.</p></div></div>
+<div class="step"><span class="n">4</span><div><p>Cualquier señal periódica: \(X(f)=\sum_nC_n\,\delta(f-nf_0)\). Así <strong>una sola herramienta</strong> (la TF con impulsos) sirve para señales periódicas, de energía y mixtas, y el espectro es <em>integrable</em> (conclusión de la Actividad 3).</p></div></div>
+
+<div class="example">
+<h4>Ejemplo 5.1 — Espectro de una señal muestreada (CP 7)</h4>
+<p>Sea \(y(t)=x(t)\,z(t)\), donde \(z(t)\) es un tren de pulsos (o impulsos) de período \(T_s=1/f_s\). Halle \(Y(f)\).</p>
+<div class="step"><span class="n">1</span><div><p>\(z(t)\) es periódica: \(z(t)=\sum_nC_n^{(z)}e^{j2\pi nf_st}\), una suma de cosenos de frecuencias \(nf_s\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Multiplicar \(x(t)\) por cada exponencial la traslada en frecuencia (teorema de modulación):</p>
+$$Y(f)=\sum_{n=-\infty}^{\infty}C_n^{(z)}\,X(f-nf_s)$$</div></div>
+<div class="step"><span class="n">3</span><div><p><strong>Conclusión</strong> (la que pide la CP): <em>el espectro de una señal muestreada es el espectro de la señal sin muestrear repetido en los múltiplos de la frecuencia de muestreo</em>, pesado por los \(C_n\) del muestreador (si son impulsos ideales, todos los pesos valen \(f_s\)). Si \(f_s\lt2W\) las réplicas se solapan: <strong>aliasing</strong> (lo estudiarás en el <a href="tema3-banda-base.html#muestreo">Tema III</a>). Esta es también la razón de que el espectro calculado por MATLAB en el Laboratorio Simulado se repita a partir de \(f_s\).</p></div></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="convolucion">6. Convolución</h2>
+<p>La convolución es la operación que, como verás en la sección 8, da la salida de cualquier sistema LTI. Su definición:</p>
+<div class="eq key">$$v(t)*w(t)=\int_{-\infty}^{\infty}v(\lambda)\,w(t-\lambda)\,d\lambda$$<div class="eq-label">Integral de convolución</div></div>
+<p><strong>Método gráfico</strong> (el que usa el ER-2): para cada instante \(t\)</p>
+<ol>
+  <li>Dibuja \(v(\lambda)\) y \(w(-\lambda)\) (<em>reflejar</em> \(w\)).</li>
+  <li>Desplaza \(w(-\lambda)\) hasta \(w(t-\lambda)\) (<em>trasladar</em> \(t\)).</li>
+  <li>Multiplica punto a punto y calcula el <strong>área</strong> del producto: ese número es \(v*w\) en el instante \(t\).</li>
+  <li>Repite para varios \(t\), identificando los intervalos donde cambia la forma del solapamiento.</li>
+</ol>
+<p>Propiedades: conmutativa, asociativa, distributiva; la duración del resultado es la suma de duraciones; el área del resultado es el producto de áreas; \(x*\delta=x\).</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Rectángulo por rectángulo</h4>
+<p>\(\Pi(t/T)*\Pi(t/T)\). Para \(|t|\lt T\) los pulsos se solapan en un intervalo de longitud \(T-|t|\) con producto 1, así que el área es \(T-|t|\); fuera, 0. Resultado: \(T\,\Lambda(t/T)\), un triángulo de base \(2T\) y altura \(T\). Comprobación en frecuencia: \([T\operatorname{sinc}(fT)]^2=T\cdot T\operatorname{sinc}^2(fT)\) ✔ (par del triángulo).</p>
+</div>
+<div class="sim" id="sim-conv">
+  <div class="sim-title">Convolución paso a paso</div>
+  <p class="meta">Arrastra \(t\): la señal \(w(t-\lambda)\) (naranja) se desliza sobre \(v(\lambda)\) (azul); el área sombreada del producto es el valor de \(v*w\) en ese \(t\) (punto sobre la curva verde).</p>
+  <div class="controls">
+    <label>v(t) <select id="cv-a"><option value="rect">Π(t)</option><option value="exp">e^{-t}u(t)</option><option value="tri">Λ(t)</option></select></label>
+    <label>w(t) <select id="cv-b"><option value="rect">Π(t)</option><option value="exp">e^{-t}u(t)</option><option value="rect2">Π(t/2)</option><option value="tri">Λ(t)</option></select></label>
+    <label>t <input type="range" min="-3" max="4" step="0.02" value="-1.2" id="cv-t" data-out="cv-to"><output id="cv-to"></output></label>
+    <button class="btn ghost" type="button" id="cv-play">▶ Animar</button>
+  </div>
+  <canvas id="cv-c1" aria-label="Señales superpuestas"></canvas>
+  <canvas id="cv-c2" aria-label="Resultado de la convolución"></canvas>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="potencia">7. Potencia, energía y función de autocorrelación</h2>
+<h3 id="pot-def">7.1 Definiciones</h3>
+<p>Si \(x(t)\) es la tensión sobre una resistencia de 1 Ω, \(|x(t)|^2\) es la potencia instantánea. Por convención, en comunicaciones se normaliza a 1 Ω (unidades V² o "W normalizados").</p>
+$$E=\int_{-\infty}^{\infty}|x(t)|^2dt\qquad\qquad P=\lim_{T\to\infty}\frac1T\int_{-T/2}^{T/2}|x(t)|^2dt\ \ \overset{\text{periódica}}{=}\ \ \frac1{T_0}\int_{T_0}|x(t)|^2dt$$
+<ul>
+  <li><strong>Señal de energía</strong>: \(E\) finita ⇒ \(P=0\). Ejemplo: un pulso.</li>
+  <li><strong>Señal de potencia</strong>: \(P\) finita ⇒ \(E=\infty\). Ejemplos: periódicas, constantes, ruido estacionario.</li>
+</ul>
+<h3 id="pot-dep">7.2 En el dominio espectral: densidades espectrales</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th></th><th>Señal de energía</th><th>Señal de potencia (periódica)</th></tr></thead>
+  <tbody>
+    <tr><td>Teorema</td><td>Rayleigh: \(E=\int|X(f)|^2df\)</td><td>Parseval: \(P=\sum|C_n|^2\)</td></tr>
+    <tr><td>Densidad espectral</td><td>De energía (DEE): \(\Psi(f)=|X(f)|^2\) [J/Hz]</td><td>De potencia (DEP): \(G(f)=\sum|C_n|^2\delta(f-nf_0)\) [W/Hz]</td></tr>
+    <tr><td>Autocorrelación</td><td>\(R(\tau)=\int x(t)x^*(t-\tau)dt\)</td><td>\(R(\tau)=\langle x(t)x^*(t-\tau)\rangle\) (promedio temporal)</td></tr>
+    <tr><td>Wiener–Khintchine</td><td>\(\mathcal F\{R(\tau)\}=\Psi(f)\)</td><td>\(\mathcal F\{R(\tau)\}=G(f)\)</td></tr>
+    <tr><td>En el origen</td><td>\(R(0)=E\)</td><td>\(R(0)=P\)</td></tr>
+  </tbody>
+</table></div>
+<p>La <strong>autocorrelación</strong> mide cuánto se parece la señal a una copia de sí misma desplazada \(\tau\). Propiedades: \(R(0)\ge|R(\tau)|\) (nada se parece más a la señal que ella misma), \(R(-\tau)=R^*(\tau)\) (par si es real), y si \(x\) es periódica, \(R\) también lo es con el mismo período. Para un coseno \(A\cos(2\pi f_0t+\varphi)\): \(R(\tau)=\frac{A^2}{2}\cos(2\pi f_0\tau)\) — <strong>la fase desaparece</strong>.</p>
+<div class="box idea"><span class="box-title">Lo más importante (CP 9)</span>
+<p>La potencia de una señal <strong>no depende de la fase ni de la frecuencia</strong> de sus componentes, solo de sus amplitudes. Y la DEP es la forma más rápida de calcularla: suma de \(|C_n|^2\), o integral de \(G(f)\).</p></div>
+
+<h3 id="pot-suma">7.3 La potencia de la suma de dos señales</h3>
+<p>Desarrollando \(|x+y|^2\):</p>
+$$P_{x+y}=P_x+P_y+2\operatorname{Re}\{R_{xy}(0)\},\qquad R_{xy}(0)=\langle x(t)\,y^*(t)\rangle$$
+<p>El término cruzado se anula si las señales no tienen componentes en frecuencias comunes (o si una es ruido de media cero independiente de la otra). Pero si comparten frecuencias, <strong>hay que sumar primero los espectros</strong> (fasores) y después elevar al cuadrado.</p>
+<div class="example">
+<h4>Ejemplo 7.1 — Estudio independiente de la CP 9</h4>
+<p>\(a(t)=2+\cos(2\pi t)\), \(b(t)=1+2\cos(2\pi t+\theta)+2\cos(2\pi\,2t)\). Calcule \(P\) de \(x=a+b\).</p>
+<div class="step"><span class="n">1</span><div><p>Sumamos los espectros componente a componente. DC: \(2+1=3\). En \(\pm1\) Hz: \(\tfrac12+e^{\pm j\theta}\). En \(\pm2\) Hz: \(1\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Parseval: \(P=3^2+2\left|\tfrac12+e^{j\theta}\right|^2+2\cdot1^2=11+2\left(\tfrac54+\cos\theta\right)=13{,}5+2\cos\theta\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Compare con la suma "ingenua": \(P_a=4{,}5\), \(P_b=1+2+2=5\), \(P_a+P_b=9{,}5\). <strong>No coinciden</strong> (ni siquiera la DC: \(3^2\ne2^2+1^2\)). Solo si \(\theta=90^\circ\) los cosenos de 1 Hz son ortogonales, pero las DC siguen sumándose como amplitudes.</p></div></div>
+</div>
+
+<h3 id="pot-ej">7.4 Ejercicios propuestos</h3>
+<ol class="exercises">
+  <li>Calcule la energía de \(x(t)=A\,\Pi(t/\tau)\) en el tiempo y en la frecuencia.
+    <details class="sol"><summary>Solución</summary><div><p>Tiempo: \(A^2\tau\). Frecuencia: \(\int A^2\tau^2\operatorname{sinc}^2(f\tau)df=A^2\tau^2\cdot\frac1\tau=A^2\tau\) ✔ (usando \(\int\operatorname{sinc}^2(f\tau)df=1/\tau\)). Aprox. el 90 % de la energía está en el lóbulo principal \(|f|\lt1/\tau\).</p></div></details></li>
+  <li>Determine la potencia de \(x(t)=10\cos(2\pi\,1000t)\cos(2\pi\,10^5t)\) (CP 9, tipo 1).
+    <details class="sol"><summary>Solución</summary><div><p>Producto de cosenos: \(5\cos(2\pi\,99\,000t)+5\cos(2\pi\,101\,000t)\). Cuatro líneas de altura 2,5: \(P=4\cdot2{,}5^2=25\) W. (También: \(\tfrac{10^2}{2}\cdot\tfrac12=25\)).</p></div></details></li>
+  <li>¿Es de energía o de potencia \(x(t)=e^{-|t|}\)? ¿Y \(u(t)\)? Calcule la magnitud finita.
+    <details class="sol"><summary>Solución</summary><div><p>\(e^{-|t|}\): energía, \(E=2\int_0^\infty e^{-2t}dt=1\) J. \(u(t)\): potencia, \(P=\lim\frac1T\int_0^{T/2}1\,dt=\tfrac12\) W.</p></div></details></li>
+  <li>Halle \(R(\tau)\) y \(G(f)\) de \(x(t)=2+4\cos(2\pi\,50t+\pi/3)\).
+    <details class="sol"><summary>Solución</summary><div><p>\(R(\tau)=4+8\cos(2\pi\,50\tau)\); \(G(f)=4\delta(f)+4[\delta(f-50)+\delta(f+50)]\); \(P=R(0)=12\) W.</p></div></details></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="lti">8. Sistemas LTI</h2>
+<h3 id="lti-def">8.1 Linealidad e invarianza</h3>
+<p>Un sistema transforma una entrada \(x(t)\) en una salida \(y(t)\). Es <strong>lineal</strong> si cumple superposición (\(ax_1+bx_2\to ay_1+by_2\)) e <strong>invariante en el tiempo</strong> si un retardo en la entrada solo retarda la salida (\(x(t-t_d)\to y(t-t_d)\)). Cables, filtros pasivos y amplificadores en zona lineal son, con buena aproximación, LTI.</p>
+<h3 id="lti-h">8.2 Respuesta impulsiva y función transferencial</h3>
+<p>La <strong>respuesta impulsiva</strong> \(h(t)\) es la salida cuando la entrada es \(\delta(t)\). Como cualquier entrada puede escribirse como "suma de impulsos" \(x(t)=\int x(\lambda)\delta(t-\lambda)d\lambda\), linealidad + invarianza dan:</p>
+<div class="eq key">$$y(t)=x(t)*h(t)=\int_{-\infty}^{\infty}x(\lambda)h(t-\lambda)d\lambda\qquad\Longleftrightarrow\qquad Y(f)=H(f)\,X(f),\quad H(f)=\mathcal F\{h(t)\}$$<div class="eq-label">Respuesta de un sistema LTI en el tiempo y en la frecuencia</div></div>
+<p>\(H(f)=|H(f)|e^{j\theta(f)}\) es la <strong>función transferencial</strong> (respuesta en frecuencia). En frecuencia la convolución se vuelve un producto: el efecto del sistema es <strong>multiplicativo en amplitud y aditivo en fase</strong> (conclusión de la Actividad 5). En particular, para un coseno:</p>
+$$A\cos(2\pi f_0t+\varphi)\ \xrightarrow{\ H\ }\ A\,|H(f_0)|\cos\!\big(2\pi f_0t+\varphi+\theta(f_0)\big)$$
+<p>Y para la potencia: \(G_y(f)=|H(f)|^2G_x(f)\) — la fase del sistema no influye en la potencia de salida.</p>
+<p><strong>Conexiones</strong>: en cascada \(H=H_1H_2\) (\(h=h_1*h_2\)); en paralelo \(H=H_1+H_2\).</p>
+
+<h3 id="lti-dist">8.3 Transmisión sin distorsión y tipos de distorsión</h3>
+<p>Una señal llega <strong>sin distorsión</strong> si a la salida tiene la misma forma, aunque escalada y retardada: \(y(t)=Kx(t-t_d)\). Transformando:</p>
+<div class="eq">$$H(f)=K\,e^{-j2\pi ft_d}:\qquad |H(f)|=K\ (\text{constante}),\qquad \theta(f)=-2\pi t_df\ (\text{lineal})$$</div>
+<p>Basta que se cumpla <em>en la banda que ocupa la señal</em>. Si no se cumple aparece:</p>
+<ul>
+  <li><strong>Distorsión de amplitud</strong>: \(|H(f)|\) no constante — unos armónicos se atenúan más que otros (un filtro paso bajo "redondea" los bordes de un pulso).</li>
+  <li><strong>Distorsión de retardo (fase)</strong>: \(\theta(f)\) no lineal — cada armónico llega con distinto retardo \(t_d(f)=-\theta(f)/2\pi f\) y la forma se deforma aunque las amplitudes sean correctas. El oído casi no la nota; los datos digitales, sí (ISI).</li>
+  <li><strong>Distorsión no lineal</strong>: el sistema no es lineal (p. ej. \(y=a_1x+a_2x^2+a_3x^3\)): aparecen <strong>frecuencias nuevas</strong> (armónicos \(2f_0,3f_0\) y productos de intermodulación \(f_1\pm f_2\)). Un sistema LTI nunca crea frecuencias nuevas.</li>
+</ul>
+
+<h3 id="lti-filtros">8.4 Filtros</h3>
+<p>Un filtro es un sistema que transmite sin distorsión <em>solo</em> en un intervalo de frecuencias (banda de paso) y atenúa el resto. Ideales: paso bajo \(H=K\Pi(f/2B)e^{-j2\pi ft_d}\), paso alto, paso banda y supresor de banda. El paso bajo ideal tiene \(h(t)=2BK\operatorname{sinc}[2B(t-t_d)]\), que empieza antes de \(t=0\): <strong>es no causal y por tanto irrealizable</strong>; los filtros reales (Butterworth, Chebyshev, RC…) lo aproximan.</p>
+<div class="example">
+<h4>Ejemplo 8.1 — Filtro RC paso bajo</h4>
+<p>Con \(R\) en serie y \(C\) en paralelo a la salida (divisor de tensión con impedancias):</p>
+$$H(f)=\frac{1/(j2\pi fC)}{R+1/(j2\pi fC)}=\frac{1}{1+j f/B},\qquad B=\frac{1}{2\pi RC},\qquad h(t)=\frac{1}{RC}e^{-t/RC}u(t)$$
+<p>\(|H(B)|=1/\sqrt2\) (−3 dB) y \(\theta(B)=-45^\circ\). Para \(f\ll B\) el sistema es casi sin distorsión con \(t_d\approx RC\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 8.2 — Potencia a la salida de dos sistemas en cascada (CP 10, ej. 2)</h4>
+<p>Un tren de impulsos \(x(t)=\sum_k\delta(t-kT_0)\) entra a \(H_1\) con \(h_1(t)=\Pi(t/\tau)\) y después a \(H_2\) (paso bajo ideal de ancho \(B\) y ganancia 1). Determine la potencia de \(z(t)\).</p>
+<div class="step"><span class="n">1</span><div><p><strong>Vía tiempo</strong>: impulsos convolucionados con un rectángulo ⇒ \(y_1(t)\) es un tren de pulsos rectangulares de amplitud 1 y duración \(\tau\). Su serie es conocida: \(C_n=\frac{\tau}{T_0}\operatorname{sinc}(nf_0\tau)\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Vía frecuencia</strong> (mismo resultado): \(X(f)=f_0\sum\delta(f-nf_0)\) por \(H_1(f)=\tau\operatorname{sinc}(f\tau)\): impulsos con pesos \(f_0\tau\operatorname{sinc}(nf_0\tau)\) — "una sinc muestreada".</p></div></div>
+<div class="step"><span class="n">3</span><div><p>\(H_2\) deja pasar solo las líneas con \(|nf_0|\lt B\): \(P_z=\sum_{|n|f_0\lt B}|C_n|^2\). Con \(T_0=1\) ms, \(\tau=0{,}5\) ms y \(B=2{,}5\) kHz: pasan \(n=0,\pm1,\pm2\): \(P_z=0{,}25+2(0{,}318)^2+0=0{,}453\) W (de los 0,5 W de \(y_1\)).</p></div></div>
+</div>
+
+<div class="sim" id="sim-rc">
+  <div class="sim-title">Onda cuadrada a través de un filtro RC</div>
+  <p class="meta">Tren de pulsos (ciclo útil 50 %, 1 kHz) a la entrada de un RC paso bajo. Arriba, entrada (gris) y salida; abajo, el espectro de líneas de entrada y salida (\(|C_n|\) y \(|H(nf_0)||C_n|\)). Baja la frecuencia de corte y mira cómo desaparecen los armónicos altos y se redondean los flancos.</p>
+  <div class="controls">
+    <label>f<sub>c</sub> = 1/(2πRC) (kHz) <input type="range" min="0.2" max="20" step="0.1" value="3" id="rc-f" data-out="rc-fo"><output id="rc-fo"></output></label>
+  </div>
+  <canvas id="rc-c1" aria-label="Entrada y salida en el tiempo"></canvas>
+  <canvas id="rc-c2" aria-label="Espectros de entrada y salida"></canvas>
+  <div class="readout" id="rc-out"></div>
+</div>
+
+<h3 id="lti-ej">8.5 Ejercicios propuestos</h3>
+<ol class="exercises">
+  <li>La señal \(x(t)=2\cos(2\pi\,1000t)+\cos(2\pi\,3000t)\) entra a un RC con \(B=1\) kHz. Escriba \(y(t)\).
+    <details class="sol"><summary>Solución</summary><div><p>\(H(1\text{k})=\tfrac{1}{1+j}=0{,}707\angle-45^\circ\); \(H(3\text{k})=\tfrac{1}{1+3j}=0{,}316\angle-71{,}6^\circ\). \(y(t)=1{,}414\cos(2\pi\,1000t-45^\circ)+0{,}316\cos(2\pi\,3000t-71{,}6^\circ)\). Hay distorsión de amplitud y de fase.</p></div></details></li>
+  <li>Un canal tiene \(H(f)=10e^{-j2\pi f(10^{-3})}\) para \(|f|\lt5\) kHz. ¿Transmite sin distorsión una señal de voz de 3,4 kHz? ¿Qué sale?
+    <details class="sol"><summary>Solución</summary><div><p>Sí: módulo constante y fase lineal en la banda de la señal. \(y(t)=10\,x(t-1\text{ ms})\).</p></div></details></li>
+  <li>Un amplificador tiene \(y=x+0{,}1x^2\). Si \(x=\cos(2\pi\,100t)\), ¿qué frecuencias aparecen a la salida?
+    <details class="sol"><summary>Solución</summary><div><p>\(0{,}1\cos^2=0{,}05+0{,}05\cos(2\pi\,200t)\): aparecen DC y 200 Hz (segundo armónico) además de 100 Hz. Distorsión no lineal.</p></div></details></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="aleatorias">9. Señales aleatorias y ruido</h2>
+<div class="box prereq"><span class="box-title">variable aleatoria, esperanza y gaussiana</span>
+<p>Una variable aleatoria \(X\) asigna un número a cada resultado de un experimento. Se describe con la función de distribución \(F_X(x)=P(X\le x)\) y la densidad \(p_X(x)=dF_X/dx\) (\(\ge0\), área 1). Momentos: media \(m_X=E[X]=\int x\,p_X(x)dx\), media cuadrática \(E[X^2]\), varianza \(\sigma_X^2=E[X^2]-m_X^2\). La gaussiana:</p>
+$$p_X(x)=\frac{1}{\sqrt{2\pi}\,\sigma}e^{-(x-m)^2/2\sigma^2}$$
+<p>Repaso: <a href="../../repaso/probabilidad.html#va">variables aleatorias</a> · <a href="../../repaso/probabilidad.html#gauss">distribución gaussiana y función Q</a>.</p></div>
+
+<h3 id="ale-proc">9.1 Proceso estocástico, estacionaridad y ergodicidad</h3>
+<p>Un <strong>proceso estocástico</strong> \(X(t)\) es un conjunto (ensemble) de funciones del tiempo —<em>realizaciones</em>—; para cada \(t\) fijo, \(X(t)\) es una variable aleatoria. Piensa en el ruido de mil resistencias idénticas medido a la vez: cada osciloscopio muestra una realización distinta.</p>
+<ul>
+  <li><strong>Promedios estadísticos</strong> (verticales, sobre el ensemble): \(m_X(t)=E[X(t)]\), \(R_X(t_1,t_2)=E[X(t_1)X(t_2)]\).</li>
+  <li><strong>Estacionario en sentido amplio (WSS)</strong>: \(m_X\) constante y \(R_X\) depende solo de \(\tau=t_1-t_2\).</li>
+  <li><strong>Ergódico</strong>: los promedios estadísticos son iguales a los promedios en el tiempo de <em>una sola</em> realización. En este curso <strong>las señales aleatorias se consideran siempre ergódicas</strong>.</li>
+</ul>
+<p>La ergodicidad conecta la estadística con lo que mide un instrumento:</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Parámetro de la señal</th><th>Momento estadístico</th></tr></thead>
+  <tbody>
+    <tr><td>Nivel de DC \(\langle x\rangle\)</td><td>\(m_X\)</td></tr>
+    <tr><td>Potencia de DC \(\langle x\rangle^2\)</td><td>\(m_X^2\)</td></tr>
+    <tr><td>Potencia promedio total \(\langle x^2\rangle\)</td><td>\(E[X^2]=R_X(0)\)</td></tr>
+    <tr><td>Potencia de AC</td><td>\(\sigma_X^2\)</td></tr>
+    <tr><td>Valor RMS</td><td>\(\sqrt{E[X^2]}\)</td></tr>
+  </tbody>
+</table></div>
+<p>La DEP de un proceso WSS es \(G_X(f)=\mathcal F\{R_X(\tau)\}\) (Wiener–Khintchine) y \(E[X^2]=\int G_X(f)df\).</p>
+
+<h3 id="ale-ruido">9.2 Ruido térmico y ruido blanco</h3>
+<p>Los electrones de cualquier conductor a temperatura \(T\gt0\) se agitan al azar; la tensión resultante en bornes de una resistencia es el <strong>ruido térmico</strong> (Johnson y Nyquist, 1928). Es un proceso gaussiano de media cero con</p>
+<div class="eq">$$\overline{v^2}=\sigma_v^2=4kTRB\qquad\text{(en un ancho de banda }B\text{)},\qquad G_v(f)=2kTR\ \ \text{(V}^2\text{/Hz, bilateral)}$$</div>
+<p>con \(k=1{,}38\times10^{-23}\) J/K. Modelo: fuente de tensión de ruido en serie con una resistencia ideal. Si se conecta a una carga adaptada (\(R_L=R\)), la DEP <strong>disponible</strong> (máxima transferencia) es</p>
+<div class="eq key">$$G_a(f)=\frac{G_v(f)}{4R}=\frac{kT}{2}\quad\text{(W/Hz)}$$<p style="text-align:center;margin-top:-6px"><strong>¡Independiente de \(R\)!</strong></p></div>
+<p>Como \(G_a\) es plana hasta frecuencias altísimas (~THz a temperatura ambiente), se idealiza como <strong>ruido blanco</strong>: DEP constante en todas las frecuencias,</p>
+$$G_n(f)=\frac{N_0}{2},\qquad R_n(\tau)=\frac{N_0}{2}\delta(\tau),\qquad N_0=kT_N$$
+<p>donde \(T_N\) es la <strong>temperatura de ruido</strong>: la temperatura que tendría que tener una resistencia para entregar ese mismo ruido (aunque la fuente real no sea térmica). Referencia: \(T_0=290\) K ⇒ \(kT_0=4{,}0\times10^{-21}\) W/Hz = −174 dBm/Hz. Un ruido blanco tiene potencia infinita (área infinita bajo \(G_n\)): es una abstracción que solo tiene sentido después de pasar por un sistema de banda limitada.</p>
+
+<h3 id="ale-sist">9.3 Ruido a través de sistemas LTI</h3>
+$$G_y(f)=|H(f)|^2\frac{N_0}{2}\qquad\Rightarrow\qquad N_y=\int_{-\infty}^{\infty}|H(f)|^2\frac{N_0}{2}df=N_0\int_0^\infty|H(f)|^2df$$
+<p>Para un paso bajo ideal de ganancia 1 y ancho \(B\): \(N_y=N_0B\). Para cualquier filtro se define el <strong>ancho de banda equivalente de ruido</strong> \(B_N=\frac{1}{|H(0)|^2}\int_0^\infty|H|^2df\), con lo que \(N_y=|H(0)|^2N_0B_N\). Para el RC: \(B_N=\frac{\pi}{2}B=\frac{1}{4RC}\).</p>
+<div class="example">
+<h4>Ejemplo 9.1 — DEP y potencia de señal + ruido (Act. 6 EI 1 y CP 11)</h4>
+<p>\(x(t)=a(t)+n(t)+c(t)\): \(a(t)\) tren de pulsos (\(T_0=1\) ms, \(A=4\) V, \(\tau=0{,}5\) ms), \(n(t)\) blanco de media cero y \(c(t)=2\cos(2\pi\,3\text{ kHz}\,t)\).</p>
+<div class="step"><span class="n">1</span><div><p><strong>¿La DEP de la suma es la suma de las DEP?</strong> Entre la parte determinística y el ruido de media cero independiente, sí: \(R_{an}=E[a(t)n(t-\tau)]=a(t)\,E[n]=0\). Pero \(a(t)\) y \(c(t)\) tienen <em>ambas</em> una línea en 3 kHz, así que <strong>entre ellas no</strong>.</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Línea de 3 kHz: \(C_3^{(a)}=2\operatorname{sinc}(3/2)=-0{,}424\) y \(C_3^{(c)}=1\). Juntas: \(1-0{,}424=0{,}576\) ⇒ \(|C_3|^2=0{,}331\) W, muy distinto de \(0{,}180+1=1{,}180\) W que daría la suma de potencias.</p></div></div>
+<div class="step"><span class="n">3</span><div>$$G_x(f)=\frac{N_0}{2}+\sum_{n\ne\pm3}|2\operatorname{sinc}(n/2)|^2\delta(f-n\cdot1\text{k})+0{,}331[\delta(f-3\text{k})+\delta(f+3\text{k})]$$<p>(En el enunciado la temperatura aparece como «1020 T₀»: casi seguro es \(10^{20}T_0\), un valor didáctico que da \(N_0=k\cdot10^{20}\cdot290\approx0{,}4\) W/Hz).</p></div></div>
+<div class="step"><span class="n">4</span><div><p><strong>Potencia a la salida de un sistema</strong> (CP 11, ej. 3): si \(x\) pasa por un paso bajo ideal de 2,5 kHz, la línea de 3 kHz se elimina y \(P_y=C_0^2+2|C_1|^2+N_0B=4+3{,}24+N_0B\). A la entrada la potencia es infinita (ruido blanco); a la salida es finita.</p></div></div>
+</div>
+<div class="sim" id="sim-noise">
+  <div class="sim-title">Ruido blanco gaussiano filtrado</div>
+  <p class="meta">Se genera ruido blanco (muestras gaussianas) y se pasa por un RC de ancho de banda \(B\). Compara la varianza medida con la teórica \(N_0B_N=N_0\pi B/2\), y mira cómo el filtro "suaviza" la realización (aumenta la correlación entre muestras vecinas) sin cambiar su carácter gaussiano.</p>
+  <div class="controls">
+    <label>N₀ (W/Hz) <input type="range" min="0.2" max="2" step="0.1" value="1" id="nz-n" data-out="nz-no"><output id="nz-no"></output></label>
+    <label>B (Hz) <input type="range" min="5" max="200" step="5" value="40" id="nz-b" data-out="nz-bo"><output id="nz-bo"></output></label>
+    <button class="btn ghost" type="button" id="nz-re">↻ Nueva realización</button>
+  </div>
+  <div class="two"><canvas id="nz-c1" aria-label="Realización del ruido filtrado"></canvas><canvas id="nz-c2" aria-label="Histograma y gaussiana teórica"></canvas></div>
+  <div class="readout" id="nz-out"></div>
+</div>
+
+<h3 id="ale-ej">9.4 Ejercicios propuestos</h3>
+<ol class="exercises">
+  <li>Calcule la tensión RMS de ruido de una resistencia de 10 kΩ a 290 K en un ancho de banda de 1 MHz.
+    <details class="sol"><summary>Solución</summary><div><p>\(\sqrt{4\cdot1{,}38\times10^{-23}\cdot290\cdot10^4\cdot10^6}=\sqrt{1{,}6\times10^{-10}}=12{,}7\) µV.</p></div></details></li>
+  <li>Un ruido blanco con \(N_0=10^{-8}\) W/Hz pasa por un paso banda ideal de 10 kHz de ancho y ganancia 2. ¿Potencia de ruido a la salida?
+    <details class="sol"><summary>Solución</summary><div><p>\(|H|^2=4\) en \(2\times10\) kHz (frecuencias positivas y negativas): \(N=4\cdot\tfrac{N_0}{2}\cdot2\cdot10^4=4\times10^{-4}\) W.</p></div></details></li>
+  <li>Una señal ergódica tiene \(m_X=1\) V y \(\sigma_X^2=3\) V². ¿Potencia total, potencia de AC y valor RMS?
+    <details class="sol"><summary>Solución</summary><div><p>\(E[X^2]=\sigma^2+m^2=4\) W; AC: 3 W; RMS: 2 V.</p></div></details></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="lab">10. Laboratorio simulado 2: espectro de señales con la computadora</h2>
+<p><strong>Objetivo</strong>: caracterizar espectralmente señales con MATLAB/Octave (coseno, tren de pulsos cuadrados simétricos y no simétricos, tren triangular, pulso aislado). <strong>Idea central</strong>: en la computadora la señal es un <em>vector de muestras</em> más su frecuencia de muestreo \(F_s\); sin \(F_s\) los números no representan ninguna señal concreta.</p>
+<h3 id="lab-pasos">10.1 Qué hacen las funciones del laboratorio</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th>Función</th><th>Qué genera / calcula</th><th>Equivalente Python (<code>fc1</code>)</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">foury(x, fs)</td><td>FFT de \(x\) dividida por \(N\), reordenada de \(-F_s/2\) a \(+F_s/2\): aproxima los \(C_n\) (espectro de amplitud bilateral).</td><td class="mono">fc1.senales.foury(x, fs)</td></tr>
+    <tr><td class="mono">cuadpuls(n, alto, bajo)</td><td>Tren de \(n\) semiperíodos: <em>alto</em> muestras a 1 y <em>bajo</em> muestras a 0.</td><td class="mono">fc1.senales.cuadpuls(...)</td></tr>
+    <tr><td class="mono">triapuls(n, sub, baj, tot)</td><td>Tren de triángulos con <em>sub</em> muestras de subida, <em>baj</em> de bajada y <em>tot</em> por período.</td><td class="mono">fc1.senales.triapuls(...)</td></tr>
+    <tr><td class="mono">un_pulse(N, k)</td><td>Un solo pulso de \(k\) muestras centrado en \(N\) muestras.</td><td class="mono">fc1.senales.un_pulse(...)</td></tr>
+  </tbody>
+</table></div>
+<h3 id="lab-calc">10.2 Cálculos que debes saber hacer</h3>
+<ul>
+  <li><strong>Período a partir de muestras</strong>: <code>cuadpuls(10,10,10)</code> con \(F_s=10\) Hz ⇒ 20 muestras por período ⇒ \(T_0=20/F_s=2\) s, \(f_0=0{,}5\) Hz.</li>
+  <li><strong>Ceros de la envolvente</strong>: con pulso alto de \(\tau\) segundos, el espectro se anula en \(k/\tau\). <code>cuadpuls(10,100,100)</code> a 100 Hz: \(\tau=1\) s ⇒ ceros en 1, 2, 3 Hz… que coinciden con los armónicos pares de \(f_0=0{,}5\) Hz.</li>
+  <li><strong>Resolución en frecuencia</strong>: \(\Delta f=F_s/N\). Para ver líneas separadas \(f_0\) se necesitan varios períodos (\(N\gg F_s/f_0\)).</li>
+  <li><strong>Rango visible</strong>: \(-F_s/2\) a \(F_s/2\). Lo que esté por encima se "dobla" (aliasing): por eso se elige \(F_s\gg f_0\).</li>
+</ul>
+<div class="sim" id="sim-lab">
+  <div class="sim-title">«foury» en el navegador</div>
+  <p class="meta">Reproduce el laboratorio sin instalar nada: el espectro se calcula con una DFT de la señal muestreada, exactamente como <code>foury.m</code> (\(|X_k|/N\), centrado).</p>
+  <div class="controls">
+    <label>Señal <select id="lb-s">
+      <option value="cos">a) cos(2π·1·t)</option>
+      <option value="mix">a′) 3 + 2cos(2πt) + 5cos(2π5t) + 4cos(2π3t)</option>
+      <option value="sq">b) cuadpuls(10, 100, 100)</option>
+      <option value="sqa">c) cuadpuls(10, 50, 150)</option>
+      <option value="tri">d) triapuls(10, 10, 10, 100)</option>
+      <option value="tria">d′) triapuls(10, 5, 15, 20) · Fs = 20</option>
+      <option value="pul">e) un_pulse(1000, 100)</option>
+    </select></label>
+    <label>F<sub>s</sub> (Hz) <input type="number" id="lb-fs" value="100" min="5" max="2000" step="5" style="width:90px"></label>
+  </div>
+  <canvas id="lb-c1" aria-label="Señal muestreada"></canvas>
+  <canvas id="lb-c2" aria-label="Espectro de amplitud"></canvas>
+  <div class="readout" id="lb-out"></div>
+</div>
+<div class="box warn"><span class="box-title">Errores típicos en el laboratorio y en el Trabajo Práctico</span>
+<ul>
+  <li>Olvidar que <code>foury</code> da el espectro de la <em>señal muestreada</em>: más allá de \(F_s/2\) no hay información nueva.</li>
+  <li>Generar pocos períodos: las líneas se ensanchan (es el espectro de un "trozo" de señal, ver Ejemplo 4.2). La guía sugiere formar la señal con más de 3–4 períodos.</li>
+  <li>Confundir número de muestras con tiempo: el eje correcto es <code>t = (0:N-1)/Fs</code>.</li>
+  <li>Comparar amplitudes sin dividir por \(N\) (la FFT sin normalizar escala con la longitud).</li>
+</ul></div>
+
+<h3 id="tp">10.3 Guía del Trabajo Práctico del Tema II</h3>
+<p>Cada equipo recibe una señal (pulsos de RF modulando un coseno, envolventes triangulares, trenes de pulsos "modificados" por un coseno, semiciclos de seno…) y debe <strong>obtener el espectro en MATLAB y comprobarlo matemáticamente</strong>. Método recomendado:</p>
+<ol>
+  <li><strong>Descomponer</strong> la señal en piezas conocidas: suma (linealidad), producto por coseno (modulación), retardo (desplazamiento), periodicidad (\(C_n=P(nf_0)/T_0\)).</li>
+  <li><strong>Calcular a mano</strong> las líneas o la envolvente: posición (\(nf_0\), \(f_c\pm nf_0\)), altura y ceros.</li>
+  <li><strong>Simular</strong> con la \(F_s\) indicada y suficientes períodos; superponer el resultado teórico.</li>
+  <li><strong>Explicar diferencias</strong>: resolución \(F_s/N\), fugas por no tomar un número entero de períodos, aliasing.</li>
+</ol>
+<div class="example">
+<h4>Ejemplo 10.1 — Coseno de 1 Hz que modula en amplitud a uno de 20 Hz (variante 5)</h4>
+<p>Si la función aplicada es la de AM convencional, \(s(t)=[2+0{,}8\cos(2\pi t)]\cos(2\pi\,20t)\).</p>
+<div class="step"><span class="n">1</span><div><p>Desarrollando: \(s=2\cos(2\pi20t)+0{,}4\cos(2\pi19t)+0{,}4\cos(2\pi21t)\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Espectro bilateral: líneas de 1 en \(\pm20\) Hz y de 0,2 en \(\pm19\) y \(\pm21\) Hz. Con \(F_s=1\) kHz, para resolver líneas separadas 1 Hz hacen falta al menos ~3 s de señal (\(N\ge3000\)).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Potencia: \(2\cdot1^2+4\cdot0{,}2^2=2{,}16\) W.</p></div></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="quiz">Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. Un coseno de amplitud 6 V tiene en el espectro bilateral de amplitud…</p><div class="opts">
+    <button class="opt" type="button">una línea de 6 en \(+f_0\)</button>
+    <button class="opt" type="button" data-ok>dos líneas de 3 en \(\pm f_0\)</button>
+    <button class="opt" type="button">dos líneas de 6 en \(\pm f_0\)</button></div>
+    <p class="why">Euler reparte la amplitud entre los dos fasores: \(A/2\) en cada frecuencia.</p></div>
+  <div class="q"><p>2. Si se retarda una señal, su espectro de amplitud…</p><div class="opts">
+    <button class="opt" type="button" data-ok>no cambia</button>
+    <button class="opt" type="button">se desplaza en frecuencia</button>
+    <button class="opt" type="button">se multiplica por \(t_d\)</button></div>
+    <p class="why">\(|X(f)e^{-j2\pi ft_d}|=|X(f)|\). Solo cambia la fase.</p></div>
+  <div class="q"><p>3. Al hacer un pulso más estrecho, el primer cero de su espectro…</p><div class="opts">
+    <button class="opt" type="button">se acerca al origen</button>
+    <button class="opt" type="button" data-ok>se aleja del origen</button>
+    <button class="opt" type="button">no cambia</button></div>
+    <p class="why">El primer cero está en \(1/\tau\).</p></div>
+  <div class="q"><p>4. ¿Qué sistema puede crear frecuencias que no estaban en la entrada?</p><div class="opts">
+    <button class="opt" type="button">Un filtro RC</button>
+    <button class="opt" type="button">Un cable coaxial</button>
+    <button class="opt" type="button" data-ok>Un amplificador saturado</button></div>
+    <p class="why">Solo los sistemas no lineales generan armónicos e intermodulación.</p></div>
+  <div class="q"><p>5. La DEP disponible de una resistencia a temperatura \(T\) es…</p><div class="opts">
+    <button class="opt" type="button">\(4kTR\)</button>
+    <button class="opt" type="button" data-ok>\(kT/2\), independiente de \(R\)</button>
+    <button class="opt" type="button">\(kTR/2\)</button></div>
+    <p class="why">\(G_v/4R=2kTR/4R=kT/2\) (bilateral).</p></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="biblio">Dónde estudiarlo</h2>
+<p class="meta">Páginas impresas del libro; entre paréntesis, la página del visor PDF del archivo en <code>05-Bibliografia</code> cuando difiere.</p>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Temas</th></tr></thead>
+  <tbody>
+    <tr><td>Carlson, Crilly y Rutledge, <em>Communication Systems</em>, 4.ª ed., McGraw-Hill, 2002</td><td>2</td><td>2.1 Line Spectra and Fourier Series</td><td>pp. 17–32 (PDF 30–45)</td><td>Fasores, espectro de línea, series</td></tr>
+    <tr><td>Carlson (ídem)</td><td>2</td><td>2.2 Fourier Transforms and Continuous Spectra · 2.3 Time and Frequency Relations · 2.4 Convolution</td><td>pp. 33–58 (PDF 46–71)</td><td>TF, teoremas, convolución</td></tr>
+    <tr><td>Carlson (ídem)</td><td>2</td><td>2.5 Impulses and Transforms in the Limit</td><td>desde p. 59 (PDF 72)</td><td>Impulsos, TF de constantes, cosenos y señales periódicas</td></tr>
+    <tr><td>Carlson (ídem)</td><td>3</td><td>3.1 Response of LTI Systems · 3.2 Signal Distortion in Transmission · 3.4 Filters and Filtering</td><td>pp. 76–98 y 109–119 (PDF 89–111 y 122–132)</td><td>Respuesta impulsiva, \(H(f)\), distorsión, filtros</td></tr>
+    <tr><td>Carlson (ídem)</td><td>3</td><td>3.6 Correlation and Spectral Density</td><td>pp. 124–134 (PDF 137–147)</td><td>Autocorrelación, DEP</td></tr>
+    <tr><td>Carlson (ídem)</td><td>9</td><td>9.1 Random Processes · 9.2 Random Signals · 9.3 Noise</td><td>pp. 352–380 (PDF 361–387)</td><td>Procesos, ergodicidad, ruido térmico y blanco</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>1</td><td>1.2 Mathematical Definition of a Random Process · 1.4 Mean, Correlation, and Covariance Functions · 1.6 Transmission through an LTI Filter · 1.7 Power Spectral Density · 1.8 Gaussian Process</td><td>pp. 32–57 (PDF 52–77)</td><td>Procesos aleatorios y ruido a través de filtros</td></tr>
+    <tr><td>Sklar y Ray, <em>Digital Communications</em>, 2.ª ed., Pearson, 2014</td><td>1</td><td>1.2 Classification of Signals · 1.3 Spectral Density · 1.4 Autocorrelation</td><td>pp. 14–20 (PDF 41–47)</td><td>Clasificación, energía y potencia, DEE/DEP</td></tr>
+    <tr><td>Sklar (ídem)</td><td>1</td><td>1.5 Random Signals (1.5.1–1.5.5)</td><td>pp. 20–33 (PDF 47–60)</td><td>VA, procesos, ergodicidad, ruido</td></tr>
+    <tr><td>Sklar (ídem)</td><td>1</td><td>1.6 Signal Transmission through Linear Systems</td><td>pp. 33–45 (PDF 60–72)</td><td>LTI, transmisión sin distorsión</td></tr>
+    <tr><td>Sklar (ídem)</td><td>Ap. A</td><td>A.2 Fourier Techniques · A.3 Properties · A.4 Useful Functions · A.5 Convolution · A.6 Tables</td><td>pp. 1069–1090 (PDF 1096–1117)</td><td>Series, TF, impulsos, convolución (es el "Sklar pp. 711–731" de la guía, en la numeración de otra edición)</td></tr>
+    <tr><td>Couch, <em>Digital and Analog Communication Systems</em>, 8.ª ed., Prentice Hall, 2012</td><td>2</td><td>2–1 Properties of Signals and Noise · 2–2 Fourier Transform and Spectra · 2–3 PSD and Autocorrelation · 2–5 Fourier Series · 2–6 Review of Linear Systems</td><td>pp. 34–89 (PDF 59–114)</td><td>Todo el tema, con ejemplos en MATLAB</td></tr>
+    <tr><td>Couch (ídem)</td><td>6</td><td>6–1 Some Basic Definitions · 6–2 PSD · 6–3 DC and RMS Values for Ergodic Processes · 6–4 Linear Systems · 6–6 The Gaussian Process</td><td>pp. 415–450 (PDF 440–475)</td><td>Procesos aleatorios y ruido a través de sistemas</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="links">Para profundizar</h2>
+<ul>
+  <li><strong>Vídeo</strong> — 3Blue1Brown, <a href="https://www.youtube.com/watch?v=h4PTucW3Rm0">«¿Qué es la Transformada de Fourier? Una introducción visual»</a> (19:48, doblado al español). Intuición geométrica de por qué la TF "detecta" frecuencias; ver completo antes de la sección 4. Original en inglés: <a href="https://www.youtube.com/watch?v=spUNpyF58BY">«But what is the Fourier Transform?»</a> (19:42).</li>
+  <li><strong>Vídeo</strong> — 3Blue1Brown, <a href="https://www.youtube.com/watch?v=r6sGWTCMz2k">«But what is a Fourier series?»</a> (24:47, inglés, con subtítulos). Series como suma de fasores giratorios: es la animación de la sección 2 llevada al extremo.</li>
+  <li><strong>Vídeo</strong> — Jacqueline Arzate, <a href="https://www.youtube.com/watch?v=QAOt309q8Rg">«Espectro de frecuencias de un tren de pulsos»</a> (26:09). Es el Ejemplo 3.1 desarrollado en pizarra.</li>
+  <li><strong>Vídeo</strong> — SignalSense, <a href="https://www.youtube.com/watch?v=IOXzLMqcLbg">«Visualizando la convolución de señales continuas»</a> (9:09). Complementa el simulador de la sección 6.</li>
+  <li><strong>Vídeo</strong> — UPV, <a href="https://www.youtube.com/watch?v=WgPoGWFAuu0">«Sistemas LTI analógicos: respuesta al impulso h(t)»</a> (8:53).</li>
+  <li><strong>Vídeo</strong> — Comunicaciones FI-UNLP, <a href="https://www.youtube.com/watch?v=VbA1ktyt6TA">«Clase práctica: función de autocorrelación y densidades espectrales»</a> (15:03). Ejercicio tipo CP 9.</li>
+  <li><strong>Vídeo</strong> — A. Sala, <a href="https://www.youtube.com/watch?v=NMHBMVT4660">«Procesos estacionarios ergódicos»</a> (10:51).</li>
+  <li><strong>Vídeo</strong> — Aaron Danner, <a href="https://www.youtube.com/watch?v=LjHs5HJ-Kq8">«Introducción al ruido de Johnson-Nyquist»</a> (11:50, inglés). Origen físico de \(4kTRB\).</li>
+  <li><strong>Curso</strong> — MIT OpenCourseWare, <a href="https://ocw.mit.edu/courses/6-003-signals-and-systems-fall-2011/">6.003 Signals and Systems (Fall 2011)</a>, D. Freeman: vídeos, apuntes y problemas resueltos de convolución, Fourier y sistemas LTI.</li>
+  <li><strong>Artículo histórico</strong> — J. B. Johnson, «Thermal agitation of electricity in conductors», <em>Phys. Rev.</em> 32, 97 (1928), <a href="https://doi.org/10.1103/PhysRev.32.97">doi:10.1103/PhysRev.32.97</a>; y H. Nyquist, «Thermal agitation of electric charge in conductors», <em>Phys. Rev.</em> 32, 110 (1928), <a href="https://doi.org/10.1103/PhysRev.32.110">doi:10.1103/PhysRev.32.110</a>. Los dos artículos que explican el ruido térmico.</li>
+</ul>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Existen de verdad las frecuencias negativas?</summary><div><p>No como algo que se mida con un frecuencímetro. Son la consecuencia de escribir un coseno real como suma de dos exponenciales complejas. El espectro bilateral es "contabilidad": la mitad de la amplitud en \(+f\) y la otra mitad en \(-f\). Para señales reales la parte negativa es redundante (simetría hermítica), pero sin ella no funcionan teoremas como el de modulación.</p></div></details>
+  <details><summary>¿Cuándo uso serie y cuándo transformada?</summary><div><p>Serie para señales periódicas (resultado: números \(C_n\), espectro de líneas); transformada para señales de energía (resultado: función continua \(X(f)\)). Con impulsos, la TF cubre ambos casos: una línea \(C_n\) se convierte en \(C_n\delta(f-nf_0)\).</p></div></details>
+  <details><summary>¿Por qué el espectro de un pulso rectangular es infinito si el pulso dura poco?</summary><div><p>Porque tiene saltos instantáneos, y un salto requiere frecuencias arbitrariamente altas. En la práctica se habla de ancho de banda "esencial" (p. ej. el lóbulo principal, \(1/\tau\), que contiene ~90 % de la energía). Señales más suaves (triángulo, coseno alzado, gaussiana) tienen espectros que decaen más rápido.</p></div></details>
+  <details><summary>¿La potencia de una suma es la suma de potencias?</summary><div><p>Solo si las señales son ortogonales (no comparten frecuencias, o una es ruido de media cero independiente). En general hay que sumar primero los espectros complejos y luego aplicar Parseval. Es una de las preguntas favoritas de las CP 9 y 11.</p></div></details>
+  <details><summary>¿Qué diferencia hay entre "potencia" y "potencia normalizada"?</summary><div><p>La normalizada supone una resistencia de 1 Ω, así que \(P=\langle v^2\rangle\) en V². Para pasar a vatios reales se divide por la resistencia real. En comunicaciones casi siempre se trabaja normalizado porque lo que importa son <em>relaciones</em> (S/N).</p></div></details>
+  <details><summary>¿Por qué el ruido blanco tiene potencia infinita y aun así lo usamos?</summary><div><p>Porque todo receptor real tiene ancho de banda finito: lo que importa es la potencia de ruido <em>a la salida</em>, \(N_0B_N\), que es finita. Modelar el ruido como blanco simplifica los cálculos y es exacto en la banda de cualquier sistema de radio o banda base.</p></div></details>
+  <details><summary>Si un sistema tiene \(|H(f)|=1\) en toda la banda, ¿puede distorsionar?</summary><div><p>Sí, si la fase no es lineal (distorsión de retardo). Los ecualizadores de fase y los filtros de Bessel existen precisamente para eso.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> Actividades 2–6 (curso 2026, Dr. C. F. E. Hernández Montero); Conferencias 7–11 (edición anterior); CP 5, 6, 7, 9, 10 y 11; «Series de Fourier: resumen y ejemplo», «Transformada de Fourier: resumen y ejemplo», ER-1, ER-2 y «Ejemplos resueltos»; Laboratorio Simulado 2 y sus funciones MATLAB; Trabajo Práctico del Tema II. Explicaciones, figuras y simuladores son elaboración propia.</p>
+</main>
+</div>
+<footer class="site wrap">Fundamentos de las Comunicaciones I · Material de estudio no oficial elaborado a partir de los materiales del curso · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

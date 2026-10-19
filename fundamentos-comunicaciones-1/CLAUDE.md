@@ -70,38 +70,67 @@ Ojo: el PDF de Sklar disponible es la edición 2014 (Sklar & Ray); verificar num
 - Diagrama de ojo con ISI y coseno alzado (roll-off); BER vs Eb/N0.
 - Software Python: toolkit `fc1` (entropía, Huffman, Hamming, PCM, BER) equivalente a las funciones del Lab Simulado.
 
+## Estructura del sitio
+
+| Archivo | Contenido |
+|---|---|
+| `index.html` | portada: temas, plan (Actividades 2026 y ed. anterior), evaluación, profesores, bibliografía, software, prerrequisitos, FAQ |
+| `temas/tema1-teoria-informacion.html` + `js/tema1.js` | Tema I completo + 6 simuladores (entropía, Huffman, LZ78, capacidad, Hamming, Viterbi) + PP1 resuelta |
+| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo + 7 simuladores (fasor, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
+| `temas/tema3-banda-base.html` + `js/tema3.js` | Tema III completo + 7 simuladores (muestreo, cuantificador, DM, códigos de línea, ojo, umbral/Pe, BER) |
+| `software/fc1/` | paquete Python sin dependencias (CLI `python -m fc1`) + 10 pruebas que reproducen los ejemplos de la web |
+
+Utilidades compartidas: `../assets/css/course.css` (cajas, ejemplos, simuladores, tablas) y
+`../assets/js/course.js` (KaTeX con macros, índice lateral automático, quiz, graficador `Course.Plot`,
+`Course.M` con sinc/Q/erfc/DFT).
+
+## Bibliografía verificada (páginas impresas → PDF)
+
+Desfases medidos (página PDF − página impresa): **Sklar 2014: +27** · **Couch 2012: +25** ·
+**MacKay: +12** · **Haykin 4ª: +20** · **Carlson 4ª: +13 (cap. 2–3), +10 (cap. 6–7), +9→+7 (cap. 9),
++6 (cap. 11–13), +4 (cap. 14)** (el escaneo de Carlson pierde páginas; no tiene capa de texto útil, se
+verificó por OCR de cabeceras). Las guías de CP citan otras ediciones (p. ej. "Sklar p. 711–731" =
+Apéndice A, pp. 1069–1090 de la edición 2014; "Carlson p. 158-163" no corresponde a la 4ª ed.).
+
 ## Estado
 
 | Tema | Teoría | Interactivo | Ejemplos | Ejercicios | CP/LAB | Biblio | Links | FAQ |
 |---|---|---|---|---|---|---|---|---|
-| I.1 Teoría de la información | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| I.2 Codificación de fuente | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| I.3 Codificación de canal / bloque | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| I.4 Código convolucional | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| II.1 Fasores y series de Fourier | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| II.2 Transformada de Fourier | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| II.3 Potencia, energía, autocorrelación | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| II.4 Sistemas LTI, filtros | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| II.5 Señales aleatorias, ruido | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| III.1 Muestreo, PCM, MDT | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| III.2 DPCM, modulación delta | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| III.3 Códigos de línea, repetidor | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| III.4 ISI y criterios de Nyquist | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| III.5 Ruido banda base, umbral y filtro óptimo | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| Pruebas parciales resueltas (PP1, PP2) | ⬜ | | | | | | | |
-
-**Prioridad sugerida:** Tema II (es lo que se está dando ahora con las Actividades 1–6).
+| I.1 Teoría de la información | ✅ | ✅ | ✅ | ✅ | ✅ CP1 | ✅ | ✅ | ✅ |
+| I.2 Codificación de fuente | ✅ | ✅ | ✅ | ✅ | ✅ CP2 | ✅ | ✅ | ✅ |
+| I.3 Codificación de canal / bloque | ✅ | ✅ | ✅ | ✅ | ✅ CP3 | ✅ | ✅ | ✅ |
+| I.4 Código convolucional | ✅ | ✅ | ✅ | ✅ | 🟡 CP4 (enunciados en imagen) | ✅ | ✅ | ✅ |
+| II.1 Fasores y series de Fourier | ✅ | ✅ | ✅ | ✅ | ✅ CP5 | ✅ | ✅ | ✅ |
+| II.2 Transformada de Fourier | ✅ | ✅ | ✅ | ✅ | ✅ CP6–7 | ✅ | ✅ | ✅ |
+| II.3 Potencia, energía, autocorrelación | ✅ | 🟡 (en series) | ✅ | ✅ | ✅ CP9 | ✅ | ✅ | ✅ |
+| II.4 Sistemas LTI, filtros | ✅ | ✅ | ✅ | ✅ | ✅ CP10 | ✅ | ✅ | ✅ |
+| II.5 Señales aleatorias, ruido | ✅ | ✅ | ✅ | ✅ | ✅ CP11 | ✅ | ✅ | ✅ |
+| II Lab. Simulado 2 + Trabajo Práctico | ✅ | ✅ | ✅ | | ✅ | | | |
+| III.1 Muestreo, PCM, MDT | ✅ | ✅ | ✅ | ✅ | ✅ CP12 | ✅ | ✅ | ✅ |
+| III.2 DPCM, modulación delta | ✅ | ✅ | ✅ | ✅ | ✅ CP13 | ✅ | ✅ | ✅ |
+| III.3 Códigos de línea, repetidor | ✅ | ✅ | 🟡 | 🟡 | — (falta Conf. 14) | ✅ | ✅ | ✅ |
+| III.4 ISI y criterios de Nyquist | ✅ | ✅ | ✅ | ✅ | ✅ CP15–16 | ✅ | ✅ | ✅ |
+| III.5 Ruido banda base, umbral y filtro óptimo | ✅ | ✅ | ✅ | ✅ | ✅ CP17–18 | ✅ | ✅ | ✅ |
+| Pruebas parciales resueltas (PP1, PP2) | 🟡 PP1 (1 variante) | | | | | | | |
 
 ## Pendientes y dudas
 
 - Faltan Conferencia 14 (códigos de línea / repetidor) y CP 8 y 14 de la edición anterior.
-- Mapear cada CP con su tema leyendo los `.doc`.
-- Agrupar las ~90 variantes de la PP1 por tipo de pregunta y resolver modelos representativos
-  (no publicar los ID de los estudiantes).
-- Extraer las funciones MATLAB de los `.rar` del Lab Simulado 2 y portarlas a Python/Octave.
+- Muchas figuras/enunciados de CP están como imágenes (CP 4, CP 6, CP 12 ej. 1 y 3, EI de las
+  Actividades): resolverlos leyendo las diapositivas renderizadas cuando se amplíe cada tema.
+- PP1: hay ~90 variantes; solo se publicó una variante representativa (sin datos personales). Agrupar
+  el resto por tipo. «Ejemplos de Prueba Parcial 2» es un .docx casi vacío en texto (está en imágenes).
+- Dudas de convención anotadas en la página: DEP «5·10⁻⁷ u²/Hz» de las CP 17–18 se tomó como bilateral;
+  «1020 T₀» del EI de la Actividad 6 se interpretó como 10²⁰ T₀; RZ con Nyquist se tomó como R_s = 2R_b.
+  Confirmar con el profesor.
+- Vídeos «Recurso orientador» (07-Videos) no se revisaron.
 
 ## Bitácora
 
+- **2026-10-19** — Sitio construido: portada + Temas I, II y III (teoría, 20 simuladores, ejemplos
+  de conferencias y CP resueltos, ejercicios con solución, guías de CP/Lab, bibliografía verificada
+  en los PDF, vídeos verificados, FAQ) y paquete `software/fc1` con pruebas. Repaso: fichas de
+  matemática, probabilidad y circuitos.
 - **2026-10-18** — Reorganización: las "Actividad 1–6" (curso actual) a `01-Conferencias/` con
   tildes corregidas en el nombre; el contenido de `01/` (edición anterior) repartido en
   `00…08`; `Lab Simulado 2.rar` extraído en `03-Laboratorios/`; `bibliografia`→`05-Bibliografia`.

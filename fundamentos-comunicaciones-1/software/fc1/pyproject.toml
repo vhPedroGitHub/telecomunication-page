@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fc1"
+version = "0.1.0"
+description = "Herramientas didácticas de Fundamentos de las Comunicaciones I: espectros (equivalente a foury.m), entropía, Huffman, LZ78, Hamming, convolucional/Viterbi, PCM, modulación delta y probabilidad de error."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+plot = ["numpy>=1.22", "matplotlib>=3.5"]
+
+[project.scripts]
+fc1 = "fc1.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["fc1*"]
