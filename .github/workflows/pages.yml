@@ -26,6 +26,7 @@ jobs:
           rsync -a ./ _site/ \
             --exclude '.git' --exclude '.github' --exclude '_site' \
             --exclude 'CLAUDE.md' --exclude '**/CLAUDE.md' \
+            --exclude 'AGENTS.md' --exclude '**/AGENTS.md' \
             --exclude '**/target' --exclude '**/__pycache__' --exclude '**/.venv'
           touch _site/.nojekyll
 

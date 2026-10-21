@@ -76,7 +76,7 @@ Ojo: el PDF de Sklar disponible es la edición 2014 (Sklar & Ray); verificar num
 |---|---|
 | `index.html` | portada: temas, plan (Actividades 2026 y ed. anterior), evaluación, profesores, bibliografía, software, prerrequisitos, FAQ |
 | `temas/tema1-teoria-informacion.html` + `js/tema1.js` | Tema I completo + 6 simuladores (entropía, Huffman, LZ78, capacidad, Hamming, Viterbi) + PP1 resuelta |
-| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo + 7 simuladores (fasor, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
+| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo (11 secciones + glosario + 9 figuras SVG) + 7 simuladores (fasor, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
 | `temas/tema3-banda-base.html` + `js/tema3.js` | Tema III completo + 7 simuladores (muestreo, cuantificador, DM, códigos de línea, ojo, umbral/Pe, BER) |
 | `software/fc1/` | paquete Python sin dependencias (CLI `python -m fc1`) + 10 pruebas que reproducen los ejemplos de la web |
 
@@ -113,6 +113,11 @@ Apéndice A, pp. 1069–1090 de la edición 2014; "Carlson p. 158-163" no corres
 | III.5 Ruido banda base, umbral y filtro óptimo | ✅ | ✅ | ✅ | ✅ | ✅ CP17–18 | ✅ | ✅ | ✅ |
 | Pruebas parciales resueltas (PP1, PP2) | 🟡 PP1 (1 variante) | | | | | | | |
 
+Nota (2026-10-21): el Tema II se amplió con una sección 2 nueva («El espectro: qué es, para qué sirve»),
+explicación paso a paso de fasores (3.1–3.3) y de los `C_n` (4.2), 9 figuras SVG generadas (dominio
+tiempo/frecuencia, fasor, contra-rotativos, `C_n` como muestras, espectros de los ejercicios,
+convolución, RC y R(τ)/G(f)), un glosario de 24 términos y 8 recursos externos verificados.
+
 ## Pendientes y dudas
 
 - Faltan Conferencia 14 (códigos de línea / repetidor) y CP 8 y 14 de la edición anterior.
@@ -127,6 +132,14 @@ Apéndice A, pp. 1069–1090 de la edición 2014; "Carlson p. 158-163" no corres
 
 ## Bitácora
 
+- **2026-10-21** — Tema II ampliado tras revisión docente: sección 2 nueva sobre qué es el espectro y
+  por qué importa (banda, multiplexación, filtros, diagnóstico); fasores reescritos en 3.1 (fasor y
+  proyección), 3.2 (Euler con Taylor → frecuencias negativas) y 3.3 (amplitud vs fase); los `C_n` con
+  receta de 5 pasos y errores típicos; 9 figuras SVG insertadas en teoría y ejercicios (4.5.1, 4.5.3,
+  Ej. 7.1, 8.4.4, 9.5.1); glosario; enlaces nuevos a PySDR (ES), LibreTexts (Johnson, Wilson, Kirtley)
+  y cinco vídeos (títulos comprobados por oEmbed). Secciones renumeradas 1–11 (anclas sin cambios) y
+  referencias «§» actualizadas en `repaso/` y en el plan de la portada. Verificado en Chromium headless:
+  sin errores de consola ni de KaTeX; a 390 px no hay desborde de página.
 - **2026-10-19** — Sitio construido: portada + Temas I, II y III (teoría, 20 simuladores, ejemplos
   de conferencias y CP resueltos, ejercicios con solución, guías de CP/Lab, bibliografía verificada
   en los PDF, vídeos verificados, FAQ) y paquete `software/fc1` con pruebas. Repaso: fichas de
