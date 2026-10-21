@@ -12,6 +12,7 @@ software complementario y preguntas frecuentes.
 | Redes 3 | [`redes-3/`](redes-3/) |
 | Gestión y Seguridad de Redes | [`gestion-y-seguridad/`](gestion-y-seguridad/) |
 | Estudios Sociales de la CyT | [`estudios-sociales-cyt/`](estudios-sociales-cyt/) |
+| Cálculo diferencial e integral | [`calculo-diferencial-e-integral/`](calculo-diferencial-e-integral/) |
 | Repaso de prerrequisitos | [`repaso/`](repaso/) |
 
 ## Ver en local

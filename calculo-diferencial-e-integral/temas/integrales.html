@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Integrales: técnicas, tabla y teorema fundamental · Cálculo</title>
+  <meta name="description" content="Integrales desde cero: antiderivada, integral indefinida, propiedades, tabla de integrales inmediatas, sustitución, integración por partes, trigonométricas, sustitución trigonométrica, fracciones parciales, teorema fundamental del cálculo, áreas, integrales impropias y métodos numéricos. Ejemplos y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../../assets/js/calculo.js"></script>
+  <style>body { --accent: var(--c-calculo); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Cálculo diferencial e integral</span>
+    <nav class="tabs" aria-label="Secciones del curso">
+      <a href="../">Inicio</a>
+      <a href="limites.html">Límites</a>
+      <a href="derivadas.html">Derivadas</a>
+      <a href="integrales.html" aria-current="page">Integrales</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Bloque 3 · Integrales · antiderivadas, técnicas, teorema fundamental y aplicaciones</p>
+<h1>Integrales</h1>
+<p class="lead">Integrar es <strong>acumular</strong>: sumar infinitos trozos infinitesimales para obtener un total exacto. El área bajo una curva, la distancia recorrida a partir de la velocidad, el trabajo de una fuerza variable y la masa de un sólido son integrales. El <strong>teorema fundamental del cálculo</strong> revela además que integrar es la operación inversa de derivar.</p>
+
+<div class="objectives">
+  <strong>Objetivos del bloque</strong>
+  <ul>
+    <li>Comprender la antiderivada y la integral indefinida; comprobar primitivas por derivación.</li>
+    <li>Manejar la tabla de integrales inmediatas y las propiedades de linealidad.</li>
+    <li>Aplicar las técnicas de sustitución, integración por partes, trigonométricas, sustitución trigonométrica y fracciones parciales.</li>
+    <li>Enunciar y usar el teorema fundamental del cálculo para calcular integrales definidas y áreas.</li>
+    <li>Reconocer integrales impropias y estimar integrales con métodos numéricos.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">derivadas, álgebra y trigonometría</span>
+  <p>Integrar es «deshacer» una derivada, así que necesitas la tabla de derivadas al revés. También factorizar, completar cuadrados, dividir polinomios, usar identidades trigonométricas (\(\sen^2x+\cos^2x=1\), \(\sen^2x=\frac{1-\cos2x}{2}\), \(\cos^2x=\frac{1+\cos2x}{2}\)) y resolver sistemas lineales sencillos. Repaso: <a href="derivadas.html">bloque de derivadas</a> · <a href="../../repaso/matematica.html#trigonometria">trigonometría</a> · <a href="../../repaso/matematica.html#integrales">integrales útiles</a>.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="antiderivada">1. Antiderivada e integral indefinida</h2>
+<div class="box def"><span class="box-title">Antiderivada</span>
+<p>\(F\) es una <strong>antiderivada</strong> (o primitiva) de \(f\) en un intervalo \(I\) si \(F'(x)=f(x)\) para todo \(x\in I\). La <strong>integral indefinida</strong> es la familia de todas las primitivas:</p>
+$$\int f(x)\,dx=F(x)+C,$$
+<p>donde \(C\in\mathbb R\) es la constante de integración.</p></div>
+<p>Si \(F\) y \(G\) son primitivas de \(f\), entonces \((F-G)'=0\), así que \(F-G\) es constante. Por eso <em>todas</em> las primitivas se obtienen sumando una constante a una cualquiera. La gráfica de \(F+C\) es la de \(F\) desplazada verticalmente.</p>
+<div class="box idea"><span class="box-title">La comprobación que nunca falla</span>
+<p>Para verificar una integral, deriva el resultado: debe dar el integrando. Ejemplo: \(\int 3x^2\,dx=x^3+C\) porque \((x^3+C)'=3x^2\). Esta comprobación detecta la mayoría de los errores de signo y de constantes.</p></div>
+<p><strong>Notación:</strong> \(x\) es la variable de integración y \(dx\) indica respecto de qué se integra. Es una «diferencial»: en la sustitución se manipula como tal porque hay un teorema detrás. La integral definida \(\int_a^b f(x)\,dx\) es un número; la indefinida es una familia de funciones.</p>
+
+<h2 id="propiedades">2. Propiedades de la integral</h2>
+<p>Sean \(f\) y \(g\) integrables y \(k\in\mathbb R\):</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Propiedad</th><th>Fórmula</th></tr></thead>
+  <tbody>
+    <tr><td>Linealidad</td><td>\(\displaystyle\int\big(kf(x)\pm g(x)\big)dx=k\int f(x)\,dx\pm\int g(x)\,dx\)</td></tr>
+    <tr><td>Constante</td><td>\(\displaystyle\int k\,dx=kx+C\)</td></tr>
+    <tr><td>Intervalo nulo</td><td>\(\displaystyle\int_a^a f(x)\,dx=0\)</td></tr>
+    <tr><td>Cambio de orden</td><td>\(\displaystyle\int_b^a f(x)\,dx=-\int_a^b f(x)\,dx\)</td></tr>
+    <tr><td>Aditividad</td><td>\(\displaystyle\int_a^b f=\int_a^c f+\int_c^b f\)</td></tr>
+    <tr><td>Comparación</td><td>Si \(f(x)\le g(x)\) en \([a,b]\), \(\displaystyle\int_a^b f\le\int_a^b g\)</td></tr>
+    <tr><td>Acotación</td><td>Si \(m\le f(x)\le M\) en \([a,b]\), \(m(b-a)\le\displaystyle\int_a^b f\le M(b-a)\)</td></tr>
+  </tbody>
+</table></div>
+<div class="box warn"><span class="box-title">No existe una regla del producto para integrales</span>
+<p>\(\displaystyle\int f(x)g(x)\,dx\) <strong>no</strong> es \(\left(\int f\right)\left(\int g\right)\). Para productos se usa la integración por partes; para cocientes, fracciones parciales, sustitución o identidades trigonométricas. Tampoco toda función elemental tiene primitiva elemental: por ejemplo, \(\int e^{-x^2}dx\) no se expresa con funciones elementales (se usa la función error).</p></div>
+
+<h2 id="tabla">3. Tabla de integrales inmediatas</h2>
+<p>Es la tabla de derivadas leída al revés. Todas las fórmulas llevan \(+C\) y son válidas en intervalos donde las expresiones estén definidas.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Integral</th><th>Resultado</th><th>Condición</th></tr></thead>
+  <tbody>
+    <tr><td>\(\displaystyle\int x^n\,dx\)</td><td>\(\dfrac{x^{n+1}}{n+1}+C\)</td><td>\(n\ne-1\)</td></tr>
+    <tr><td>\(\displaystyle\int \frac{dx}{x}\)</td><td>\(\ln|x|+C\)</td><td>\(x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int e^x\,dx\)</td><td>\(e^x+C\)</td><td>—</td></tr>
+    <tr><td>\(\displaystyle\int a^x\,dx\)</td><td>\(\dfrac{a^x}{\ln a}+C\)</td><td>\(a>0,\ a\ne1\)</td></tr>
+    <tr><td>\(\displaystyle\int \sen x\,dx\)</td><td>\(-\cos x+C\)</td><td>—</td></tr>
+    <tr><td>\(\displaystyle\int \cos x\,dx\)</td><td>\(\sen x+C\)</td><td>—</td></tr>
+    <tr><td>\(\displaystyle\int \sec^2x\,dx\)</td><td>\(\tg x+C\)</td><td>\(\cos x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \csc^2x\,dx\)</td><td>\(-\cotg x+C\)</td><td>\(\sen x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \sec x\,\tg x\,dx\)</td><td>\(\sec x+C\)</td><td>\(\cos x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \csc x\,\cotg x\,dx\)</td><td>\(-\csc x+C\)</td><td>\(\sen x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \tg x\,dx\)</td><td>\(-\ln|\cos x|+C=\ln|\sec x|+C\)</td><td>\(\cos x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \cotg x\,dx\)</td><td>\(\ln|\sen x|+C\)</td><td>\(\sen x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \sec x\,dx\)</td><td>\(\ln|\sec x+\tg x|+C\)</td><td>\(\cos x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \csc x\,dx\)</td><td>\(\ln|\csc x-\cotg x|+C\)</td><td>\(\sen x\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \frac{dx}{1+x^2}\)</td><td>\(\arctg x+C\)</td><td>—</td></tr>
+    <tr><td>\(\displaystyle\int \frac{dx}{\sqrt{1-x^2}}\)</td><td>\(\arcsen x+C\)</td><td>\(|x|<1\)</td></tr>
+    <tr><td>\(\displaystyle\int \frac{dx}{a^2+x^2}\)</td><td>\(\dfrac1a\arctg\dfrac xa+C\)</td><td>\(a\ne0\)</td></tr>
+    <tr><td>\(\displaystyle\int \frac{dx}{\sqrt{a^2-x^2}}\)</td><td>\(\arcsen\dfrac xa+C\)</td><td>\(|x|<a\)</td></tr>
+    <tr><td>\(\displaystyle\int \frac{dx}{x^2-a^2}\)</td><td>\(\dfrac{1}{2a}\ln\left|\dfrac{x-a}{x+a}\right|+C\)</td><td>\(x\ne\pm a\)</td></tr>
+    <tr><td>\(\displaystyle\int \ln x\,dx\)</td><td>\(x\ln x-x+C\)</td><td>\(x>0\)</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Versiones compuestas</strong> (con \(u=u(x)\) y \(du=u'\,dx\)):</p>
+$$\int u^n\,du=\frac{u^{n+1}}{n+1}+C,\qquad \int e^u\,du=e^u+C,\qquad \int\frac{du}{u}=\ln|u|+C,\qquad \int\cos u\,du=\sen u+C.$$
+
+<h2 id="ftc">4. Integral definida y teorema fundamental</h2>
+<p>La integral definida nace como límite de sumas de Riemann. Dividimos \([a,b]\) en \(n\) subintervalos de ancho \(\Delta x=\frac{b-a}{n}\), elegimos un punto \(x_i^*\) en cada uno y sumamos áreas de rectángulos:</p>
+$$\int_a^b f(x)\,dx=\lim_{n\to\infty}\sum_{i=1}^{n}f(x_i^*)\,\Delta x.$$
+<p>Si \(f(x)\ge0\), la integral es el área bajo la curva. Si \(f\) cambia de signo, las áreas bajo el eje se cuentan negativas.</p>
+<div class="box def"><span class="box-title">Teorema fundamental del cálculo</span>
+<p><strong>Parte 1.</strong> Si \(f\) es continua en \([a,b]\) y \(F(x)=\displaystyle\int_a^x f(t)\,dt\), entonces \(F\) es derivable y \(F'(x)=f(x)\).</p>
+<p><strong>Parte 2.</strong> Si \(F\) es cualquier primitiva de \(f\) en \([a,b]\), entonces</p>
+$$\int_a^b f(x)\,dx=F(b)-F(a).$$
+</div>
+<p>La parte 1 dice que la función «área acumulada» tiene por derivada al integrando. La parte 2 convierte el cálculo de un límite de sumas en una simple resta de primitivas. Se escribe también \(\Big[F(x)\Big]_a^b=F(b)-F(a)\).</p>
+<div class="box def"><span class="box-title">Teorema del valor medio para integrales</span>
+<p>Si \(f\) es continua en \([a,b]\), existe al menos un \(c\in[a,b]\) tal que</p>
+$$\int_a^b f(x)\,dx=f(c)(b-a).$$
+<p>El valor \(f(c)=\dfrac{1}{b-a}\displaystyle\int_a^b f(x)\,dx\) es el <strong>valor medio</strong> de \(f\) en el intervalo.</p></div>
+
+<h2 id="sim">5. Interactivo: sumas de Riemann</h2>
+<p>Aumenta \(n\) y cambia el método. Los rectángulos aproximan el área; el error disminuye al crecer \(n\) (aunque no siempre de forma monótona). Compara la suma con el valor exacto que da el teorema fundamental.</p>
+<div class="sim" id="sim-int">
+  <div class="sim-title">Rectángulos que se convierten en integral</div>
+  <div class="controls">
+    <label>Función e intervalo
+      <select id="int-fn">
+        <option value="cuad">f(x) = x² en [0, 2]</option>
+        <option value="seno">f(x) = sen x en [0, π]</option>
+        <option value="raiz">f(x) = √x en [0, 4]</option>
+        <option value="inversa">f(x) = 1/x en [1, 3]</option>
+        <option value="exp">f(x) = eˣ en [0, 2]</option>
+      </select>
+    </label>
+    <label>Subintervalos n <input type="range" id="int-n" min="1" max="80" step="1" value="6"> <output id="int-no"></output></label>
+    <label>Punto de muestra
+      <select id="int-met">
+        <option value="left">extremo izquierdo</option>
+        <option value="mid">punto medio</option>
+        <option value="right">extremo derecho</option>
+      </select>
+    </label>
+  </div>
+  <canvas id="int-canvas" aria-label="Gráfica de la función y los rectángulos de la suma de Riemann"></canvas>
+  <div class="readout" id="int-out"></div>
+</div>
+
+<h2 id="tecnicas">6. Técnicas de integración</h2>
+<p>No hay un algoritmo universal. La estrategia es <strong>reconocer la forma</strong> del integrando y elegir la técnica. Orden práctico: ¿es inmediata o casi inmediata? → ¿hay una sustitución evidente? → ¿es un producto de tipos distintos? → ¿es racional o trigonométrica?</p>
+
+<h3 id="sustitucion">6.1 Sustitución (cambio de variable)</h3>
+<p>Si \(u=g(x)\), entonces \(du=g'(x)\,dx\) y</p>
+$$\int f(g(x))\,g'(x)\,dx=\int f(u)\,du.$$
+<p>La sustitución deshace la regla de la cadena. En una integral definida hay dos opciones: cambiar los límites a \(u\) o deshacer la sustitución antes de evaluar.</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Sustitución directa</h4>
+<p>\(\displaystyle\int 2x\,e^{x^2}dx\). Sea \(u=x^2\), \(du=2x\,dx\):</p>
+$$\int e^u\,du=e^u+C=e^{x^2}+C.$$
+<p>Comprobación: \((e^{x^2})'=2x e^{x^2}\). \(\checkmark\)</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.2 — Sustitución con ajuste de constante</h4>
+<p>\(\displaystyle\int(2x+1)^5dx\). Con \(u=2x+1\), \(du=2\,dx\), es decir, \(dx=\frac12du\):</p>
+$$\int u^5\cdot\frac12du=\frac12\cdot\frac{u^6}{6}+C=\frac{(2x+1)^6}{12}+C.$$
+</div>
+
+<h3 id="partes">6.2 Integración por partes</h3>
+<p>De la regla del producto \((uv)'=u'v+uv'\) se obtiene</p>
+<div class="eq key">$$\int u\,dv=uv-\int v\,du.$$<div class="eq-label">Integración por partes</div></div>
+<p>Para elegir \(u\) se usa la regla <strong>LIATE</strong> (orden de preferencia): <strong>L</strong>ogaritmos, <strong>I</strong>nversas trigonométricas, <strong>A</strong>lgebraicas, <strong>T</strong>rigonométricas, <strong>E</strong>xponenciales. Se elige como \(u\) la primera que aparezca y como \(dv\) el resto.</p>
+<div class="example">
+<h4>Ejemplo 6.3 — Por partes con polinomio y exponencial</h4>
+<p>\(\displaystyle\int x e^x\,dx\). Con \(u=x\), \(dv=e^x dx\): \(du=dx\), \(v=e^x\).</p>
+$$\int x e^x\,dx=xe^x-\int e^x\,dx=xe^x-e^x+C=e^x(x-1)+C.$$
+</div>
+<div class="example">
+<h4>Ejemplo 6.4 — Por partes con logaritmo</h4>
+<p>\(\displaystyle\int\ln x\,dx\). Con \(u=\ln x\), \(dv=dx\): \(du=\frac1x dx\), \(v=x\).</p>
+$$\int\ln x\,dx=x\ln x-\int x\cdot\frac1x\,dx=x\ln x-x+C.$$
+</div>
+<div class="example">
+<h4>Ejemplo 6.5 — Por partes cíclica</h4>
+<p>\(\displaystyle\int e^x\sen x\,dx\). Aplicando partes dos veces se vuelve a la integral original; llamándola \(I\):</p>
+$$I=e^x\sen x-\int e^x\cos x\,dx=e^x\sen x-\left(e^x\cos x+\int e^x\sen x\,dx\right).$$
+<p>Por tanto, \(2I=e^x(\sen x-\cos x)\) y \(I=\dfrac{e^x(\sen x-\cos x)}{2}+C\).</p>
+</div>
+
+<h3 id="trig">6.3 Integrales trigonométricas</h3>
+<p>Las identidades reducen potencias y productos a sumas:</p>
+$$\sen^2x=\frac{1-\cos2x}{2},\qquad \cos^2x=\frac{1+\cos2x}{2},\qquad \sen x\cos x=\frac{\sen2x}{2}.$$
+<p>Reglas prácticas:</p>
+<ul>
+  <li>\(\int\sen^m x\cos^n x\,dx\): si \(m\) es impar, se guarda un \(\sen x\) y se sustituye \(u=\cos x\); si \(n\) es impar, se guarda un \(\cos x\) y \(u=\sen x\); si ambas son pares, se usan las identidades de ángulo doble.</li>
+  <li>\(\int\tg^m x\sec^n x\,dx\): si \(n\) es par, se guarda \(\sec^2x\) y \(u=\tg x\); si \(m\) es impar, se guarda \(\sec x\tg x\) y \(u=\sec x\).</li>
+</ul>
+<div class="example">
+<h4>Ejemplo 6.6 — Potencia par de seno</h4>
+<p>\(\displaystyle\int\sen^2x\,dx=\int\frac{1-\cos2x}{2}dx=\frac{x}{2}-\frac{\sen2x}{4}+C.\)</p>
+</div>
+
+<h3 id="sustrig">6.4 Sustitución trigonométrica</h3>
+<p>Sirve para eliminar raíces de la forma \(\sqrt{a^2-x^2}\), \(\sqrt{a^2+x^2}\) o \(\sqrt{x^2-a^2}\).</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Radical</th><th>Sustitución</th><th>Identidad que simplifica</th></tr></thead>
+  <tbody>
+    <tr><td>\(\sqrt{a^2-x^2}\)</td><td>\(x=a\sen\theta\)</td><td>\(a^2-a^2\sen^2\theta=a^2\cos^2\theta\)</td></tr>
+    <tr><td>\(\sqrt{a^2+x^2}\)</td><td>\(x=a\tg\theta\)</td><td>\(a^2+a^2\tg^2\theta=a^2\sec^2\theta\)</td></tr>
+    <tr><td>\(\sqrt{x^2-a^2}\)</td><td>\(x=a\sec\theta\)</td><td>\(a^2\sec^2\theta-a^2=a^2\tg^2\theta\)</td></tr>
+  </tbody>
+</table></div>
+<div class="example">
+<h4>Ejemplo 6.7 — Sustitución trigonométrica</h4>
+<p>\(\displaystyle\int\sqrt{1-x^2}\,dx\). Con \(x=\sen\theta\), \(dx=\cos\theta\,d\theta\), y \(\sqrt{1-\sen^2\theta}=\cos\theta\):</p>
+$$\int\cos^2\theta\,d\theta=\frac{\theta}{2}+\frac{\sen2\theta}{4}+C.$$
+<p>Volviendo a \(x\): \(\theta=\arcsen x\) y \(\sen2\theta=2x\sqrt{1-x^2}\). Resultado:</p>
+$$\int\sqrt{1-x^2}\,dx=\frac{\arcsen x}{2}+\frac{x\sqrt{1-x^2}}{2}+C.$$
+</div>
+
+<h3 id="fracciones">6.5 Fracciones parciales</h3>
+<p>Para integrar una función racional \(\dfrac{P(x)}{Q(x)}\): si \(\deg P\ge\deg Q\), primero se divide; después se factoriza \(Q\) y se descompone en fracciones simples. Cada factor produce términos de la forma</p>
+$$\frac{A}{x-a},\qquad \frac{A}{(x-a)^k},\qquad \frac{Bx+C}{x^2+bx+c},\qquad \frac{Bx+C}{(x^2+bx+c)^k}.$$
+<div class="example">
+<h4>Ejemplo 6.8 — Fracciones parciales</h4>
+<p>\(\displaystyle\int\frac{dx}{x^2-1}\). Como \(x^2-1=(x-1)(x+1)\):</p>
+$$\frac{1}{(x-1)(x+1)}=\frac{A}{x-1}+\frac{B}{x+1}\quad\Longrightarrow\quad 1=A(x+1)+B(x-1).$$
+<p>Con \(x=1\): \(A=\frac12\); con \(x=-1\): \(B=-\frac12\). Entonces</p>
+$$\int\left(\frac{1/2}{x-1}-\frac{1/2}{x+1}\right)dx=\frac12\ln|x-1|-\frac12\ln|x+1|+C=\frac12\ln\left|\frac{x-1}{x+1}\right|+C.$$
+</div>
+
+<h2 id="impropias">7. Integrales impropias</h2>
+<p>Una integral es impropia si el intervalo es infinito o si el integrando tiene una asíntota vertical dentro del intervalo. Se define como un límite:</p>
+$$\int_a^\infty f(x)\,dx=\lim_{t\to\infty}\int_a^t f(x)\,dx,\qquad
+\int_a^b f(x)\,dx=\lim_{t\to b^-}\int_a^t f(x)\,dx\quad(f\to\pm\infty\text{ en }b).$$
+<p>Si el límite existe y es finito, la integral <strong>converge</strong>; si no, <strong>diverge</strong>. En una asíntota interior se parte el intervalo y se calculan dos límites.</p>
+<div class="box idea"><span class="box-title">Criterio \(p\)</span>
+<p>\(\displaystyle\int_1^\infty\frac{dx}{x^p}\) converge si \(p>1\) y diverge si \(p\le1\). En cambio, \(\displaystyle\int_0^1\frac{dx}{x^p}\) converge si \(p<1\) y diverge si \(p\ge1\).</p></div>
+<div class="example">
+<h4>Ejemplo 7.1 — Integral impropia convergente</h4>
+<p>\(\displaystyle\int_1^\infty\frac{dx}{x^2}=\lim_{t\to\infty}\left[-\frac1x\right]_1^t=\lim_{t\to\infty}\left(-\frac1t+1\right)=1.\)</p>
+</div>
+
+<h2 id="numerico">8. Integración numérica</h2>
+<p>Cuando no hay primitiva elemental o solo se conocen valores tabulados, se aproxima la integral. Con \(n\) subintervalos de ancho \(\Delta x=(b-a)/n\):</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Método</th><th>Fórmula</th><th>Error típico</th></tr></thead>
+  <tbody>
+    <tr><td>Punto medio</td><td>\(M_n=\Delta x\sum_{i=1}^n f(\bar x_i)\)</td><td>\(O(\Delta x^2)\)</td></tr>
+    <tr><td>Trapecios</td><td>\(T_n=\dfrac{\Delta x}{2}\left[f(x_0)+2f(x_1)+\cdots+2f(x_{n-1})+f(x_n)\right]\)</td><td>\(O(\Delta x^2)\)</td></tr>
+    <tr><td>Simpson (n par)</td><td>\(S_n=\dfrac{\Delta x}{3}\left[f(x_0)+4f(x_1)+2f(x_2)+\cdots+4f(x_{n-1})+f(x_n)\right]\)</td><td>\(O(\Delta x^4)\)</td></tr>
+  </tbody>
+</table></div>
+<p>Para funciones suaves, Simpson suele ser mucho más preciso con el mismo número de evaluaciones. Los métodos compuestos permiten controlar el error aumentando \(n\).</p>
+
+<h2 id="aplicaciones">9. Aplicaciones de la integral definida</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Aplicación</th><th>Fórmula</th></tr></thead>
+  <tbody>
+    <tr><td>Área entre dos curvas</td><td>\(\displaystyle A=\int_a^b\big(f(x)-g(x)\big)dx\) (con \(f\ge g\))</td></tr>
+    <tr><td>Valor medio</td><td>\(\displaystyle \bar f=\frac{1}{b-a}\int_a^b f(x)\,dx\)</td></tr>
+    <tr><td>Volumen de revolución (discos)</td><td>\(\displaystyle V=\pi\int_a^b\big[f(x)\big]^2dx\)</td></tr>
+    <tr><td>Volumen (arandelas)</td><td>\(\displaystyle V=\pi\int_a^b\left(\big[R(x)\big]^2-\big[r(x)\big]^2\right)dx\)</td></tr>
+    <tr><td>Longitud de arco</td><td>\(\displaystyle L=\int_a^b\sqrt{1+\big[f'(x)\big]^2}\,dx\)</td></tr>
+    <tr><td>Trabajo de fuerza variable</td><td>\(\displaystyle W=\int_a^b F(x)\,dx\)</td></tr>
+    <tr><td>Distancia a partir de la velocidad</td><td>\(\displaystyle s=\int_a^b v(t)\,dt\)</td></tr>
+  </tbody>
+</table></div>
+<div class="example">
+<h4>Ejemplo 9.1 — Área entre dos curvas</h4>
+<p>Área entre \(y=x\) y \(y=x^2\) en \([0,1]\). En ese intervalo \(x\ge x^2\):</p>
+$$A=\int_0^1(x-x^2)dx=\left[\frac{x^2}{2}-\frac{x^3}{3}\right]_0^1=\frac12-\frac13=\frac16.$$
+</div>
+<div class="example">
+<h4>Ejemplo 9.2 — Volumen de revolución</h4>
+<p>Al girar \(y=\sqrt x\) alrededor del eje \(x\) entre \(x=0\) y \(x=4\):</p>
+$$V=\pi\int_0^4(\sqrt x)^2dx=\pi\int_0^4x\,dx=\pi\left[\frac{x^2}{2}\right]_0^4=8\pi.$$
+</div>
+
+<h2 id="ejemplos">10. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 10.1 — Polinomio</h4>
+<p>\(\displaystyle\int(3x^2-2x+5)\,dx=x^3-x^2+5x+C.\)</p>
+<p>Comprobación: \((x^3-x^2+5x+C)'=3x^2-2x+5\). \(\checkmark\)</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.2 — Integral definida con el teorema fundamental</h4>
+<p>\(\displaystyle\int_0^1x^2\,dx=\left[\frac{x^3}{3}\right]_0^1=\frac13-0=\frac13.\)</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.3 — Sustitución en integral definida</h4>
+<p>\(\displaystyle\int_0^1 2x\,e^{x^2}dx\). Con \(u=x^2\), \(du=2x\,dx\); si \(x=0\), \(u=0\); si \(x=1\), \(u=1\):</p>
+$$\int_0^1e^u\,du=\left[e^u\right]_0^1=e-1.$$
+</div>
+<div class="example">
+<h4>Ejemplo 10.4 — Por partes con límites</h4>
+<p>\(\displaystyle\int_1^e\ln x\,dx=\left[x\ln x-x\right]_1^e=(e\ln e-e)-(1\ln1-1)=(e-e)-(0-1)=1.\)</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.5 — Completar cuadrados</h4>
+<p>\(\displaystyle\int\frac{dx}{x^2+4x+13}\). Completamos: \(x^2+4x+13=(x+2)^2+9\). Con \(u=x+2\), \(a=3\):</p>
+$$\int\frac{du}{u^2+9}=\frac13\arctg\frac{u}{3}+C=\frac13\arctg\frac{x+2}{3}+C.$$
+</div>
+<div class="example">
+<h4>Ejemplo 10.6 — Valor medio</h4>
+<p>Valor medio de \(f(x)=x^2\) en \([0,3]\):</p>
+$$\bar f=\frac{1}{3-0}\int_0^3x^2\,dx=\frac13\left[\frac{x^3}{3}\right]_0^3=\frac13\cdot9=3.$$
+</div>
+
+<h2 id="ejercicios">11. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Calcula \(\displaystyle\int(4x^3-6x+1)\,dx\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(x^4-3x^2+x+C\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int\frac{dx}{x^2}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\displaystyle\int x^{-2}dx=\frac{x^{-1}}{-1}+C=-\frac1x+C\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int(3x-2)^7dx\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Con \(u=3x-2\), \(du=3dx\): \(\frac{1}{3}\cdot\frac{u^8}{8}+C=\frac{(3x-2)^8}{24}+C\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int x\cos x\,dx\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Partes con \(u=x\), \(dv=\cos x\,dx\): \(x\sen x-\int\sen x\,dx=x\sen x+\cos x+C\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int x^2e^x\,dx\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Partes dos veces: \(x^2e^x-2xe^x+2e^x+C=e^x(x^2-2x+2)+C\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int\sen^2x\,dx\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\frac{x}{2}-\frac{\sen2x}{4}+C\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int\frac{dx}{x^2-4}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Fracciones parciales: \(\frac14\ln\left|\frac{x-2}{x+2}\right|+C\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int\frac{2x+3}{x^2+3x+2}\,dx\).
+    <details class="sol"><summary>Respuesta</summary><div><p>El numerador es la derivada del denominador: \(\ln|x^2+3x+2|+C\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int_0^2(3x^2+1)\,dx\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\left[x^3+x\right]_0^2=8+2=10\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int_1^2\frac{dx}{x}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\left[\ln|x|\right]_1^2=\ln2-\ln1=\ln2\approx0{,}6931\).</p></div></details></li>
+  <li>Calcula el área entre \(y=4-x^2\) y el eje \(x\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Cortes: \(4-x^2=0\Rightarrow x=\pm2\). \(A=\int_{-2}^2(4-x^2)dx=\left[4x-\frac{x^3}{3}\right]_{-2}^2=\frac{32}{3}\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int_1^\infty\frac{dx}{x^3}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\lim_{t\to\infty}\left[-\frac{1}{2x^2}\right]_1^t=0+\frac12=\frac12\). Converge.</p></div></details></li>
+  <li>Calcula el volumen al girar \(y=x^2\) alrededor del eje \(x\) entre \(0\) y \(1\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(V=\pi\int_0^1x^4dx=\pi\left[\frac{x^5}{5}\right]_0^1=\frac{\pi}{5}\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int\sqrt{9-x^2}\,dx\) con la sustitución \(x=3\sen\theta\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\sqrt{9-x^2}=3\cos\theta\), \(dx=3\cos\theta d\theta\): \(9\int\cos^2\theta d\theta=\frac92\left(\theta+\sen\theta\cos\theta\right)+C=\frac92\arcsen\frac x3+\frac{x}{2}\sqrt{9-x^2}+C\).</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">12. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. \(\displaystyle\int\frac{dx}{x}=\)</p>
+    <div class="opts">
+      <button class="opt">\(x^{-2}+C\)</button>
+      <button class="opt" data-ok>\(\ln|x|+C\)</button>
+      <button class="opt">\(\frac{x^0}{0}+C\)</button>
+    </div>
+    <p class="why">La regla de la potencia excluye \(n=-1\) porque el denominador sería cero; la primitiva de \(1/x\) es el logaritmo del valor absoluto.</p>
+  </div>
+  <div class="q">
+    <p>2. \(\displaystyle\int_0^1 3x^2\,dx=\)</p>
+    <div class="opts">
+      <button class="opt">3</button>
+      <button class="opt" data-ok>1</button>
+      <button class="opt">\(1/3\)</button>
+    </div>
+    <p class="why">Una primitiva es \(x^3\); evaluando, \(1^3-0^3=1\).</p>
+  </div>
+  <div class="q">
+    <p>3. Para \(\displaystyle\int x e^x\,dx\), la elección de partes es</p>
+    <div class="opts">
+      <button class="opt" data-ok>\(u=x\), \(dv=e^x dx\)</button>
+      <button class="opt">\(u=e^x\), \(dv=x\,dx\)</button>
+      <button class="opt">no se puede usar partes</button>
+    </div>
+    <p class="why">LIATE: la algebraica \(x\) va como \(u\) y la exponencial como \(dv\). La otra elección complica la integral (\(\int \frac{x^2}{2}e^x dx\)).</p>
+  </div>
+</div>
+
+<h2 id="biblio">13. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Stewart, <em>Cálculo de una variable</em>, 8.ª ed.</td><td>5</td><td>5.1–5.5</td><td>Áreas, integral definida, teorema fundamental, sustitución</td></tr>
+    <tr><td>Stewart, <em>Cálculo de una variable</em>, 8.ª ed.</td><td>7</td><td>7.1–7.5</td><td>Partes, trigonométricas, sustitución trigonométrica, fracciones parciales</td></tr>
+    <tr><td>Stewart, <em>Cálculo de una variable</em>, 8.ª ed.</td><td>7–8</td><td>7.8, 8.1–8.2</td><td>Integrales impropias, longitud de arco y área de superficie</td></tr>
+    <tr><td>Spivak, <em>Calculus</em>, 4.ª ed.</td><td>13–19</td><td>Integración</td><td>Construcción rigurosa y teorema fundamental</td></tr>
+    <tr><td>OpenStax, <em>Calculus Volume 1</em></td><td>5–6</td><td>5.1–5.7, 6.1–6.4</td><td>Integración, aplicaciones y técnicas</td></tr>
+    <tr><td>Thomas, <em>Cálculo: una variable</em>, 12.ª ed.</td><td>5, 8</td><td>5.1–5.6, 8.1–8.4</td><td>Integral definida y técnicas</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="recursos">14. Para profundizar</h2>
+<ul>
+  <li><a href="https://openstax.org/books/calculus-volume-1/pages/5-introduction">OpenStax · Calculus Volume 1, capítulo 5 (integración)</a>: teorema fundamental, sustitución y aplicaciones.</li>
+  <li><a href="https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/">MIT OCW 18.01</a>: vídeos y apuntes de integración y técnicas.</li>
+  <li><a href="https://es.khanacademy.org/math/calculus-1">Khan Academy · Cálculo 1</a>: práctica de antiderivadas, integrales definidas y áreas.</li>
+</ul>
+
+<h2 id="faq">15. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué la integral indefinida lleva \(+C\) y la definida no?</summary><div><p>La indefinida representa todas las primitivas, que difieren en una constante. En la definida, al evaluar \(F(b)-F(a)\), la constante se cancela: \((F(b)+C)-(F(a)+C)=F(b)-F(a)\). Por eso el resultado es un número único.</p></div></details>
+  <details><summary>¿Cómo sé qué técnica usar?</summary><div><p>Primero simplifica y busca una integral inmediata o casi inmediata. Si aparece una función y su derivada (salvo constante), usa sustitución. Si es un producto de tipos distintos (polinomio × exponencial, logaritmo, trigonométrica), usa partes. Si hay raíces de la forma \(a^2-x^2\), sustitución trigonométrica. Si es un cociente de polinomios, fracciones parciales. La práctica desarrolla el reconocimiento.</p></div></details>
+  <details><summary>¿Toda función continua tiene primitiva?</summary><div><p>Sí: si \(f\) es continua en un intervalo, la función área \(F(x)=\int_a^x f(t)dt\) es una primitiva (teorema fundamental, parte 1). Otra cosa es que esa primitiva se pueda escribir con funciones elementales; muchas no se pueden (por ejemplo, \(e^{-x^2}\)).</p></div></details>
+  <details><summary>¿Cómo se calcula una integral impropia con una asíntota interior?</summary><div><p>Se parte en el punto singular: \(\int_a^b=\int_a^c+\int_c^b\), y cada trozo se define como límite lateral. Si ambos límites convergen, la integral converge a la suma; si uno diverge, diverge. No se puede aplicar el teorema fundamental a través de la singularidad sin analizar los límites.</p></div></details>
+  <details><summary>¿Qué diferencia hay entre área y integral definida?</summary><div><p>La integral definida es un número con signo: las regiones bajo el eje cuentan negativo. El área geométrica es la integral del valor absoluto: \(\int_a^b|f(x)|dx\). Para calcular áreas entre curvas hay que identificar qué función está arriba en cada tramo.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de integración de cálculo de una variable. Bibliografía por capítulo y epígrafe; enlaces abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Cálculo diferencial e integral · Integrales · <a href="../">Volver al curso</a></footer>
+</body>
+</html>

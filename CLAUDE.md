@@ -79,6 +79,7 @@ telecomunication-page/
 ├── assets/css/base.css           ← tokens de diseño compartidos (claro/oscuro)
 ├── assets/js/                    ← utilidades compartidas (temas, quizzes, KaTeX, etc.)
 ├── repaso/                       ← páginas de repaso de prerrequisitos (matemática, física, probabilidad…)
+├── calculo-diferencial-e-integral/ ← curso complementario propio (límites, derivadas, integrales)
 ├── <asignatura>/
 │   ├── CLAUDE.md                 ← contexto + inventario + ESTADO de la asignatura
 │   ├── index.html                ← página principal de la asignatura
@@ -183,6 +184,7 @@ El repo es **público**. Los materiales fuente están **fuera** del repo a prop�
 | Redes 3 | ⬜ pendiente | solo estructura |
 | Gestión y Seguridad de Redes | ⬜ pendiente | solo estructura |
 | Estudios Sociales de la CyT | ⛔ sin materiales | carpeta fuente vacía |
+| Cálculo diferencial e integral | ✅ completo | curso complementario propio: límites, derivadas e integrales + 3 simuladores |
 | Repaso de prerrequisitos | 🟡 iniciada | matemática, probabilidad, circuitos, electrónica digital y analógica, física EM |
 | Portal raíz + CI/CD | ✅ hecho | `index.html`, `assets/css/base.css`, workflow |
 
@@ -190,6 +192,13 @@ Leyenda: ✅ completo · 🟡 en progreso · ⬜ pendiente · ⛔ bloqueado.
 
 ## 12. Bitácora global
 
+- **2026-10-21** — Curso complementario **Cálculo diferencial e integral** (`calculo-diferencial-e-integral/`):
+  portada + tres bloques (límites y continuidad, derivadas, integrales) con teoría, teoremas,
+  tablas de reglas y derivadas/integrales comunes, ejemplos resueltos, ejercicios con solución,
+  autoevaluación y bibliografía por capítulo/epígrafe. Tres simuladores propios en
+  `assets/js/calculo.js` (explorador de límites, secante→tangente y sumas de Riemann) y nuevo
+  acento `--c-calculo`. Verificado en Chromium headless (sin errores de consola ni KaTeX, sin
+  desborde a 390 px).
 - **2026-10-19** — Infraestructura común: `assets/css/course.css` y `assets/js/course.js` (KaTeX 0.16.11
   con macros, índice lateral automático, quiz, graficador canvas que respeta el tema). FC I completa
   (ver su CLAUDE.md). Fichas de repaso. Verificación: Chromium headless (errores JS/KaTeX, desborde en

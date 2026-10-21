@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cálculo diferencial e integral · Límites, derivadas e integrales</title>
+  <meta name="description" content="Curso de cálculo diferencial e integral en español: límites y continuidad, derivadas con todas las reglas y derivadas comunes, integrales con técnicas y tablas. Teoría, teoremas, ejemplos resueltos y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <script src="../assets/js/theme.js"></script>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-calculo); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../">← Portal</a>
+    <span class="title">Cálculo diferencial e integral</span>
+    <nav class="tabs" aria-label="Secciones del curso">
+      <a href="./" aria-current="page">Inicio</a>
+      <a href="temas/limites.html">Límites</a>
+      <a href="temas/derivadas.html">Derivadas</a>
+      <a href="temas/integrales.html">Integrales</a>
+      <a href="#como-estudiar">Cómo estudiar</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso completo · 3 bloques · teoría, teoremas, ejemplos y ejercicios resueltos</p>
+<h1>Cálculo diferencial e integral</h1>
+<p class="lead">Un recorrido en tres etapas: <strong>límites</strong> (qué significa acercarse), <strong>derivadas</strong> (cómo cambia) e <strong>integrales</strong> (cuánto se acumula). Cada bloque incluye la teoría explicada desde cero, los teoremas con su hipótesis y su interpretación, las reglas y tablas que hay que dominar, ejemplos paso a paso, simuladores y ejercicios con solución desplegable.</p>
+
+<div class="box idea"><span class="box-title">La idea que une todo el curso</span>
+<p>El cálculo estudia funciones mediante <em>aproximaciones que se vuelven exactas en el límite</em>. Una recta secante se convierte en tangente cuando el segundo punto se acerca al primero (derivada). Un montón de rectángulos se convierte en el área exacta cuando su ancho tiende a cero (integral). El <strong>teorema fundamental del cálculo</strong> demuestra que esas dos operaciones son inversas: derivar y integrar son dos caras de la misma moneda.</p></div>
+
+<h2 id="temas">Los tres bloques</h2>
+<div class="topic-grid">
+  <a href="temas/limites.html">
+    <h3>1 · Límites y continuidad</h3>
+    <p>Idea intuitiva, límites laterales, definición ε–δ, propiedades y álgebra de límites, indeterminaciones, límites al infinito, asíntotas, límites trigonométricos y el número \(e\), continuidad y teoremas del valor intermedio y de los extremos.</p>
+  </a>
+  <a href="temas/derivadas.html">
+    <h3>2 · Derivadas</h3>
+    <p>Definición como límite, interpretación geométrica y física, reglas de potencias, producto, cociente y cadena, tabla de derivadas comunes, derivación implícita, logarítmica e inversa, teoremas de Rolle y del valor medio, L'Hôpital, máximos, mínimos y optimización.</p>
+  </a>
+  <a href="temas/integrales.html">
+    <h3>3 · Integrales</h3>
+    <p>Antiderivada, integral indefinida, propiedades, tabla de integrales inmediatas, sustitución, integración por partes, trigonométricas, sustitución trigonométrica y fracciones parciales, teorema fundamental del cálculo, áreas, integrales impropias y métodos numéricos.</p>
+  </a>
+</div>
+
+<h2 id="como-estudiar">Cómo estudiar el curso</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Paso</th><th>Qué hacer</th><th>Dónde</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Leer la teoría y reproducir cada definición con un ejemplo propio.</td><td>Secciones 1–3 de cada bloque</td></tr>
+    <tr><td>2</td><td>Mover los simuladores hasta <em>ver</em> el concepto: el hueco, la secante que se vuelve tangente, los rectángulos que llenan el área.</td><td>Interactivo de cada bloque</td></tr>
+    <tr><td>3</td><td>Copiar los ejemplos resueltos <strong>sin mirar</strong> y comparar; si falla un paso, identificar la regla usada.</td><td>Ejemplos resueltos</td></tr>
+    <tr><td>4</td><td>Resolver los ejercicios propuestos con lápiz y papel antes de abrir la solución; después, explicar en voz alta por qué está bien.</td><td>Ejercicios con solución</td></tr>
+    <tr><td>5</td><td>Hacer el cuestionario de autoevaluación y volver a los apartados fallados.</td><td>Autoevaluación</td></tr>
+  </tbody>
+</table></div>
+<div class="box warn"><span class="box-title">Tres errores que cuestan exámenes</span>
+<ul>
+  <li><strong>Saltar la hipótesis.</strong> L'Hôpital solo se aplica a \(0/0\) o \(\infty/\infty\); el teorema del valor medio exige continuidad en el intervalo cerrado y derivabilidad en el abierto.</li>
+  <li><strong>Olvidar la constante.</strong> Toda integral indefinida lleva \(+C\); dos primitivas de la misma función difieren en una constante.</li>
+  <li><strong>No comprobar.</strong> Una derivada se comprueba volviendo a integrar; una integral, derivando el resultado.</li>
+</ul></div>
+
+<h2 id="prerrequisitos">Antes de empezar: prerrequisitos</h2>
+<p>El cálculo no empieza de cero: se apoya en álgebra, geometría analítica y trigonometría. Si algo de la tabla no suena familiar, conviene repasarlo antes de seguir.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Tema previo</th><th>Se usa para</th><th>Repaso</th></tr></thead>
+  <tbody>
+    <tr><td>Factorización, racionalización, leyes de exponentes y logaritmos</td><td>Resolver indeterminaciones y simplificar derivadas e integrales</td><td><a href="../repaso/matematica.html#logaritmos">Matemática · logaritmos</a></td></tr>
+    <tr><td>Trigonometría: identidades, valores notables, radianes</td><td>Límites trigonométricos, derivadas e integrales</td><td><a href="../repaso/matematica.html#trigonometria">Matemática · trigonometría</a></td></tr>
+    <tr><td>Funciones: dominio, rango, composición, inversa</td><td>Dominio de límites, regla de la cadena, funciones inversas</td><td><a href="../repaso/matematica.html">Ficha de matemática</a></td></tr>
+    <tr><td>Rectas, pendiente, ecuación punto–pendiente</td><td>Interpretación geométrica de la derivada</td><td><a href="../repaso/matematica.html">Ficha de matemática</a></td></tr>
+    <tr><td>Áreas de figuras planas y suma de series geométricas</td><td>Integral definida y sumas de Riemann</td><td><a href="../repaso/matematica.html#integrales">Matemática · integrales útiles</a></td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="notacion">Notación y convenciones</h2>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Símbolo</th><th>Significado</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>\(\lim_{x\to a}f(x)=L\)</td><td>\(f(x)\) se acerca a \(L\) cuando \(x\) se acerca a \(a\)</td><td>\(\lim_{x\to1}(x+1)=2\)</td></tr>
+    <tr><td>\(f'(a)\), \(\dfrac{df}{dx}\), \(Df\)</td><td>Derivada de \(f\) en \(a\)</td><td>\((x^2)'=2x\)</td></tr>
+    <tr><td>\(\int f(x)\,dx\)</td><td>Familia de primitivas de \(f\)</td><td>\(\int 2x\,dx=x^2+C\)</td></tr>
+    <tr><td>\(\int_a^b f(x)\,dx\)</td><td>Integral definida (un número)</td><td>\(\int_0^1 2x\,dx=1\)</td></tr>
+    <tr><td>\([a,b]\), \((a,b)\)</td><td>Intervalo cerrado / abierto</td><td>\([0,2]\), \((0,2)\)</td></tr>
+    <tr><td>\(x\to a^-\), \(x\to a^+\)</td><td>Límite lateral izquierdo / derecho</td><td>\(\lim_{x\to0^+}\frac1x=+\infty\)</td></tr>
+  </tbody>
+</table></div>
+<p>Las funciones trigonométricas se escriben \(\operatorname{sen}x\) y \(\cos x\); en los límites y derivadas <strong>el ángulo se mide en radianes</strong>. La notación \(\ln x\) es el logaritmo natural (base \(e\)) y \(\log x\) se reserva para base 10 cuando se indique.</p>
+
+<h2 id="evaluacion">Autoevaluación de entrada</h2>
+<p>Cinco preguntas para decidir por dónde empezar. La respuesta está en el desplegable.</p>
+<div class="quiz">
+  <div class="q">
+    <p>1. \(\displaystyle\lim_{x\to2}(3x-1)=\)</p>
+    <div class="opts">
+      <button class="opt" data-ok>5</button>
+      <button class="opt">No existe si \(f(2)\) no está definida</button>
+      <button class="opt">Depende del valor de \(f(2)\)</button>
+    </div>
+    <p class="why">El límite depende del comportamiento <em>cerca</em> de 2, no del valor en 2. Como \(3x-1\) es un polinomio, \(\lim_{x\to2}(3x-1)=3\cdot2-1=5\) aunque \(f(2)\) no existiera.</p>
+  </div>
+</div>
+<div class="quiz">
+  <div class="q">
+    <p>2. La derivada de \(f(x)=x^3\) es</p>
+    <div class="opts">
+      <button class="opt">\(3x\)</button>
+      <button class="opt" data-ok>\(3x^2\)</button>
+      <button class="opt">\(x^2/2\)</button>
+    </div>
+    <p class="why">Regla de la potencia: \((x^n)'=nx^{n-1}\), válida para todo \(n\) real. Con \(n=3\): \(3x^2\).</p>
+  </div>
+</div>
+<div class="quiz">
+  <div class="q">
+    <p>3. \(\displaystyle\int \cos x\,dx=\)</p>
+    <div class="opts">
+      <button class="opt" data-ok>\(\operatorname{sen}x+C\)</button>
+      <button class="opt">\(-\operatorname{sen}x+C\)</button>
+      <button class="opt">\(\cos x+C\)</button>
+    </div>
+    <p class="why">Porque \((\operatorname{sen}x)'=\cos x\). La derivada de \(-\operatorname{sen}x\) es \(-\cos x\), y la de \(\cos x\) es \(-\operatorname{sen}x\).</p>
+  </div>
+</div>
+<div class="quiz">
+  <div class="q">
+    <p>4. Si \(f(x)=|x|\), en \(x=0\) la función</p>
+    <div class="opts">
+      <button class="opt">es derivable y \(f'(0)=0\)</button>
+      <button class="opt" data-ok>es continua pero no derivable</button>
+      <button class="opt">no es continua</button>
+    </div>
+    <p class="why">\(|x|\) es continua en 0, pero los cocientes incrementales laterales valen \(-1\) y \(+1\): hay un pico y no existe la tangente única. Derivabilidad implica continuidad, pero no al revés.</p>
+  </div>
+</div>
+<div class="quiz">
+  <div class="q">
+    <p>5. \(\displaystyle\int_0^1 2x\,dx=\)</p>
+    <div class="opts">
+      <button class="opt">\(1/2\)</button>
+      <button class="opt" data-ok>1</button>
+      <button class="opt">2</button>
+    </div>
+    <p class="why">Una primitiva es \(x^2\). Teorema fundamental: \(\left[x^2\right]_0^1=1^2-0^2=1\).</p>
+  </div>
+</div>
+
+<h2 id="bibliografia">Bibliografía recomendada</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Edición</th><th>Uso en este curso</th><th>Acceso</th></tr></thead>
+  <tbody>
+    <tr><td>J. Stewart, <em>Cálculo de una variable: trascendentes tempranas</em></td><td>8.ª ed., Cengage, 2018</td><td>Límites (cap. 2), derivadas (cap. 3), aplicaciones (cap. 4), integrales (cap. 5) y técnicas (cap. 7)</td><td>Biblioteca</td></tr>
+    <tr><td>G. B. Thomas, <em>Cálculo: una variable</em></td><td>12.ª ed., Pearson, 2010</td><td>Explicaciones alternativas y problemas de aplicación</td><td>Biblioteca</td></tr>
+    <tr><td>M. Spivak, <em>Calculus</em></td><td>4.ª ed., Publish or Perish, 2008</td><td>Fundamentos y demostraciones rigurosas de los teoremas</td><td>Biblioteca</td></tr>
+    <tr><td>OpenStax, <em>Calculus Volume 1</em></td><td>2.ª ed., Rice University, 2023</td><td>Texto abierto: cap. 2 (límites), 3 (derivadas), 4 (aplicaciones) y 5 (integración)</td><td><a href="https://openstax.org/details/books/calculus-volume-1">openstax.org</a> (gratis)</td></tr>
+    <tr><td>MIT OpenCourseWare, <em>18.01 Single Variable Calculus</em></td><td>—</td><td>Vídeos de clase, apuntes y exámenes resueltos</td><td><a href="https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/">ocw.mit.edu</a></td></tr>
+  </tbody>
+</table></div>
+<p class="meta">Cada bloque incluye su propia tabla «Dónde estudiarlo» con los capítulos y epígrafes concretos. Las referencias de páginas no se incluyen porque varían entre impresiones; se indica siempre capítulo y sección.</p>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿En qué orden conviene estudiar los tres bloques?</summary><div><p>En el orden propuesto: límites → derivadas → integrales. Las derivadas se definen con un límite y las integrales definidas se construyen con límites de sumas; además, el teorema fundamental conecta derivada e integral. Saltarse límites hace que todo lo demás parezca magia.</p></div></details>
+  <details><summary>¿Hay que memorizar las tablas de derivadas e integrales?</summary><div><p>Las derivadas básicas (potencia, exponencial, logaritmo, seno, coseno, tangente) hay que saberlas de memoria. De las integrales conviene memorizar la tabla inmediata y las tres técnicas principales (sustitución, partes y fracciones parciales); el resto se deduce o se busca en tablas. La práctica es lo que fija la memoria.</p></div></details>
+  <details><summary>¿La derivada es una fracción?</summary><div><p>La notación \(dy/dx\) recuerda un cociente de incrementos, pero la derivada es el <em>límite</em> de ese cociente. Se puede manipular como si fuera una fracción en la regla de la cadena y en la sustitución porque hay teoremas que lo justifican, no porque sea literalmente una división de números.</p></div></details>
+  <details><summary>¿Por qué las integrales indefinidas llevan \(+C\)?</summary><div><p>Si \(F\) es una primitiva de \(f\), entonces \(F+C\) también lo es para cualquier constante \(C\), porque la derivada de una constante es cero. Geométricamente son la misma curva desplazada verticalmente; para fijar \(C\) hace falta una condición inicial (un punto por el que pasa la curva).</p></div></details>
+  <details><summary>¿Se puede usar calculadora o software?</summary><div><p>Sí, para comprobar y para explorar gráficas, pero no para sustituir el procedimiento. Los simuladores de este curso muestran el concepto; la calculadora simbólica sirve para verificar un resultado. En un examen se evalúa el razonamiento y la justificación de cada paso.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> curso elaborado con contenido propio a partir del temario estándar de cálculo diferencial e integral de una variable (límites, derivadas e integrales). Bibliografía y recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Cálculo diferencial e integral · Material de estudio · <a href="../">Portal de asignaturas</a></footer>
+</body>
+</html>

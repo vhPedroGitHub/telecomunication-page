@@ -228,7 +228,10 @@
         "\\E": "\\mathbf{E}",
         "\\dB": "\\,\\text{dB}",
         "\\Hz": "\\,\\text{Hz}",
-        "\\ang": "\\angle"
+        "\\ang": "\\angle",
+        "\\sen": "\\operatorname{sen}",
+        "\\tg": "\\operatorname{tg}",
+        "\\arcsen": "\\operatorname{arcsen}"
       }
     });
   }

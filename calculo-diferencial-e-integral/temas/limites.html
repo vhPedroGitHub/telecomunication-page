@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Límites y continuidad · Cálculo</title>
+  <meta name="description" content="Límites y continuidad: idea intuitiva, límites laterales, definición épsilon-delta, propiedades, indeterminaciones, límites al infinito, límites trigonométricos y el número e, teorema del valor intermedio y de los extremos. Ejemplos y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../../assets/js/calculo.js"></script>
+  <style>body { --accent: var(--c-calculo); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Cálculo diferencial e integral</span>
+    <nav class="tabs" aria-label="Secciones del curso">
+      <a href="../">Inicio</a>
+      <a href="limites.html" aria-current="page">Límites</a>
+      <a href="derivadas.html">Derivadas</a>
+      <a href="integrales.html">Integrales</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Bloque 1 · Límites y continuidad · base de las derivadas y de la integral definida</p>
+<h1>Límites y continuidad</h1>
+<p class="lead">El límite responde a una pregunta muy concreta: <strong>¿a qué valor se acerca \(f(x)\) cuando \(x\) se acerca a \(a\), sin importar lo que ocurra exactamente en \(a\)?</strong> Esa idea permite hablar de pendientes instantáneas, de áreas exactas y de continuidad. Sin límites no hay cálculo.</p>
+
+<div class="objectives">
+  <strong>Objetivos del bloque</strong>
+  <ul>
+    <li>Comprender el concepto de límite y distinguirlo del valor de la función en el punto.</li>
+    <li>Calcular límites laterales, límites al infinito y límites infinitos; decidir cuándo existe el límite.</li>
+    <li>Aplicar las propiedades (álgebra de límites) y resolver las indeterminaciones con técnicas algebraicas y con los límites notables.</li>
+    <li>Reconocer y clasificar discontinuidades; aplicar los teoremas de continuidad, del valor intermedio y de los extremos.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">álgebra, funciones y trigonometría</span>
+  <p>Para manipular límites necesitas factorizar (\(x^2-a^2=(x-a)(x+a)\)), racionalizar multiplicando por el conjugado, operar con potencias y logaritmos, y conocer las gráficas de las funciones elementales. En trigonometría: \(\sen^2x+\cos^2x=1\), \(\sen(0)=0\), \(\cos(0)=1\), y los ángulos en <strong>radianes</strong>. Repaso: <a href="../../repaso/matematica.html#trigonometria">trigonometría</a> · <a href="../../repaso/matematica.html#logaritmos">logaritmos</a> · <a href="../../repaso/matematica.html#integrales">funciones y gráficas</a>.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="idea">1. La idea de límite</h2>
+<p>Considera \(f(x)=\dfrac{x^2-1}{x-1}\). En \(x=1\) aparece \(0/0\): la función no está definida. Sin embargo, para \(x\ne1\) se puede simplificar:</p>
+$$\frac{x^2-1}{x-1}=\frac{(x-1)(x+1)}{x-1}=x+1.$$
+<p>La gráfica es la recta \(y=x+1\) con un <strong>hueco</strong> en \((1,2)\). Aunque \(f(1)\) no existe, cuando \(x\) se acerca a 1 por cualquiera de los dos lados, \(f(x)\) se acerca a 2. Eso es el límite:</p>
+<div class="eq key">$$\lim_{x\to a}f(x)=L$$<div class="eq-label">\(f(x)\) tiende a \(L\) cuando \(x\) tiende a \(a\)</div></div>
+<p>La definición no dice nada sobre \(f(a)\). El límite puede existir aunque \(f(a)\) no exista, y puede valer algo distinto de \(f(a)\). Lo único que importa es el comportamiento en un entorno perforado de \(a\).</p>
+<div class="box idea"><span class="box-title">Tres lecturas del mismo concepto</span>
+<ul>
+  <li><strong>Geométrica:</strong> si los puntos de la gráfica se acercan al punto \((a,L)\), el límite es \(L\).</li>
+  <li><strong>Numérica:</strong> al construir una tabla con valores de \(x\) cada vez más próximos a \(a\) (por ambos lados), los valores de \(f(x)\) se estabilizan en \(L\).</li>
+  <li><strong>Analítica:</strong> si \(f\) es una función elemental y está definida en \(a\), entonces \(\lim_{x\to a}f(x)=f(a)\).</li>
+</ul></div>
+
+<h2 id="laterales">2. Límites laterales</h2>
+<p>Acercarse por la izquierda y por la derecha puede dar resultados distintos. Se escribe:</p>
+$$\lim_{x\to a^-}f(x)\quad\text{(lateral izquierdo)},\qquad \lim_{x\to a^+}f(x)\quad\text{(lateral derecho)}.$$
+<div class="box def"><span class="box-title">Existencia del límite</span>
+<p>\(\displaystyle\lim_{x\to a}f(x)=L\) existe <strong>si y solo si</strong> existen los dos límites laterales y son iguales a \(L\):</p>
+$$\lim_{x\to a^-}f(x)=\lim_{x\to a^+}f(x)=L.$$
+<p>Si los laterales difieren, o si alguno es infinito, el límite bilateral no existe (aunque se pueda describir con \(+\infty\) o \(-\infty\)).</p></div>
+<p><strong>Ejemplo típico:</strong> \(f(x)=|x|/x\). Para \(x<0\), \(|x|=-x\) y \(f(x)=-1\). Para \(x>0\), \(f(x)=1\). Por tanto, los límites laterales en 0 son \(-1\) y \(1\): el límite no existe. La gráfica tiene un <em>salto</em>.</p>
+
+<h2 id="epsilon">3. Definición formal \(\varepsilon\)–\(\delta\)</h2>
+<p>La frase «se acerca» se precisa con dos tolerancias. \(L\) es el límite si podemos hacer que \(f(x)\) quede tan cerca de \(L\) como queramos (\(<\varepsilon\)) eligiendo \(x\) suficientemente cerca de \(a\) (\(0<|x-a|<\delta\)).</p>
+<div class="box def"><span class="box-title">Definición \(\varepsilon\)–\(\delta\)</span>
+<p>\(\displaystyle\lim_{x\to a}f(x)=L\) significa que para todo \(\varepsilon>0\) existe un \(\delta>0\) tal que</p>
+$$0<|x-a|<\delta\quad\Longrightarrow\quad |f(x)-L|<\varepsilon.$$
+<p>El \(0<\) es esencial: excluye \(x=a\), porque el límite no mira el valor en el punto.</p></div>
+<div class="example">
+<h4>Ejemplo 3.1 — Demostrar que \(\lim_{x\to3}(2x-1)=5\)</h4>
+<div class="step"><span class="n">1</span><div><p>Dado \(\varepsilon>0\), hay que lograr \(|(2x-1)-5|<\varepsilon\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Simplificamos: \(|2x-6|=2|x-3|\). Queremos \(2|x-3|<\varepsilon\), es decir, \(|x-3|<\varepsilon/2\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Elegimos \(\delta=\varepsilon/2\). Si \(0<|x-3|<\delta\), entonces \(|f(x)-5|=2|x-3|<2\delta=\varepsilon\). \(\square\)</p></div></div>
+<p class="meta">En la práctica no se pide encontrar el \(\delta\) óptimo: basta con uno que funcione. Para funciones lineales, \(\delta=\varepsilon/|m|\); para otras se acota \(|f(x)-L|\) en términos de \(|x-a|\).</p>
+</div>
+
+<h2 id="propiedades">4. Propiedades y álgebra de límites</h2>
+<p>Si \(\lim_{x\to a}f(x)=L\) y \(\lim_{x\to a}g(x)=M\) (ambos finitos), entonces:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Propiedad</th><th>Fórmula</th><th>Condición</th></tr></thead>
+  <tbody>
+    <tr><td>Unicidad</td><td>El límite, si existe, es único</td><td>—</td></tr>
+    <tr><td>Constante</td><td>\(\lim k=k\)</td><td>—</td></tr>
+    <tr><td>Identidad</td><td>\(\lim x=a\)</td><td>—</td></tr>
+    <tr><td>Suma y diferencia</td><td>\(\lim(f\pm g)=L\pm M\)</td><td>—</td></tr>
+    <tr><td>Múltiplo constante</td><td>\(\lim(kf)=kL\)</td><td>—</td></tr>
+    <tr><td>Producto</td><td>\(\lim(fg)=LM\)</td><td>—</td></tr>
+    <tr><td>Cociente</td><td>\(\lim\dfrac{f}{g}=\dfrac{L}{M}\)</td><td>\(M\ne0\)</td></tr>
+    <tr><td>Potencia</td><td>\(\lim f^n=L^n\)</td><td>\(n\in\mathbb N\) (o real si \(L^n\) está definido)</td></tr>
+    <tr><td>Raíz</td><td>\(\lim\sqrt[n]{f}=\sqrt[n]{L}\)</td><td>\(L\ge0\) si \(n\) es par</td></tr>
+    <tr><td>Composición</td><td>\(\lim f(g(x))=f\!\left(\lim g(x)\right)\)</td><td>\(f\) continua en \(M\)</td></tr>
+  </tbody>
+</table></div>
+<p>Consecuencia inmediata: los <strong>polinomios</strong> y las <strong>funciones racionales</strong> (en los puntos donde el denominador no se anula) se evalúan directamente. También lo hacen \(\sen x\), \(\cos x\), \(e^x\), \(\ln x\) (para \(x>0\)) y las raíces (en su dominio).</p>
+<div class="box warn"><span class="box-title">Cuidado con aplicar propiedades a ciegas</span>
+<p>Las propiedades valen cuando los límites son <strong>finitos</strong>. Expresiones como \(\infty-\infty\), \(0\cdot\infty\) o \(\infty/\infty\) no son operaciones válidas con \(\infty\): son <em>formas indeterminadas</em> y hay que transformarlas antes de concluir.</p></div>
+
+<h2 id="indeterminaciones">5. Indeterminaciones y técnicas de cálculo</h2>
+<p>Una indeterminación es una expresión cuya apariencia no decide el límite. Las siete formas habituales son</p>
+$$\frac00,\qquad \frac{\infty}{\infty},\qquad 0\cdot\infty,\qquad \infty-\infty,\qquad 1^\infty,\qquad 0^0,\qquad \infty^0.$$
+<p>No son resultados: son señales de que hay que <strong>reescribir</strong> la expresión. Las técnicas, en orden de preferencia:</p>
+
+<h3 id="tec-algebra">5.1 Factorizar, simplificar y racionalizar (\(0/0\))</h3>
+<p>Si al sustituir aparece \(0/0\) en un cociente de polinomios, \(a\) es raíz de ambos: se factoriza y se cancela el factor común. Si hay raíces cuadradas, se multiplica numerador y denominador por el conjugado.</p>
+<div class="example">
+<h4>Ejemplo 5.1 — Dos indeterminaciones \(0/0\)</h4>
+<p><strong>(a)</strong> \(\displaystyle\lim_{x\to2}\frac{x^2-4}{x-2}\). Factorizando: \(\frac{(x-2)(x+2)}{x-2}=x+2\) para \(x\ne2\); el límite es \(4\).</p>
+<p><strong>(b)</strong> \(\displaystyle\lim_{x\to0}\frac{\sqrt{x+1}-1}{x}\). Multiplicamos por el conjugado:</p>
+$$\frac{(\sqrt{x+1}-1)(\sqrt{x+1}+1)}{x(\sqrt{x+1}+1)}=\frac{x+1-1}{x(\sqrt{x+1}+1)}=\frac{1}{\sqrt{x+1}+1}\xrightarrow[x\to0]{}\frac12.$$
+</div>
+
+<h3 id="tec-infinito">5.2 Dividir por la potencia dominante (\(\infty/\infty\))</h3>
+<p>En un cociente de polinomios cuando \(x\to\pm\infty\), se divide numerador y denominador por la mayor potencia de \(x\). El resultado depende de los grados:</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Grados</th><th>Comportamiento</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>\(\deg P<\deg Q\)</td><td>El límite es \(0\)</td><td>\(\dfrac{x}{x^2+1}\to0\)</td></tr>
+    <tr><td>\(\deg P=\deg Q\)</td><td>Cociente de coeficientes líderes</td><td>\(\dfrac{3x^2-1}{2x^2+5}\to\dfrac32\)</td></tr>
+    <tr><td>\(\deg P>\deg Q\)</td><td>\(\pm\infty\) (según signos)</td><td>\(\dfrac{x^3}{x+1}\to+\infty\) si \(x\to+\infty\)</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="tec-conjugado">5.3 Conjugado en diferencias con raíces (\(\infty-\infty\))</h3>
+<p>Para \(\sqrt{x^2+x}-x\) cuando \(x\to+\infty\), se multiplica y divide por el conjugado \(\sqrt{x^2+x}+x\):</p>
+$$\sqrt{x^2+x}-x=\frac{x}{\sqrt{x^2+x}+x}=\frac{1}{\sqrt{1+1/x}+1}\xrightarrow[x\to+\infty]{}\frac12.$$
+
+<h3 id="tec-trig">5.4 Límites trigonométricos notables</h3>
+<div class="eq key">
+$$\lim_{x\to0}\frac{\sen x}{x}=1,\qquad
+\lim_{x\to0}\frac{1-\cos x}{x}=0,\qquad
+\lim_{x\to0}\frac{1-\cos x}{x^2}=\frac12,\qquad
+\lim_{x\to0}\frac{\tg x}{x}=1.$$
+<div class="eq-label">Válidos con el ángulo en radianes</div></div>
+<p>El primero se demuestra geométricamente comparando áreas (\( \sen x<x<\tg x\) para \(0<x<\pi/2\)) y aplicando el teorema del emparedado. Los demás se deducen de él con identidades trigonométricas.</p>
+
+<h3 id="tec-e">5.5 El número \(e\) y las potencias \(1^\infty\)</h3>
+<div class="eq key">
+$$\lim_{x\to\infty}\left(1+\frac1x\right)^x=e,\qquad
+\lim_{x\to0}(1+x)^{1/x}=e,\qquad
+\lim_{x\to0}\frac{e^x-1}{x}=1,\qquad
+\lim_{x\to0}\frac{\ln(1+x)}{x}=1.$$
+<div class="eq-label">Definiciones y límites fundamentales de la exponencial y el logaritmo</div></div>
+<p>Para una indeterminación \(1^\infty\) se usa la identidad \(A^B=e^{B\ln A}\) y se lleva el exponente a un límite de la forma \(0/0\) o \(\infty/\infty\).</p>
+
+<h3 id="tec-squeeze">5.6 Teorema del emparedado (squeeze)</h3>
+<div class="box def"><span class="box-title">Teorema del emparedado</span>
+<p>Si \(g(x)\le f(x)\le h(x)\) en un entorno perforado de \(a\) y \(\displaystyle\lim_{x\to a}g(x)=\lim_{x\to a}h(x)=L\), entonces \(\displaystyle\lim_{x\to a}f(x)=L\).</p></div>
+<p>Sirve para funciones oscilantes o acotadas. Ejemplo: \(0\le x^2\sen(1/x)\le x^2\), y como \(x^2\to0\), el límite es \(0\).</p>
+
+<h2 id="infinito">6. Límites al infinito y asíntotas</h2>
+<p>\(\lim_{x\to\infty}f(x)=L\) significa que \(f(x)\) se acerca a \(L\) cuando \(x\) crece sin cota. Gráficamente, la recta \(y=L\) es una <strong>asíntota horizontal</strong>. Si \(f(x)\to\pm\infty\) cuando \(x\to a\), la recta \(x=a\) es una <strong>asíntota vertical</strong>.</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Límite</th><th>Interpretación</th></tr></thead>
+  <tbody>
+    <tr><td>\(\lim_{x\to\infty}f(x)=L\)</td><td>Asíntota horizontal \(y=L\) por la derecha</td></tr>
+    <tr><td>\(\lim_{x\to-\infty}f(x)=L\)</td><td>Asíntota horizontal \(y=L\) por la izquierda</td></tr>
+    <tr><td>\(\lim_{x\to a^+}f(x)=+\infty\)</td><td>Asíntota vertical \(x=a\) (sube por la derecha)</td></tr>
+    <tr><td>\(\lim_{x\to a^-}f(x)=-\infty\)</td><td>Asíntota vertical \(x=a\) (baja por la izquierda)</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Reglas rápidas:</strong> \(\lim_{x\to\pm\infty}\frac{1}{x^n}=0\) para \(n>0\); \(\lim_{x\to0^+}\frac{1}{x}=+\infty\); \(\lim_{x\to0^-}\frac{1}{x}=-\infty\). La función exponencial domina a cualquier potencia y la potencia domina al logaritmo: para \(x\to+\infty\),</p>
+$$\ln x\ll x^n\ll e^x\qquad(n>0).$$
+
+<h2 id="continuidad">7. Continuidad</h2>
+<div class="box def"><span class="box-title">Continuidad en un punto</span>
+<p>\(f\) es continua en \(a\) si se cumplen las tres condiciones:</p>
+<ol>
+  <li>\(f(a)\) está definida;</li>
+  <li>\(\displaystyle\lim_{x\to a}f(x)\) existe (finito);</li>
+  <li>\(\displaystyle\lim_{x\to a}f(x)=f(a)\).</li>
+</ol></div>
+<p>Si falla alguna, hay una <strong>discontinuidad</strong>. Se clasifica así:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Tipo</th><th>Qué ocurre</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Evitable</td><td>El límite existe pero no coincide con \(f(a)\) (o \(f(a)\) no existe)</td><td>\(\dfrac{x^2-1}{x-1}\) en \(x=1\)</td></tr>
+    <tr><td>De salto</td><td>Los límites laterales existen pero son distintos</td><td>\(|x|/x\) en \(x=0\)</td></tr>
+    <tr><td>Infinita</td><td>Al menos un lateral es \(\pm\infty\)</td><td>\(1/x\) en \(x=0\)</td></tr>
+    <tr><td>Esencial</td><td>Algún lateral no existe ni es infinito (oscila)</td><td>\(\sen(1/x)\) en \(x=0\)</td></tr>
+  </tbody>
+</table></div>
+<p>Los polinomios son continuos en todo \(\mathbb R\); las funciones racionales lo son en su dominio; \(\sen x\), \(\cos x\), \(e^x\) son continuas en todo \(\mathbb R\); \(\ln x\) y \(\sqrt x\) lo son en su dominio. La suma, producto, cociente (con denominador no nulo) y composición de continuas es continua.</p>
+
+<h3 id="teoremas-cont">7.1 Teoremas fundamentales de continuidad</h3>
+<div class="box def"><span class="box-title">Teorema de los valores intermedios (Bolzano)</span>
+<p>Si \(f\) es continua en \([a,b]\) y \(k\) está entre \(f(a)\) y \(f(b)\), entonces existe al menos un \(c\in(a,b)\) tal que \(f(c)=k\). En particular, si \(f(a)\) y \(f(b)\) tienen signos opuestos, existe una raíz \(c\) con \(f(c)=0\).</p></div>
+<div class="box def"><span class="box-title">Teorema de los extremos (Weierstrass)</span>
+<p>Si \(f\) es continua en un intervalo <strong>cerrado y acotado</strong> \([a,b]\), entonces \(f\) alcanza un máximo absoluto y un mínimo absoluto en \([a,b]\): existen \(c,d\in[a,b]\) con \(f(c)\le f(x)\le f(d)\) para todo \(x\in[a,b]\).</p></div>
+<p>Ambos teoremas son <em>de existencia</em>: aseguran que el valor o el extremo existe, pero no dicen cómo encontrarlo. Las hipótesis importan: en \((0,1)\) la función \(f(x)=1/x\) es continua pero no está acotada ni alcanza máximo; en \([0,1]\) con \(f(0)=-1\), \(f(1)=1\) y un salto, puede no haber valor intermedio.</p>
+<div class="example">
+<h4>Ejemplo 7.1 — Una raíz garantizada</h4>
+<p>Sea \(f(x)=x^3+x-1\). Es un polinomio, luego continua en \([0,1]\). \(f(0)=-1<0\) y \(f(1)=1>0\). Por el teorema de Bolzano existe \(c\in(0,1)\) con \(f(c)=0\). (El valor aproximado es \(c\approx0{,}6823\).)</p>
+</div>
+
+<h2 id="sim">8. Interactivo: ver el límite</h2>
+<p>Elige una función y mueve \(x\) a ambos lados de \(a\). Observa que \(f(x)\) se acerca al mismo valor \(L\) aunque en \(a\) haya un hueco. En el último ejemplo, los laterales no coinciden y el límite no existe.</p>
+<div class="sim" id="sim-lim">
+  <div class="sim-title">Explorador de límites</div>
+  <div class="controls">
+    <label>Función
+      <select id="lim-fn">
+        <option value="racional">(x² − 1)/(x − 1), a = 1</option>
+        <option value="cuad">(x² − 4)/(x − 2), a = 2</option>
+        <option value="sinx">sen x / x, a = 0</option>
+        <option value="raiz">(√(x+1) − 1)/x, a = 0</option>
+        <option value="cos">(1 − cos x)/x², a = 0</option>
+        <option value="abss">|x| / x, a = 0</option>
+      </select>
+    </label>
+    <label>Posición de x
+      <input type="range" id="lim-x" min="-1.5" max="1.5" step="0.01" value="0">
+      <span class="val">a + desplazamiento</span>
+    </label>
+  </div>
+  <canvas id="lim-canvas" aria-label="Gráfica de la función con el hueco y el límite"></canvas>
+  <div class="readout" id="lim-out"></div>
+  <p class="meta" id="lim-note"></p>
+</div>
+
+<h2 id="ejemplos">9. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 9.1 — Límite por factorización</h4>
+<p>\(\displaystyle\lim_{x\to3}\frac{x^2-9}{x-3}\).</p>
+<div class="step"><span class="n">1</span><div><p>Al sustituir: \(0/0\). Factorizamos: \(x^2-9=(x-3)(x+3)\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Para \(x\ne3\), \(\dfrac{(x-3)(x+3)}{x-3}=x+3\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>\(\lim_{x\to3}(x+3)=6\). <strong>Respuesta: 6.</strong></p></div></div>
+</div>
+<div class="example">
+<h4>Ejemplo 9.2 — Límite al infinito</h4>
+<p>\(\displaystyle\lim_{x\to\infty}\frac{3x^2-2x+1}{x^2+4}\).</p>
+<p>Dividimos por \(x^2\):</p>
+$$\frac{3-\frac2x+\frac1{x^2}}{1+\frac4{x^2}}\xrightarrow[x\to\infty]{}\frac{3-0+0}{1+0}=3.$$
+<p>Como los grados coinciden, el resultado es el cociente de coeficientes líderes: \(3/1=3\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.3 — Trigonométrico con cambio de variable</h4>
+<p>\(\displaystyle\lim_{x\to0}\frac{\sen(5x)}{3x}\). Hacemos \(u=5x\); cuando \(x\to0\), \(u\to0\), y \(x=u/5\):</p>
+$$\frac{\sen u}{3(u/5)}=\frac53\cdot\frac{\sen u}{u}\xrightarrow[u\to0]{}\frac53.$$
+</div>
+<div class="example">
+<h4>Ejemplo 9.4 — Indeterminación \(1^\infty\)</h4>
+<p>\(\displaystyle\lim_{x\to\infty}\left(1+\frac2x\right)^x\).</p>
+<div class="step"><span class="n">1</span><div><p>Escribimos \(A^B=e^{B\ln A}\): el límite es \(\exp\left(\lim_{x\to\infty}x\ln(1+2/x)\right)\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Con \(u=2/x\to0\): \(x\ln(1+2/x)=\frac{2}{u}\ln(1+u)=2\cdot\frac{\ln(1+u)}{u}\to2\cdot1=2\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Por tanto, el límite es \(e^2\).</p></div></div>
+</div>
+<div class="example">
+<h4>Ejemplo 9.5 — Continuidad y parámetro</h4>
+<p>Sea \(f(x)=\dfrac{x^2-4}{x-2}\) para \(x\ne2\) y \(f(2)=k\). ¿Qué valor de \(k\) hace \(f\) continua en \(2\)?</p>
+<p>El límite es \(\lim_{x\to2}(x+2)=4\). Para que coincida con \(f(2)\), debe ser \(k=4\). Con ese valor la discontinuidad evitable se repara.</p>
+</div>
+
+<h2 id="ejercicios">10. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Calcula \(\displaystyle\lim_{x\to-1}\frac{x^2-1}{x+1}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(0/0\). Factorizando: \(\frac{(x-1)(x+1)}{x+1}=x-1\to-2\). <strong>−2.</strong></p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to4}\frac{\sqrt{x}-2}{x-4}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Multiplicando por \(\sqrt{x}+2\): \(\frac{x-4}{(x-4)(\sqrt{x}+2)}=\frac{1}{\sqrt{x}+2}\to\frac14\). <strong>1/4.</strong></p></div></details></li>
+  <li>Decide si existe \(\displaystyle\lim_{x\to0}\frac{x}{|x|}\) y calcula los laterales.
+    <details class="sol"><summary>Respuesta</summary><div><p>Para \(x>0\): \(x/|x|=1\); para \(x<0\): \(x/|x|=-1\). Los laterales son \(1\) y \(-1\), distintos. <strong>El límite no existe.</strong></p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to\infty}\frac{5x^3-2x}{2x^3+x^2+1}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Dividiendo por \(x^3\): \(\frac{5-2/x^2}{2+1/x+1/x^3}\to\frac52\). <strong>5/2.</strong></p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to0}\frac{\sen(7x)}{x}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\frac{\sen(7x)}{x}=7\cdot\frac{\sen(7x)}{7x}\to7\cdot1=7\). <strong>7.</strong></p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to\infty}\left(1+\frac1x\right)^{3x}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\left[(1+1/x)^x\right]^3\to e^3\). <strong>\(e^3\).</strong></p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to0}\frac{\sqrt{x+4}-2}{x}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Conjugado: \(\frac{x}{x(\sqrt{x+4}+2)}=\frac{1}{\sqrt{x+4}+2}\to\frac14\). <strong>1/4.</strong></p></div></details></li>
+  <li>Halla las asíntotas verticales y horizontales de \(f(x)=\dfrac{2x}{x-3}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Vertical: \(x=3\) (el denominador se anula y el numerador no). Horizontal: \(\lim_{x\to\pm\infty}\frac{2x}{x-3}=2\), luego \(y=2\). <strong>\(x=3\) e \(y=2\).</strong></p></div></details></li>
+  <li>Estudia la continuidad de \(f(x)=\begin{cases}x^2 & x<1\\ 2x-1 & x\ge1\end{cases}\) en \(x=1\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Por la izquierda: \(x^2\to1\). Por la derecha: \(2x-1\to1\). Además \(f(1)=1\). Los tres valores coinciden: <strong>es continua en \(x=1\)</strong> (y en todo \(\mathbb R\)).</p></div></details></li>
+  <li>Demuestra que \(x^5+x-1=0\) tiene al menos una raíz en \((0,1)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f(x)=x^5+x-1\) es continua por ser polinomio. \(f(0)=-1<0\) y \(f(1)=1>0\). Por el teorema de Bolzano, existe \(c\in(0,1)\) con \(f(c)=0\). <strong>Queda demostrado.</strong></p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to2}\frac{x^3-8}{x^2-4}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(0/0\). Factorizando: \(\frac{(x-2)(x^2+2x+4)}{(x-2)(x+2)}=\frac{x^2+2x+4}{x+2}\to\frac{12}{4}=3\). <strong>3.</strong></p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to0^+}\left(\frac1x-\frac{1}{\sen x}\right)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Común denominador: \(\frac{\sen x-x}{x\sen x}\). Usando \(\sen x=x-x^3/6+O(x^5)\), el numerador es \(-x^3/6+O(x^5)\) y el denominador \(x^2+O(x^4)\); el cociente tiende a \(0\). <strong>0.</strong></p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">11. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. Si \(\lim_{x\to a}f(x)=L\), entonces necesariamente</p>
+    <div class="opts">
+      <button class="opt">\(f(a)=L\)</button>
+      <button class="opt" data-ok>\(f\) se acerca a \(L\) cerca de \(a\), aunque \(f(a)\) no exista</button>
+      <button class="opt">\(f\) es continua en \(a\)</button>
+    </div>
+    <p class="why">El límite no controla el valor en el punto. La continuidad exige además que \(f(a)\) exista y coincida con \(L\).</p>
+  </div>
+  <div class="q">
+    <p>2. \(\displaystyle\lim_{x\to\infty}\frac{3x+1}{x^2-2}=\)</p>
+    <div class="opts">
+      <button class="opt">3</button>
+      <button class="opt" data-ok>0</button>
+      <button class="opt">\(\infty\)</button>
+    </div>
+    <p class="why">El grado del denominador es mayor: dividiendo por \(x^2\), el numerador tiende a 0 y el denominador a 1.</p>
+  </div>
+  <div class="q">
+    <p>3. La discontinuidad de \(f(x)=1/x\) en \(x=0\) es</p>
+    <div class="opts">
+      <button class="opt">evitable</button>
+      <button class="opt">de salto</button>
+      <button class="opt" data-ok>infinita</button>
+    </div>
+    <p class="why">Los laterales son \(-\infty\) y \(+\infty\): no existe límite finito y la recta \(x=0\) es asíntota vertical.</p>
+  </div>
+</div>
+
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Stewart, <em>Cálculo de una variable</em>, 8.ª ed.</td><td>2</td><td>2.2–2.6</td><td>Límite, laterales, cálculo, continuidad, infinito</td></tr>
+    <tr><td>Stewart, <em>Cálculo de una variable</em>, 8.ª ed.</td><td>2</td><td>2.3, 2.7</td><td>Definición \(\varepsilon\)–\(\delta\), derivada como límite (puente al bloque 2)</td></tr>
+    <tr><td>Spivak, <em>Calculus</em>, 4.ª ed.</td><td>5–7</td><td>Límites y continuidad</td><td>Demostraciones rigurosas y teoremas</td></tr>
+    <tr><td>OpenStax, <em>Calculus Volume 1</em></td><td>2</td><td>2.2–2.5, 2.7</td><td>Texto abierto con ejemplos y ejercicios</td></tr>
+    <tr><td>Thomas, <em>Cálculo: una variable</em>, 12.ª ed.</td><td>2</td><td>2.2–2.6</td><td>Límites, continuidad y aplicaciones</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="recursos">13. Para profundizar</h2>
+<ul>
+  <li><a href="https://openstax.org/books/calculus-volume-1/pages/2-introduction">OpenStax · Calculus Volume 1, capítulo 2 (límites)</a>: definiciones, ejemplos interactivos y ejercicios con solución.</li>
+  <li><a href="https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/">MIT OCW 18.01</a>: clases en vídeo y apuntes; las sesiones iniciales cubren límites y continuidad.</li>
+  <li><a href="https://es.khanacademy.org/math/calculus-1">Khan Academy · Cálculo 1</a>: vídeos cortos y práctica interactiva de límites y continuidad.</li>
+</ul>
+
+<h2 id="faq">14. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué \(0/0\) es indeterminado y no cero?</summary><div><p>Porque \(0/0\) no es una división válida: describe situaciones distintas según la función. \(\frac{x}{x}\to1\), \(\frac{2x}{x}\to2\) y \(\frac{x}{x^2}\to\infty\) cuando \(x\to0\); todas se "ven" como \(0/0\) al sustituir. El valor depende de cómo se acercan numerador y denominador a cero.</p></div></details>
+  <details><summary>¿Se puede usar L'Hôpital en límites?</summary><div><p>Sí, cuando hay \(0/0\) o \(\infty/\infty\) y se cumplen las hipótesis (funciones derivables cerca del punto, denominador no nulo, límite del cociente de derivadas existente). Se estudia en el bloque de derivadas; conviene usar primero álgebra y límites notables, y reservar L'Hôpital para casos genuinos.</p></div></details>
+  <details><summary>¿Qué diferencia hay entre «límite no existe» y «límite infinito»?</summary><div><p>Un límite infinito es una forma de describir un comportamiento: \(f(x)\to+\infty\). El límite <em>como número real</em> no existe, pero la notación infinita es informativa y se usa para asíntotas. «No existe» sin más incluye también la oscilación (como \(\sen(1/x)\)) y los saltos.</p></div></details>
+  <details><summary>¿La continuidad se comprueba siempre con los tres pasos?</summary><div><p>Para funciones elementales en su dominio, basta con evaluar: son continuas por composición de continuas. Los tres pasos se usan en funciones definidas a trozos, en puntos donde cambia la fórmula o donde el denominador se anula.</p></div></details>
+  <details><summary>¿Por qué el teorema de Bolzano pide continuidad en un intervalo cerrado?</summary><div><p>Porque la continuidad garantiza que la gráfica no "salta" y no puede pasar de negativa a positiva sin cortar el eje. Sin continuidad, una función puede saltar de \(-1\) a \(1\) sin valer nunca \(0\).</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de límites y continuidad de cálculo de una variable. Bibliografía indicada por capítulo y epígrafe; enlaces abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Cálculo diferencial e integral · Límites y continuidad · <a href="../">Volver al curso</a></footer>
+</body>
+</html>

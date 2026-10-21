@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Derivadas: reglas, propiedades y tabla · Cálculo</title>
+  <meta name="description" content="Derivadas desde cero: definición como límite, interpretación geométrica, reglas de la potencia, producto, cociente y cadena, tabla de derivadas comunes, derivación implícita, logarítmica e inversa, teoremas de Rolle y del valor medio, L'Hôpital, máximos y mínimos, optimización y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../../assets/js/calculo.js"></script>
+  <style>body { --accent: var(--c-calculo); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Cálculo diferencial e integral</span>
+    <nav class="tabs" aria-label="Secciones del curso">
+      <a href="../">Inicio</a>
+      <a href="limites.html">Límites</a>
+      <a href="derivadas.html" aria-current="page">Derivadas</a>
+      <a href="integrales.html">Integrales</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Bloque 2 · Derivadas · reglas, propiedades, tabla y aplicaciones</p>
+<h1>Derivadas</h1>
+<p class="lead">La derivada mide <strong>cómo cambia una función</strong>. Geométricamente es la pendiente de la recta tangente; físicamente, la velocidad instantánea; en economía, el costo marginal. Todo se reduce al mismo límite: el cociente entre el cambio de \(y\) y el cambio de \(x\), cuando el cambio de \(x\) tiende a cero.</p>
+
+<div class="objectives">
+  <strong>Objetivos del bloque</strong>
+  <ul>
+    <li>Calcular derivadas a partir de la definición y reconocer su interpretación geométrica y física.</li>
+    <li>Dominar las reglas de derivación (potencia, suma, producto, cociente, cadena) y la tabla de derivadas comunes.</li>
+    <li>Derivar funciones implícitas, logarítmicas e inversas; calcular derivadas de orden superior.</li>
+    <li>Aplicar los teoremas de Rolle, del valor medio y de L'Hôpital; estudiar monotonía, extremos y concavidad.</li>
+    <li>Resolver problemas de optimización, razones relacionadas y aproximación lineal.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">límites y álgebra de funciones</span>
+  <p>La derivada <em>es</em> un límite: \(\displaystyle f'(a)=\lim_{h\to0}\frac{f(a+h)-f(a)}{h}\). Necesitas manejar límites, factorización, racionalización y las identidades trigonométricas. También la ecuación punto–pendiente de la recta: \(y-y_0=m(x-x_0)\). Repaso: <a href="limites.html">bloque de límites</a> · <a href="../../repaso/matematica.html#trigonometria">trigonometría</a> · <a href="../../repaso/matematica.html#logaritmos">logaritmos y exponenciales</a>.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="definicion">1. Definición de derivada</h2>
+<div class="box def"><span class="box-title">Derivada en un punto</span>
+<p>La derivada de \(f\) en \(a\), denotada \(f'(a)\), es</p>
+$$f'(a)=\lim_{h\to0}\frac{f(a+h)-f(a)}{h}=\lim_{x\to a}\frac{f(x)-f(a)}{x-a},$$
+<p>siempre que el límite exista y sea finito. Si existe, se dice que \(f\) es <strong>derivable</strong> en \(a\).</p></div>
+<p>La fracción \(\dfrac{f(a+h)-f(a)}{h}\) es el <strong>cociente incremental</strong>: el cambio de \(f\) dividido por el cambio de \(x\). Es la pendiente de la recta secante que pasa por \((a,f(a))\) y \((a+h,f(a+h))\). Al hacer \(h\to0\), el segundo punto se acerca al primero y la secante tiende a la <strong>tangente</strong>.</p>
+<div class="eq key">
+$$m_{\text{tangente}}=f'(a),\qquad y-f(a)=f'(a)(x-a).$$
+<div class="eq-label">Pendiente y ecuación de la recta tangente en \(x=a\)</div></div>
+<p><strong>Interpretación física:</strong> si \(s(t)\) es la posición de un móvil en el instante \(t\), entonces \(s'(t)\) es su velocidad instantánea y \(s''(t)\) su aceleración. <strong>Interpretación económica:</strong> si \(C(q)\) es el costo de producir \(q\) unidades, \(C'(q)\) es el costo marginal.</p>
+
+<h3 id="notacion">1.1 Notaciones</h3>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Notación</th><th>Autor / uso</th><th>Significado</th></tr></thead>
+  <tbody>
+    <tr><td>\(f'(x)\)</td><td>Lagrange</td><td>Derivada como función</td></tr>
+    <tr><td>\(\dfrac{dy}{dx}\)</td><td>Leibniz</td><td>Cambio de \(y\) respecto de \(x\); cómoda en la regla de la cadena</td></tr>
+    <tr><td>\(D_x f\)</td><td>Operador</td><td>Derivada respecto de \(x\)</td></tr>
+    <tr><td>\(\dot y\)</td><td>Newton</td><td>Derivada respecto del tiempo (física)</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="continuidad">2. Derivabilidad y continuidad</h2>
+<div class="box def"><span class="box-title">Teorema</span>
+<p>Si \(f\) es derivable en \(a\), entonces \(f\) es continua en \(a\). El recíproco <strong>no</strong> es cierto: hay funciones continuas que no son derivables.</p></div>
+<p><strong>Demostración (idea):</strong> \(f(a+h)-f(a)=\dfrac{f(a+h)-f(a)}{h}\cdot h\). El primer factor tiende a \(f'(a)\) y el segundo a \(0\); el producto tiende a \(0\), que es exactamente la continuidad en \(a\).</p>
+<p>Tres formas típicas de <strong>no</strong> ser derivable, aunque haya continuidad:</p>
+<ul>
+  <li><strong>Pico:</strong> \(f(x)=|x|\) en \(0\). Los cocientes laterales valen \(-1\) y \(1\); no hay tangente única.</li>
+  <li><strong>Tangente vertical:</strong> \(f(x)=\sqrt[3]{x}\) en \(0\); la pendiente tiende a \(+\infty\).</li>
+  <li><strong>Oscilación:</strong> \(f(x)=x\sen(1/x)\) (con \(f(0)=0\)) es continua y no derivable en \(0\), porque el cociente incremental oscila.</li>
+</ul>
+
+<h2 id="reglas">3. Reglas de derivación</h2>
+<p>Estas reglas permiten derivar sin volver al límite. Sean \(u=u(x)\) y \(v=v(x)\) funciones derivables y \(c\in\mathbb R\) una constante.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Regla</th><th>Fórmula</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Constante</td><td>\((c)'=0\)</td><td>\((7)'=0\)</td></tr>
+    <tr><td>Identidad</td><td>\((x)'=1\)</td><td>—</td></tr>
+    <tr><td>Potencia</td><td>\((x^n)'=nx^{n-1}\)</td><td>\((x^5)'=5x^4\)</td></tr>
+    <tr><td>Múltiplo constante</td><td>\((cu)'=cu'\)</td><td>\((3x^2)'=6x\)</td></tr>
+    <tr><td>Suma y diferencia</td><td>\((u\pm v)'=u'\pm v'\)</td><td>\((x^2+x)'=2x+1\)</td></tr>
+    <tr><td>Producto</td><td>\((uv)'=u'v+uv'\)</td><td>\((x^2\sen x)'=2x\sen x+x^2\cos x\)</td></tr>
+    <tr><td>Cociente</td><td>\(\left(\dfrac uv\right)'=\dfrac{u'v-uv'}{v^2}\)</td><td>\(\left(\dfrac{x}{x+1}\right)'=\dfrac{1}{(x+1)^2}\)</td></tr>
+    <tr><td>Cadena</td><td>\(\big(f(g(x))\big)'=f'(g(x))\,g'(x)\)</td><td>\((\sen 3x)'=3\cos 3x\)</td></tr>
+    <tr><td>Inversa</td><td>\(\big(f^{-1}\big)'(y)=\dfrac{1}{f'(x)}\), \(y=f(x)\)</td><td>\((\ln x)'=1/x\) a partir de \(e^x\)</td></tr>
+    <tr><td>Valor absoluto</td><td>\((|x|)'=\dfrac{x}{|x|}=\operatorname{sgn}x\), \(x\ne0\)</td><td>\((|x|)'=1\) si \(x>0\)</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Regla de la cadena en palabras:</strong> «derivada de la de fuera, evaluada en la de dentro, multiplicada por la derivada de la de dentro». Para \(y=f(u)\) con \(u=g(x)\): \(\dfrac{dy}{dx}=\dfrac{dy}{du}\cdot\dfrac{du}{dx}\). Se puede encadenar tantas veces como haga falta.</p>
+<div class="box warn"><span class="box-title">Errores frecuentes</span>
+<ul>
+  <li>\((uv)'\ne u'v'\) y \(\left(\frac uv\right)'\ne\frac{u'}{v'}\). Usa las fórmulas correctas.</li>
+  <li>\((x^n)'=nx^{n-1}\) también vale para exponentes negativos y fraccionarios: \((x^{-2})'=-2x^{-3}\), \((\sqrt x)'=\frac{1}{2\sqrt x}\).</li>
+  <li>En la cadena no olvides la derivada interna: \((\sen x^2)'=2x\cos x^2\), no \(\cos x^2\).</li>
+  <li>\((f\cdot g)'\) no se puede hacer «derivada de cada una»; el producto exige la regla del producto.</li>
+</ul></div>
+
+<h2 id="tabla">4. Tabla de derivadas comunes</h2>
+<p>Esta tabla hay que dominarla. En todas las fórmulas el ángulo está en radianes y las expresiones se evalúan donde estén definidas.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Función \(f(x)\)</th><th>Derivada \(f'(x)\)</th><th>Dominio de derivabilidad</th></tr></thead>
+  <tbody>
+    <tr><td>\(c\) (constante)</td><td>\(0\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(x^n\)</td><td>\(nx^{n-1}\)</td><td>Según \(n\)</td></tr>
+    <tr><td>\(\sqrt x\)</td><td>\(\dfrac{1}{2\sqrt x}\)</td><td>\(x>0\)</td></tr>
+    <tr><td>\(\dfrac1x\)</td><td>\(-\dfrac1{x^2}\)</td><td>\(x\ne0\)</td></tr>
+    <tr><td>\(e^x\)</td><td>\(e^x\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(a^x\)</td><td>\(a^x\ln a\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(\ln x\)</td><td>\(\dfrac1x\)</td><td>\(x>0\)</td></tr>
+    <tr><td>\(\ln|x|\)</td><td>\(\dfrac1x\)</td><td>\(x\ne0\)</td></tr>
+    <tr><td>\(\log_a x\)</td><td>\(\dfrac{1}{x\ln a}\)</td><td>\(x>0\)</td></tr>
+    <tr><td>\(\sen x\)</td><td>\(\cos x\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(\cos x\)</td><td>\(-\sen x\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(\tg x\)</td><td>\(\sec^2x=\dfrac{1}{\cos^2x}\)</td><td>\(\cos x\ne0\)</td></tr>
+    <tr><td>\(\cotg x\)</td><td>\(-\csc^2x=-\dfrac{1}{\sen^2x}\)</td><td>\(\sen x\ne0\)</td></tr>
+    <tr><td>\(\sec x\)</td><td>\(\sec x\,\tg x\)</td><td>\(\cos x\ne0\)</td></tr>
+    <tr><td>\(\csc x\)</td><td>\(-\csc x\,\cotg x\)</td><td>\(\sen x\ne0\)</td></tr>
+    <tr><td>\(\arcsen x\)</td><td>\(\dfrac{1}{\sqrt{1-x^2}}\)</td><td>\(|x|<1\)</td></tr>
+    <tr><td>\(\arccos x\)</td><td>\(-\dfrac{1}{\sqrt{1-x^2}}\)</td><td>\(|x|<1\)</td></tr>
+    <tr><td>\(\arctg x\)</td><td>\(\dfrac{1}{1+x^2}\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(\operatorname{arccotg}x\)</td><td>\(-\dfrac{1}{1+x^2}\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(\operatorname{senh}x\)</td><td>\(\cosh x\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(\cosh x\)</td><td>\(\operatorname{senh}x\)</td><td>\(\mathbb R\)</td></tr>
+    <tr><td>\(\operatorname{tgh}x\)</td><td>\(\dfrac{1}{\cosh^2x}\)</td><td>\(\mathbb R\)</td></tr>
+  </tbody>
+</table></div>
+<p>Combinando la tabla con la regla de la cadena se derivan las versiones compuestas:</p>
+$$(\sen u)'=u'\cos u,\qquad (e^u)'=u'e^u,\qquad (\ln u)'=\frac{u'}{u},\qquad (\sqrt u)'=\frac{u'}{2\sqrt u}.$$
+
+<h3 id="orden-superior">4.1 Derivadas de orden superior</h3>
+<p>La derivada de \(f'\) es la <strong>segunda derivada</strong>, \(f''=(f')'\). Se define análogamente la tercera, la cuarta, etc.: \(f^{(n)}=\big(f^{(n-1)}\big)'\). Notaciones: \(f''(x)\), \(\dfrac{d^2y}{dx^2}\), \(y''\).</p>
+<div class="example">
+<h4>Ejemplo 4.1 — Derivadas sucesivas</h4>
+<p>\(f(x)=x^4-2x^3\). Entonces</p>
+$$f'(x)=4x^3-6x^2,\quad f''(x)=12x^2-12x,\quad f'''(x)=24x-12,\quad f^{(4)}(x)=24,\quad f^{(5)}(x)=0.$$
+<p>En general, un polinomio de grado \(n\) tiene derivada \(n\)-ésima constante y las siguientes nulas. En física, si \(s(t)\) es la posición, \(s'\) es la velocidad y \(s''\) la aceleración; en geometría, \(f''\) controla la concavidad (sección 8).</p>
+</div>
+
+<h2 id="sim">5. Interactivo: de la secante a la tangente</h2>
+<p>Mueve \(a\) para cambiar el punto de tangencia y \(h\) para acercar el segundo punto. El cociente incremental (recta verde) es la pendiente de la secante; cuando \(h\to0\), coincide con \(f'(a)\) (recta naranja discontinua).</p>
+<div class="sim" id="sim-der">
+  <div class="sim-title">Secante que se convierte en tangente</div>
+  <div class="controls">
+    <label>Función
+      <select id="der-fn">
+        <option value="cuad">f(x) = x²</option>
+        <option value="cubo">f(x) = x³</option>
+        <option value="seno">f(x) = sen x</option>
+        <option value="exp">f(x) = eˣ</option>
+        <option value="log">f(x) = ln x</option>
+      </select>
+    </label>
+    <label>Punto a <input type="range" id="der-a" min="-2.5" max="2.5" step="0.01" value="0.8"> <output id="der-ao"></output></label>
+    <label>Incremento h <input type="range" id="der-h" min="-1.5" max="1.5" step="0.05" value="0.8"> <output id="der-ho"></output></label>
+  </div>
+  <canvas id="der-canvas" aria-label="Gráfica de la función, la recta secante y la recta tangente"></canvas>
+  <div class="readout" id="der-out"></div>
+  <p class="meta">La recta naranja discontinua es la tangente; la verde, la secante. La diferencia entre sus pendientes mide el error de la aproximación.</p>
+</div>
+
+<h2 id="ejemplos">6. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 6.1 — Derivada por definición</h4>
+<p>Calcular \(f'(3)\) para \(f(x)=x^2\).</p>
+<div class="step"><span class="n">1</span><div><p>\(f(3+h)=(3+h)^2=9+6h+h^2\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>\(\dfrac{f(3+h)-f(3)}{h}=\dfrac{9+6h+h^2-9}{h}=\dfrac{6h+h^2}{h}=6+h\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>\(\lim_{h\to0}(6+h)=6\). <strong>\(f'(3)=6\)</strong>, que coincide con \(2x\) en \(x=3\).</p></div></div>
+</div>
+<div class="example">
+<h4>Ejemplo 6.2 — Polinomio (suma, potencia y múltiplos)</h4>
+<p>\(f(x)=3x^4-2x^2+7x-5\).</p>
+$$f'(x)=3(4x^3)-2(2x)+7-0=12x^3-4x+7.$$
+</div>
+<div class="example">
+<h4>Ejemplo 6.3 — Regla del producto</h4>
+<p>\(f(x)=x^2\sen x\). Con \(u=x^2\), \(v=\sen x\): \(u'=2x\), \(v'=\cos x\).</p>
+$$f'(x)=2x\sen x+x^2\cos x.$$
+</div>
+<div class="example">
+<h4>Ejemplo 6.4 — Regla del cociente</h4>
+<p>\(f(x)=\dfrac{x^2+1}{x-1}\).</p>
+$$f'(x)=\frac{2x(x-1)-(x^2+1)(1)}{(x-1)^2}=\frac{2x^2-2x-x^2-1}{(x-1)^2}=\frac{x^2-2x-1}{(x-1)^2}.$$
+</div>
+<div class="example">
+<h4>Ejemplo 6.5 — Regla de la cadena (simple y anidada)</h4>
+<p><strong>(a)</strong> \(f(x)=\sen(3x^2+1)\). La derivada interna es \(6x\):</p>
+$$f'(x)=6x\cos(3x^2+1).$$
+<p><strong>(b)</strong> \(g(x)=e^{\sqrt x}\). Aquí \(g=e^u\) con \(u=\sqrt x\), y \(u'=\frac{1}{2\sqrt x}\):</p>
+$$g'(x)=e^{\sqrt x}\cdot\frac{1}{2\sqrt x}=\frac{e^{\sqrt x}}{2\sqrt x}.$$
+<p><strong>(c)</strong> \(h(x)=\ln(\cos x)\). \(h'=\dfrac{-\sen x}{\cos x}=-\tg x\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.6 — Derivación implícita</h4>
+<p>La circunferencia \(x^2+y^2=25\) define \(y\) implícitamente. Derivamos ambos miembros respecto de \(x\), recordando que \(y=y(x)\):</p>
+$$2x+2y\,y'=0\quad\Longrightarrow\quad y'=-\frac{x}{y}\qquad(y\ne0).$$
+<p>En el punto \((3,4)\), la pendiente es \(-3/4\), y la tangente es \(y-4=-\frac34(x-3)\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.7 — Derivación logarítmica</h4>
+<p>Para \(y=x^x\) (con \(x>0\)), tomamos logaritmos: \(\ln y=x\ln x\). Derivando implícitamente:</p>
+$$\frac{y'}{y}=\ln x+x\cdot\frac1x=\ln x+1\quad\Longrightarrow\quad y'=x^x(\ln x+1).$$
+<p>Este método es útil cuando la variable aparece en la base y en el exponente.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.8 — Recta tangente</h4>
+<p>Hallar la tangente a \(f(x)=x^3-2x\) en \(x=1\).</p>
+<div class="step"><span class="n">1</span><div><p>Punto: \(f(1)=1-2=-1\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p>Pendiente: \(f'(x)=3x^2-2\), \(f'(1)=1\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p>Ecuación: \(y-(-1)=1(x-1)\), es decir, \(y=x-2\).</p></div></div>
+</div>
+<div class="example">
+<h4>Ejemplo 6.9 — L'Hôpital</h4>
+<p><strong>(a)</strong> \(\displaystyle\lim_{x\to0}\frac{e^x-1}{x}\) es \(0/0\). Derivando numerador y denominador: \(\frac{e^x}{1}\to1\).</p>
+<p><strong>(b)</strong> \(\displaystyle\lim_{x\to1}\frac{\ln x}{x-1}\) es \(0/0\). L'Hôpital: \(\frac{1/x}{1}\to1\).</p>
+<p><strong>(c)</strong> \(\displaystyle\lim_{x\to\infty}\frac{\ln x}{x}\) es \(\infty/\infty\). L'Hôpital: \(\frac{1/x}{1}\to0\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.10 — Optimización</h4>
+<p>Con 20 m de valla se quiere cercar un rectángulo de área máxima. Si los lados son \(x\) e \(y\), \(2x+2y=20\Rightarrow y=10-x\). El área es</p>
+$$A(x)=x(10-x)=10x-x^2,\qquad 0<x<10.$$
+<p>\(A'(x)=10-2x=0\Rightarrow x=5\). Como \(A''=-2<0\), es un máximo. El rectángulo óptimo es un cuadrado de \(5\times5\) m y área \(25\) m².</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.11 — Razones relacionadas</h4>
+<p>Una esfera se infla de modo que su radio crece a \(2\) cm/s. ¿A qué rapidez crece el volumen cuando \(r=5\) cm?</p>
+<p>\(V=\frac43\pi r^3\Rightarrow \dfrac{dV}{dt}=4\pi r^2\dfrac{dr}{dt}\). Con \(r=5\) y \(dr/dt=2\):</p>
+$$\frac{dV}{dt}=4\pi(25)(2)=200\pi\ \text{cm}^3/\text{s}\approx628\ \text{cm}^3/\text{s}.$$
+</div>
+<div class="example">
+<h4>Ejemplo 6.12 — Aproximación lineal</h4>
+<p>Para \(f(x)=\sqrt x\) en \(a=4\), \(f'(x)=\frac{1}{2\sqrt x}\) y \(f'(4)=\frac14\). Entonces</p>
+$$\sqrt{4{,}1}\approx f(4)+f'(4)(0{,}1)=2+\frac14(0{,}1)=2{,}025.$$
+<p>El valor real es \(2{,}024845\ldots\): el error es menor que \(0{,}0002\).</p>
+</div>
+
+<h2 id="teoremas">7. Teoremas del cálculo diferencial</h2>
+<h3 id="fermat">7.1 Teorema de Fermat</h3>
+<div class="box def"><span class="box-title">Teorema de Fermat</span>
+<p>Si \(f\) tiene un extremo local en un punto interior \(c\) de su dominio y es derivable en \(c\), entonces \(f'(c)=0\).</p></div>
+<p>Los puntos donde \(f'=0\) o donde \(f'\) no existe se llaman <strong>puntos críticos</strong>. Todo extremo local interior está entre ellos, pero no todo punto crítico es extremo: \(f(x)=x^3\) tiene \(f'(0)=0\) y en \(0\) no hay máximo ni mínimo, sino un punto de inflexión.</p>
+
+<h3 id="rolle">7.2 Teorema de Rolle</h3>
+<div class="box def"><span class="box-title">Teorema de Rolle</span>
+<p>Si \(f\) es continua en \([a,b]\), derivable en \((a,b)\) y \(f(a)=f(b)\), entonces existe al menos un \(c\in(a,b)\) con \(f'(c)=0\).</p></div>
+<p>Interpretación: si una curva sale y llega a la misma altura, en algún punto del camino la tangente es horizontal. Es la base de la demostración del teorema del valor medio.</p>
+
+<h3 id="mvt">7.3 Teorema del valor medio (Lagrange)</h3>
+<div class="box def"><span class="box-title">Teorema del valor medio</span>
+<p>Si \(f\) es continua en \([a,b]\) y derivable en \((a,b)\), existe al menos un \(c\in(a,b)\) tal que</p>
+$$f'(c)=\frac{f(b)-f(a)}{b-a}.$$
+<p>Es decir, en algún punto la tangente es paralela a la secante que une los extremos.</p></div>
+<div class="example">
+<h4>Ejemplo 7.1 — Verificar el teorema del valor medio</h4>
+<p>\(f(x)=x^2\) en \([0,2]\). La secante tiene pendiente \(\frac{f(2)-f(0)}{2-0}=\frac42=2\). Como \(f'(x)=2x\), se necesita \(2c=2\), es decir, \(c=1\), que está en \((0,2)\). \(\checkmark\)</p>
+</div>
+<p><strong>Consecuencias útiles:</strong></p>
+<ul>
+  <li>Si \(f'(x)=0\) en un intervalo, \(f\) es constante en él.</li>
+  <li>Si \(f'(x)>0\) en un intervalo, \(f\) es estrictamente creciente; si \(f'(x)<0\), es estrictamente decreciente.</li>
+  <li>Si dos funciones tienen la misma derivada, difieren en una constante.</li>
+</ul>
+
+<h3 id="lhopital">7.4 Regla de L'Hôpital</h3>
+<div class="box def"><span class="box-title">Regla de L'Hôpital</span>
+<p>Si \(\displaystyle\lim_{x\to a}\frac{f(x)}{g(x)}\) es de la forma \(\frac00\) o \(\frac{\infty}{\infty}\), y existe \(\displaystyle\lim_{x\to a}\frac{f'(x)}{g'(x)}\) (finito o infinito), entonces</p>
+$$\lim_{x\to a}\frac{f(x)}{g(x)}=\lim_{x\to a}\frac{f'(x)}{g'(x)}.$$
+<p>Requiere que \(f\) y \(g\) sean derivables cerca de \(a\) y que \(g'(x)\ne0\) allí. No es una regla para cualquier cociente.</p></div>
+<p>Para las otras indeterminaciones (\(0\cdot\infty\), \(\infty-\infty\), \(1^\infty\), \(0^0\), \(\infty^0\)) primero se transforma la expresión en un cociente o se usa \(A^B=e^{B\ln A}\).</p>
+
+<h3 id="taylor">7.5 Aproximación de Taylor (idea)</h3>
+<p>Las derivadas sucesivas describen localmente a la función. El polinomio de Taylor de orden \(n\) en \(a\) es</p>
+$$P_n(x)=f(a)+f'(a)(x-a)+\frac{f''(a)}{2!}(x-a)^2+\cdots+\frac{f^{(n)}(a)}{n!}(x-a)^n.$$
+<p>Para \(e^x\) en \(a=0\): \(P_n(x)=1+x+\frac{x^2}{2!}+\cdots+\frac{x^n}{n!}\). Cuanto mayor es \(n\), mejor es la aproximación cerca de \(0\). El caso \(n=1\) es la aproximación lineal (recta tangente).</p>
+
+<h2 id="aplicaciones">8. Aplicaciones: forma de la gráfica</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Información</th><th>Signo de la derivada</th><th>Conclusión</th></tr></thead>
+  <tbody>
+    <tr><td>Monotonía</td><td>\(f'>0\)</td><td>Creciente</td></tr>
+    <tr><td>Monotonía</td><td>\(f'<0\)</td><td>Decreciente</td></tr>
+    <tr><td>Extremo local</td><td>\(f'\) cambia de \(+\) a \(-\)</td><td>Máximo local</td></tr>
+    <tr><td>Extremo local</td><td>\(f'\) cambia de \(-\) a \(+\)</td><td>Mínimo local</td></tr>
+    <tr><td>Concavidad</td><td>\(f''>0\)</td><td>Cóncava hacia arriba (\(\cup\))</td></tr>
+    <tr><td>Concavidad</td><td>\(f''<0\)</td><td>Cóncava hacia abajo (\(\cap\))</td></tr>
+    <tr><td>Punto de inflexión</td><td>\(f''\) cambia de signo</td><td>Cambia la concavidad</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Criterio de la segunda derivada:</strong> si \(f'(c)=0\) y \(f''(c)>0\), hay un mínimo local en \(c\); si \(f''(c)<0\), hay un máximo local; si \(f''(c)=0\), el criterio no decide (hay que usar el signo de \(f'\)).</p>
+<p><strong>Receta para estudiar una función:</strong> dominio → cortes con los ejes → asíntotas → \(f'\) (monotonía y extremos) → \(f''\) (concavidad e inflexiones) → gráfica. Para optimización: plantear una función de una variable, derivar, resolver \(f'=0\), comprobar con \(f''\) o con el contexto, y responder la pregunta.</p>
+
+<h2 id="ejercicios">9. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Deriva \(f(x)=5x^3-4x^2+2x-9\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f'(x)=15x^2-8x+2\).</p></div></details></li>
+  <li>Deriva \(f(x)=x^2e^x\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Producto: \(f'=2xe^x+x^2e^x=xe^x(2+x)\).</p></div></details></li>
+  <li>Deriva \(f(x)=\dfrac{\sen x}{x}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Cociente: \(f'=\dfrac{x\cos x-\sen x}{x^2}\).</p></div></details></li>
+  <li>Deriva \(f(x)=\cos(4x^3)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Cadena: \(f'=-12x^2\sen(4x^3)\).</p></div></details></li>
+  <li>Deriva \(f(x)=\ln(x^2+1)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f'=\dfrac{2x}{x^2+1}\).</p></div></details></li>
+  <li>Deriva \(f(x)=\sqrt{3x+5}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f'=\dfrac{3}{2\sqrt{3x+5}}\).</p></div></details></li>
+  <li>Halla \(y'\) si \(x^3+y^3=6xy\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Derivando implícitamente: \(3x^2+3y^2y'=6y+6xy'\). Despejando: \(y'=\dfrac{6y-3x^2}{3y^2-6x}=\dfrac{2y-x^2}{y^2-2x}\).</p></div></details></li>
+  <li>Deriva \(y=x^{\sen x}\) (con \(x>0\)) por derivación logarítmica.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\ln y=\sen x\ln x\); \(\frac{y'}y=\cos x\ln x+\frac{\sen x}{x}\). Por tanto, \(y'=x^{\sen x}\left(\cos x\ln x+\frac{\sen x}{x}\right)\).</p></div></details></li>
+  <li>Calcula la recta tangente a \(f(x)=e^{2x}\) en \(x=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f(0)=1\), \(f'(x)=2e^{2x}\), \(f'(0)=2\). Tangente: \(y-1=2(x-0)\), es decir, \(y=2x+1\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to0}\frac{\sen x-x}{x^3}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(0/0\). L'Hôpital: \(\frac{\cos x-1}{3x^2}\) sigue \(0/0\); otra vez: \(\frac{-\sen x}{6x}\to-\frac16\). <strong>−1/6.</strong></p></div></details></li>
+  <li>Calcula \(\displaystyle\lim_{x\to\infty}\frac{x^2}{e^x}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\infty/\infty\). L'Hôpital dos veces: \(\frac{2x}{e^x}\to\frac{2}{e^x}\to0\). <strong>0.</strong></p></div></details></li>
+  <li>Halla los extremos locales de \(f(x)=x^3-3x\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f'=3x^2-3=3(x-1)(x+1)\); críticos \(x=\pm1\). \(f''=6x\): en \(x=1\), \(f''=6>0\) (mínimo, \(f(1)=-2\)); en \(x=-1\), \(f''=-6<0\) (máximo, \(f(-1)=2\)).</p></div></details></li>
+  <li>Un cilindro tiene volumen \(V=100\) cm³. Expresa el área total en función del radio y halla el radio que la minimiza.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(V=\pi r^2h\Rightarrow h=\frac{100}{\pi r^2}\). Área: \(A(r)=2\pi r^2+2\pi rh=2\pi r^2+\frac{200}{r}\). \(A'(r)=4\pi r-\frac{200}{r^2}=0\Rightarrow r^3=\frac{50}{\pi}\Rightarrow r=\sqrt[3]{\frac{50}{\pi}}\approx2{,}52\) cm. \(A''>0\): mínimo.</p></div></details></li>
+  <li>La arista de un cubo crece a \(0{,}5\) cm/s. ¿A qué rapidez crece el volumen cuando la arista mide 6 cm?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(V=a^3\Rightarrow \frac{dV}{dt}=3a^2\frac{da}{dt}=3(36)(0{,}5)=54\) cm³/s.</p></div></details></li>
+  <li>Aproxima \(\sqrt{9{,}2}\) con la recta tangente de \(\sqrt x\) en \(x=9\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f(9)=3\), \(f'(9)=\frac{1}{2\sqrt9}=\frac16\). \(f(9{,}2)\approx3+\frac16(0{,}2)=3+0{,}0333=3{,}0333\).</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">10. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. La derivada de \(\sen(x^2)\) es</p>
+    <div class="opts">
+      <button class="opt">\(\cos(x^2)\)</button>
+      <button class="opt" data-ok>\(2x\cos(x^2)\)</button>
+      <button class="opt">\(2x\sen(x^2)\)</button>
+    </div>
+    <p class="why">Regla de la cadena: derivada del seno (coseno) evaluada en \(x^2\), multiplicada por la derivada de \(x^2\), que es \(2x\).</p>
+  </div>
+  <div class="q">
+    <p>2. Si \(f'(x)=0\) en todo un intervalo, entonces \(f\) es</p>
+    <div class="opts">
+      <button class="opt" data-ok>constante en ese intervalo</button>
+      <button class="opt">necesariamente \(f(x)=0\)</button>
+      <button class="opt">creciente</button>
+    </div>
+    <p class="why">Por el teorema del valor medio, \(f(b)-f(a)=f'(c)(b-a)=0\), luego \(f(a)=f(b)\) para todo par de puntos del intervalo.</p>
+  </div>
+  <div class="q">
+    <p>3. L'Hôpital se puede aplicar directamente a</p>
+    <div class="opts">
+      <button class="opt">\(\displaystyle\lim_{x\to0}\frac{x+1}{x+2}\)</button>
+      <button class="opt" data-ok>\(\displaystyle\lim_{x\to0}\frac{\sen x}{x}\)</button>
+      <button class="opt">\(\displaystyle\lim_{x\to0}\frac{x^2+1}{x}\)</button>
+    </div>
+    <p class="why">Solo hay \(0/0\) en la segunda. En la primera el límite es \(1/2\) por sustitución; en la tercera el límite es infinito y no es una indeterminación \(\infty/\infty\) (el numerador tiende a 1).</p>
+  </div>
+</div>
+
+<h2 id="biblio">11. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Stewart, <em>Cálculo de una variable</em>, 8.ª ed.</td><td>3</td><td>3.1–3.6, 3.8–3.9</td><td>Definición, reglas, tabla, implícita, logarítmica, razones relacionadas</td></tr>
+    <tr><td>Stewart, <em>Cálculo de una variable</em>, 8.ª ed.</td><td>4</td><td>4.1–4.4, 4.8, 4.9</td><td>Extremos, valor medio, L'Hôpital, Newton, antiderivadas</td></tr>
+    <tr><td>Spivak, <em>Calculus</em>, 4.ª ed.</td><td>9–11</td><td>Derivadas y teoremas</td><td>Demostraciones de Rolle, valor medio e inversa</td></tr>
+    <tr><td>OpenStax, <em>Calculus Volume 1</em></td><td>3–4</td><td>3.1–3.9, 4.1–4.7</td><td>Reglas, aplicaciones y problemas</td></tr>
+    <tr><td>Thomas, <em>Cálculo: una variable</em>, 12.ª ed.</td><td>3–4</td><td>3.1–3.6, 4.1–4.4</td><td>Derivadas y aplicaciones</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="recursos">12. Para profundizar</h2>
+<ul>
+  <li><a href="https://openstax.org/books/calculus-volume-1/pages/3-introduction">OpenStax · Calculus Volume 1, capítulo 3 (derivadas)</a>: definición, reglas y ejemplos resueltos.</li>
+  <li><a href="https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/">MIT OCW 18.01</a>: vídeos de clase y problemas de derivadas y aplicaciones.</li>
+  <li><a href="https://es.khanacademy.org/math/calculus-1">Khan Academy · Cálculo 1</a>: práctica de reglas de derivación y aplicaciones.</li>
+</ul>
+
+<h2 id="faq">13. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Cuál es la diferencia entre derivada y diferencial?</summary><div><p>La derivada \(f'(a)\) es un número (la pendiente). El diferencial \(dy=f'(a)\,dx\) es la variación aproximada de \(y\) cuando \(x\) cambia en \(dx\). La diferencial es la parte lineal del cambio; el error es de orden \(dx^2\).</p></div></details>
+  <details><summary>¿Se puede derivar una función definida a trozos?</summary><div><p>Sí, derivando cada trozo en su interior. En las uniones hay que comprobar si existen los límites laterales del cociente incremental y si coinciden. Si la función es continua pero los laterales de la derivada difieren, hay un pico y no es derivable en ese punto.</p></div></details>
+  <details><summary>¿Para qué sirve la segunda derivada?</summary><div><p>Mide cómo cambia la pendiente: indica concavidad, permite clasificar extremos (criterio de la segunda derivada) y aparece en física como aceleración. También interviene en los criterios de convergencia y en la aproximación de Taylor.</p></div></details>
+  <details><summary>¿Siempre que \(f'(c)=0\) hay un máximo o un mínimo?</summary><div><p>No. \(f(x)=x^3\) tiene \(f'(0)=0\) y en 0 hay un punto de inflexión. Hay que estudiar el cambio de signo de \(f'\) o el signo de \(f''\) (si no se anula).</p></div></details>
+  <details><summary>¿L'Hôpital puede fallar?</summary><div><p>Sí: si el límite de \(f'/g'\) no existe, no se puede concluir nada (aunque el límite original sí exista). También falla si no se cumple \(0/0\) o \(\infty/\infty\), o si \(g'\) se anula en todo entorno. Úsalo como herramienta, no como reflejo.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de derivadas y sus aplicaciones. Bibliografía por capítulo y epígrafe; enlaces abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Cálculo diferencial e integral · Derivadas · <a href="../">Volver al curso</a></footer>
+</body>
+</html>
