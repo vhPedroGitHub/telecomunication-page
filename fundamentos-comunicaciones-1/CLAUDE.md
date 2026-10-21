@@ -76,7 +76,7 @@ Ojo: el PDF de Sklar disponible es la edición 2014 (Sklar & Ray); verificar num
 |---|---|
 | `index.html` | portada: temas, plan (Actividades 2026 y ed. anterior), evaluación, profesores, bibliografía, software, prerrequisitos, FAQ |
 | `temas/tema1-teoria-informacion.html` + `js/tema1.js` | Tema I completo + 6 simuladores (entropía, Huffman, LZ78, capacidad, Hamming, Viterbi) + PP1 resuelta |
-| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo (11 secciones + glosario + 19 figuras SVG) + 7 simuladores (fasor, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
+| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo (11 secciones + glosario + 20 figuras SVG) + 7 simuladores (fasor, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
 | `temas/tema3-banda-base.html` + `js/tema3.js` | Tema III completo + 7 simuladores (muestreo, cuantificador, DM, códigos de línea, ojo, umbral/Pe, BER) |
 | `software/fc1/` | paquete Python sin dependencias (CLI `python -m fc1`) + 10 pruebas que reproducen los ejemplos de la web |
 
@@ -119,7 +119,8 @@ tiempo/frecuencia, fasor, contra-rotativos, `C_n` como muestras, espectros de lo
 convolución, RC y R(τ)/G(f)), un glosario de 24 términos y 8 recursos externos verificados.
 Después se añadieron 10 figuras de «datos del problema» (el enunciado dibujado con sus valores) en
 los ejemplos y ejercicios con datos numéricos: 4.1, 4.5.4, 5.1, 5.2, 5.3, 9.2, 9.5.2, 10.1, 10.4.2
-y 11.1; total 19 figuras.
+y 11.1; después se añadió el dibujo del espectro bilateral (amplitud y fase) del Ej. 4.1; total
+20 figuras.
 
 ## Pendientes y dudas
 
@@ -135,6 +136,10 @@ y 11.1; total 19 figuras.
 
 ## Bitácora
 
+- **2026-10-21** — Tema II, Ej. 4.1: añadida la figura `data-fig="espectro-p41"` con el espectro
+  bilateral del tren de pulsos (A = 4 V, τ = 0,5 ms, T₀ = 1 ms): amplitud `|Cn| = 2|sinc(n/2)|`
+  con las líneas en nf₀, la envolvente sinc, los ceros en los armónicos pares y las fases 0°/180°
+  según el signo. Verificada en Chromium: sin errores de consola, sin desborde a 390 px.
 - **2026-10-21** — Tema II: figuras de «datos del problema» (el enunciado dibujado, con los valores
   ubicados en los ejes) en Ej. 4.1 (tren de pulsos: A = 4 V, τ = 0,5 ms, T₀ = 1 ms), Ej. 4.5.4
   (restar el valor medio), Ej. 5.1 (pulso A, τ), 5.2 (trozo de coseno T₁, f₁), 5.3 (triángulo y su
