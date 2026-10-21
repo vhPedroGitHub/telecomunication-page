@@ -76,7 +76,7 @@ Ojo: el PDF de Sklar disponible es la edición 2014 (Sklar & Ray); verificar num
 |---|---|
 | `index.html` | portada: temas, plan (Actividades 2026 y ed. anterior), evaluación, profesores, bibliografía, software, prerrequisitos, FAQ |
 | `temas/tema1-teoria-informacion.html` + `js/tema1.js` | Tema I completo + 6 simuladores (entropía, Huffman, LZ78, capacidad, Hamming, Viterbi) + PP1 resuelta |
-| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo (11 secciones + glosario + 9 figuras SVG) + 7 simuladores (fasor, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
+| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo (11 secciones + glosario + 19 figuras SVG) + 7 simuladores (fasor, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
 | `temas/tema3-banda-base.html` + `js/tema3.js` | Tema III completo + 7 simuladores (muestreo, cuantificador, DM, códigos de línea, ojo, umbral/Pe, BER) |
 | `software/fc1/` | paquete Python sin dependencias (CLI `python -m fc1`) + 10 pruebas que reproducen los ejemplos de la web |
 
@@ -117,6 +117,9 @@ Nota (2026-10-21): el Tema II se amplió con una sección 2 nueva («El espectro
 explicación paso a paso de fasores (3.1–3.3) y de los `C_n` (4.2), 9 figuras SVG generadas (dominio
 tiempo/frecuencia, fasor, contra-rotativos, `C_n` como muestras, espectros de los ejercicios,
 convolución, RC y R(τ)/G(f)), un glosario de 24 términos y 8 recursos externos verificados.
+Después se añadieron 10 figuras de «datos del problema» (el enunciado dibujado con sus valores) en
+los ejemplos y ejercicios con datos numéricos: 4.1, 4.5.4, 5.1, 5.2, 5.3, 9.2, 9.5.2, 10.1, 10.4.2
+y 11.1; total 19 figuras.
 
 ## Pendientes y dudas
 
@@ -132,6 +135,14 @@ convolución, RC y R(τ)/G(f)), un glosario de 24 términos y 8 recursos externo
 
 ## Bitácora
 
+- **2026-10-21** — Tema II: figuras de «datos del problema» (el enunciado dibujado, con los valores
+  ubicados en los ejes) en Ej. 4.1 (tren de pulsos: A = 4 V, τ = 0,5 ms, T₀ = 1 ms), Ej. 4.5.4
+  (restar el valor medio), Ej. 5.1 (pulso A, τ), 5.2 (trozo de coseno T₁, f₁), 5.3 (triángulo y su
+  derivada), 9.2 (cadena impulsos → rectángulo → paso bajo con T₀, τ, B), 9.5.2 (canal de 5 kHz y voz
+  de 3,4 kHz), 10.1 (a(t), c(t) y ruido), 10.4.2 (ruido blanco por paso banda) y 11.1 (AM 1 Hz/20 Hz).
+  Las figuras sustituyen placeholders `<!--FIG:clave-->` mediante el generador `genfigs2.py` (análogo
+  al de las 9 anteriores: `data-fig`, `--reset`). Verificado en Chromium: 19 figuras visibles, sin
+  errores de consola ni de KaTeX, sin desborde de página a 390/768/1280 px.
 - **2026-10-21** — Tema II ampliado tras revisión docente: sección 2 nueva sobre qué es el espectro y
   por qué importa (banda, multiplexación, filtros, diagnóstico); fasores reescritos en 3.1 (fasor y
   proyección), 3.2 (Euler con Taylor → frecuencias negativas) y 3.3 (amplitud vs fase); los `C_n` con
