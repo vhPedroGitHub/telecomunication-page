@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matemática discreta · Matemáticas para Telecom</title>
+  <meta name="description" content="Matemática discreta: lógica y demostraciones, combinatoria, recurrencias y funciones generadoras, grafos y árboles, álgebra de Boole, aritmética modular, códigos detectores y correctores, CRC y RSA. Ejemplos y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 8 · Matemática discreta</p>
+<h1>Matemática discreta</h1>
+<p class="lead">Las redes, los protocolos, los códigos y los algoritmos viven en el mundo de lo discreto: conjuntos finitos, grafos, bits y números enteros. La matemática discreta aporta el lenguaje para demostrar propiedades, contar configuraciones, analizar algoritmos y construir códigos y sistemas criptográficos.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Manejar lógica proposicional, cuantificadores y métodos de demostración.</li>
+    <li>Contar con permutaciones, combinaciones y el principio del palomar.</li>
+    <li>Resolver recurrencias lineales y usar funciones generadoras.</li>
+    <li>Modelar redes con grafos y árboles; aplicar recorridos y coloración.</li>
+    <li>Simplificar funciones booleanas y entender la aritmética modular.</li>
+    <li>Relacionar todo ello con códigos detectores, CRC y RSA.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">álgebra elemental y ganas de demostrar</span>
+  <p>No hace falta cálculo. Sí conviene manejar potencias, divisibilidad y algo de programación. Repaso: <a href="../../repaso/matematica.html#logaritmos">logaritmos</a> · <a href="../../repaso/matematica.html#series">sumas</a> · <a href="../../repaso/electronica-digital.html#numeracion">binario y hexadecimal</a>.</p>
+</div>
+
+<h2 id="logica">1. Lógica y demostraciones</h2>
+<p>Una <strong>proposición</strong> es una afirmación que es verdadera o falsa. Los conectores básicos son \(\neg\) (no), \(\land\) (y), \(\lor\) (o), \(\to\) (implica) y \(\leftrightarrow\) (si y solo si).</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>\(p\)</th><th>\(q\)</th><th>\(p\to q\)</th><th>\(p\leftrightarrow q\)</th></tr></thead>
+  <tbody>
+    <tr><td>V</td><td>V</td><td>V</td><td>V</td></tr>
+    <tr><td>V</td><td>F</td><td>F</td><td>F</td></tr>
+    <tr><td>F</td><td>V</td><td>V</td><td>F</td></tr>
+    <tr><td>F</td><td>F</td><td>V</td><td>V</td></tr>
+  </tbody>
+</table></div>
+<p>Una implicación \(p\to q\) es falsa solo cuando \(p\) es verdadera y \(q\) falsa. Su <strong>contrarrecíproca</strong> \(\neg q\to\neg p\) es lógicamente equivalente; la <strong>recíproca</strong> \(q\to p\) no lo es.</p>
+<p>Los cuantificadores son \(\forall\) (para todo) y \(\exists\) (existe). Su negación intercambia ambos: \(\neg(\forall x\,P(x))=\exists x\,\neg P(x)\).</p>
+<p><strong>Métodos de demostración:</strong></p>
+<ul>
+  <li><strong>Directa:</strong> de las hipótesis se deduce la tesis.</li>
+  <li><strong>Contrarrecíproca:</strong> se demuestra \(\neg q\to\neg p\).</li>
+  <li><strong>Contradicción:</strong> se supone lo contrario y se llega a un absurdo.</li>
+  <li><strong>Inducción:</strong> caso base y paso inductivo.</li>
+</ul>
+<div class="example">
+<h4>Ejemplo 1.1 — Inducción</h4>
+<p>Probar \(1+3+\cdots+(2n-1)=n^2\). Base \(n=1\): \(1=1\). Paso: si la suma hasta \(n\) es \(n^2\), añadir \(2n+1\) da \(n^2+2n+1=(n+1)^2\). \(\square\)</p>
+</div>
+
+<h2 id="combinatoria">2. Combinatoria</h2>
+<p>El <strong>principio multiplicativo</strong>: si una tarea tiene \(m\) formas y otra \(n\), hacer ambas tiene \(mn\) formas. El <strong>principio aditivo</strong> se usa para alternativas disjuntas.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Objeto</th><th>Fórmula</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Permutaciones de \(n\)</td><td>\(n!\)</td><td>Ordenar 5 libros: 120</td></tr>
+    <tr><td>Variaciones \(V(n,k)\)</td><td>\(\frac{n!}{(n-k)!}\)</td><td>Podio de 10 corredores: 720</td></tr>
+    <tr><td>Combinaciones \(\binom nk\)</td><td>\(\frac{n!}{k!(n-k)!}\)</td><td>Elegir 3 de 10: 120</td></tr>
+    <tr><td>Con repetición</td><td>\(n^k\)</td><td>PIN de 4 cifras: \(10^4\)</td></tr>
+  </tbody>
+</table></div>
+<p>El <strong>teorema del binomio</strong> es</p>
+$$(x+y)^n=\sum_{k=0}^n\binom nk x^{n-k}y^k.$$
+<p>Los coeficientes \(\binom nk\) forman el triángulo de Pascal y cuentan los subconjuntos de tamaño \(k\).</p>
+<div class="box def"><span class="box-title">Principio del palomar</span>
+<p>Si se distribuyen \(n+1\) objetos en \(n\) cajas, alguna caja contiene al menos dos. Generalizando, si hay \(N\) objetos y \(k\) cajas, alguna contiene al menos \(\lceil N/k\rceil\).</p></div>
+<p>Ejemplo: en cualquier grupo de 13 personas, al menos dos cumplen años el mismo mes. En telecom se usa para demostrar cotas de compresión y de códigos.</p>
+
+<h2 id="recurrencias">3. Recurrencias y funciones generadoras</h2>
+<p>Una <strong>recurrencia</strong> define una sucesión en función de términos anteriores. Para una recurrencia lineal homogénea de orden 2,</p>
+$$a_n=pa_{n-1}+qa_{n-2},$$
+<p>se prueba \(a_n=r^n\), lo que da \(r^2-pr-q=0\). Si las raíces \(r_1,r_2\) son distintas,</p>
+$$a_n=C_1r_1^n+C_2r_2^n.$$
+<p>Si hay raíz doble \(r\), \(a_n=(C_1+C_2n)r^n\). Las constantes se fijan con las condiciones iniciales.</p>
+<div class="example">
+<h4>Ejemplo 3.1 — Fibonacci</h4>
+<p>\(F_n=F_{n-1}+F_{n-2}\), \(F_0=0,F_1=1\). Característica \(r^2-r-1=0\), raíces \(\varphi=\frac{1+\sqrt5}{2}\) y \(\psi=\frac{1-\sqrt5}{2}\). La fórmula de Binet es</p>
+$$F_n=\frac{\varphi^n-\psi^n}{\sqrt5}.$$
+<p>Aunque parezca extraño, da enteros; \(\psi^n/\sqrt5\) se hace despreciable.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 3.2 — Torres de Hanoi</h4>
+<p>\(T(n)=2T(n-1)+1\), \(T(1)=1\). Solución \(T(n)=2^n-1\). Para 64 discos harían falta \(1{,}8\times10^{19}\) movimientos.</p>
+</div>
+<p>Una <strong>función generadora</strong> empaqueta la sucesión en una serie: \(A(x)=\sum_{n\ge0}a_nx^n\). Por ejemplo, la de Fibonacci es \(\frac{x}{1-x-x^2}\), y \(\frac{1}{(1-x)^2}\) genera \(a_n=n+1\). Las operaciones con series traducen recurrencias en ecuaciones algebraicas.</p>
+
+<h2 id="grafos">4. Grafos y árboles</h2>
+<p>Un <strong>grafo</strong> \(G=(V,E)\) tiene vértices y aristas. Puede ser dirigido o no, ponderado o no. El <strong>grado</strong> de un vértice es el número de aristas incidentes; en un grafo no dirigido,</p>
+$$\sum_{v\in V}\deg(v)=2|E|.$$
+<p>Un <strong>camino</strong> recorre vértices conectados; un <strong>ciclo</strong> empieza y termina en el mismo vértice. Un grafo es <strong>conexo</strong> si hay camino entre todo par de vértices.</p>
+<ul>
+  <li><strong>Árbol:</strong> grafo conexo sin ciclos. Con \(n\) vértices tiene \(n-1\) aristas. Todo árbol es bipartito.</li>
+  <li><strong>Árbol de expansión:</strong> subgrafo que conecta todos los vértices sin ciclos. El de mínimo peso se obtiene con Kruskal o Prim.</li>
+  <li><strong>Euleriano:</strong> recorre cada arista exactamente una vez. Existe si el grafo es conexo y todos los grados son pares (o exactamente dos impares, para un recorrido abierto).</li>
+  <li><strong>Hamiltoniano:</strong> visita cada vértice una vez. No hay criterio simple; es NP-completo en general.</li>
+  <li><strong>Bipartito:</strong> los vértices se dividen en dos conjuntos sin aristas internas. Equivale a no tener ciclos de longitud impar.</li>
+</ul>
+<p>La <strong>fórmula de Euler</strong> para un grafo plano conexo es \(V-E+F=2\), con \(F\) caras incluida la exterior. La <strong>coloración</strong> asigna colores a vértices adyacentes distintos; el teorema de los cuatro colores garantiza que todo mapa plano se colorea con cuatro.</p>
+<div class="example">
+<h4>Ejemplo 4.1 — Dijkstra</h4>
+<p>Para encontrar la ruta más corta entre dos nodos con pesos no negativos, Dijkstra mantiene las distancias provisionales y va fijando la menor. Es la base de muchos protocolos de encaminamiento.</p>
+</div>
+
+<h2 id="boole">5. Álgebra de Boole</h2>
+<p>Las variables booleanas toman valores 0 o 1. Las operaciones son \(\cdot\) (AND), \(+\) (OR) y \(\overline{x}\) (NOT). Leyes importantes:</p>
+$$x+\overline{x}=1,\qquad x\cdot\overline{x}=0,\qquad \overline{x+y}=\overline{x}\,\overline{y},\qquad \overline{xy}=\overline{x}+\overline{y}.$$
+<p>Las dos últimas son las <strong>leyes de De Morgan</strong>. Cualquier función booleana se puede escribir como suma de productos (forma canónica) o producto de sumas.</p>
+<p>Las puertas lógicas implementan estas operaciones: AND, OR, NOT, NAND, NOR, XOR. NAND y NOR son <strong>universales</strong>: con solo una de ellas se construye cualquier circuito. El mapa de Karnaugh es un método gráfico para simplificar funciones de hasta 4 o 5 variables agrupando unos adyacentes.</p>
+<div class="example">
+<h4>Ejemplo 5.1 — Simplificación</h4>
+<p>\(f=x\overline y+xy=x(\overline y+y)=x\). Un circuito de dos puertas se reduce a una conexión directa.</p>
+</div>
+
+<h2 id="numeros">6. Aritmética modular</h2>
+<p>Se dice que \(a\equiv b\pmod n\) si \(n\mid(a-b)\). La suma, resta y multiplicación se comportan bien módulo \(n\); la división solo si el divisor es invertible.</p>
+<p>El <strong>algoritmo de Euclides</strong> calcula \(\gcd(a,b)\) mediante divisiones sucesivas. El <strong>máximo común divisor</strong> permite resolver ecuaciones diofánticas y calcular inversos modulares con el algoritmo extendido.</p>
+<p>El <strong>teorema chino del resto</strong> dice que si \(n_1,\dots,n_k\) son coprimos dos a dos, el sistema \(x\equiv a_i\pmod{n_i}\) tiene solución única módulo \(N=\prod n_i\).</p>
+<div class="box def"><span class="box-title">Euler y Fermat</span>
+<p>Si \(\gcd(a,n)=1\), \(a^{\varphi(n)}\equiv1\pmod n\), donde \(\varphi(n)\) cuenta los enteros menores que \(n\) coprimos con \(n\). Si \(p\) es primo y \(p\nmid a\), el <strong>pequeño teorema de Fermat</strong> da \(a^{p-1}\equiv1\pmod p\).</p></div>
+<div class="example">
+<h4>Ejemplo 6.1 — Inverso modular</h4>
+<p>Hallar \(3^{-1}\pmod{11}\). Como \(3\cdot4=12\equiv1\), el inverso es 4. En general se usa Euclides extendido: \(11=3\cdot3+2\), \(3=2\cdot1+1\), de donde \(1=3-2=3-(11-3\cdot3)=4\cdot3-11\).</p>
+</div>
+
+<h2 id="codigos">7. Códigos y criptografía</h2>
+<p>Un <strong>código detector</strong> añade redundancia para detectar errores; un <strong>corrector</strong> puede además localizarlos y corregirlos. La <strong>distancia de Hamming</strong> entre dos palabras es el número de bits distintos; un código con distancia mínima \(d\) detecta \(d-1\) errores y corrige \(\lfloor(d-1)/2\rfloor\).</p>
+<p>El código de paridad añade un bit para que el número de unos sea par (o impar). El <strong>CRC</strong> trata los bits como coeficientes de un polinomio y calcula el resto de la división por un polinomio generador; es muy eficaz para ráfagas y se usa en Ethernet, Wi-Fi y enlaces serie.</p>
+<p>El código de Hamming \((7,4)\) codifica 4 bits de datos en 7, con 3 bits de paridad y distancia mínima 3: corrige un error simple. Los códigos de Reed–Solomon, basados en cuerpos finitos, se usan en DVD, QR y comunicaciones espaciales.</p>
+<div class="example">
+<h4>Ejemplo 7.1 — RSA</h4>
+<p>Elegimos primos \(p=3\), \(q=11\), luego \(n=33\) y \(\varphi(n)=20\). Con \(e=3\) (coprimo con 20), el inverso es \(d=7\) porque \(3\cdot7=21\equiv1\). Para cifrar \(m=4\): \(c=4^3\bmod33=64\bmod33=31\). Descifrar: \(31^7\bmod33=4\). La seguridad real exige primos de cientos de bits y relleno adecuado.</p>
+</div>
+
+<h2 id="telecom">8. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>Redes:</strong> topologías, árboles de expansión, encaminamiento (Dijkstra, Bellman–Ford), flujo máximo.</li>
+  <li><strong>Protocolos:</strong> máquinas de estados finitos y lógica de temporizadores.</li>
+  <li><strong>Codificación:</strong> paridad, Hamming, CRC, Reed–Solomon, LDPC y turbo códigos.</li>
+  <li><strong>Criptografía:</strong> RSA, Diffie–Hellman, curvas elípticas; aritmética modular y cuerpos finitos.</li>
+  <li><strong>Planificación:</strong> asignación de canales, coloring de grafos de interferencia y teoría de colas discretas.</li>
+  <li><strong>Computación:</strong> análisis de algoritmos, complejidad y estructuras de datos.</li>
+</ul>
+
+<h2 id="ejemplos">9. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 9.1 — Contar</h4>
+<p>¿Cuántos números de 4 cifras distintas se pueden formar con 1,2,3,4? \(4!=24\). ¿Y con 0,1,2,3 sin empezar por 0? Total \(4!-3!=24-6=18\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.2 — Recurrencia</h4>
+<p>\(a_n=5a_{n-1}-6a_{n-2}\), \(a_0=1,a_1=2\). Característica \(r^2-5r+6=0\), raíces 2 y 3. \(a_n=C_1 2^n+C_2 3^n\). De \(C_1+C_2=1\) y \(2C_1+3C_2=2\): \(C_1=1,C_2=0\). \(a_n=2^n\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.3 — Grafos</h4>
+<p>Un grafo conexo con 10 vértices y 9 aristas sin ciclos es un árbol. Si tuviera 10 aristas, tendría exactamente un ciclo.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.4 — Hamming</h4>
+<p>Con distancia mínima 3, se corrige 1 error y se detectan 2. Si se recibe una palabra a distancia 1 de una palabra válida, se corrige a esa; si está a distancia 2 de dos palabras válidas, no se puede decidir.</p>
+</div>
+
+<h2 id="ejercicios">10. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>¿Cuántos subconjuntos tiene un conjunto de 6 elementos?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(2^6=64\).</p></div></details></li>
+  <li>¿De cuántas formas se eligen 2 personas de 8?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\binom82=28\).</p></div></details></li>
+  <li>Halla el término de \(x^3\) en \((x+1)^5\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\binom53x^3=10x^3\).</p></div></details></li>
+  <li>Resuelve \(a_n=3a_{n-1}\), \(a_0=2\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(a_n=2\cdot3^n\).</p></div></details></li>
+  <li>Resuelve \(a_n=a_{n-1}+n\), \(a_0=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(a_n=n(n+1)/2\).</p></div></details></li>
+  <li>¿Cuántas aristas tiene un árbol con 12 vértices?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(12-1=11\).</p></div></details></li>
+  <li>¿Puede existir un grafo con grados 3,3,3,3,2?
+    <details class="sol"><summary>Respuesta</summary><div><p>La suma es 14, par, así que no se descarta por paridad; pero el número de vértices de grado impar es 4 (par), lo cual es posible. Habría que comprobar si la sucesión es gráfica (teorema de Erdős–Gallai).</p></div></details></li>
+  <li>Simplifica \(x+xy\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(x(1+y)=x\), porque \(1+y=1\) en álgebra booleana.</p></div></details></li>
+  <li>Calcula \(2^{10}\bmod7\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(2^3=8\equiv1\), luego \(2^{10}=2^{9}2\equiv1\cdot2=2\pmod7\).</p></div></details></li>
+  <li>¿Cuántos errores corrige un código de distancia mínima 5?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\lfloor(5-1)/2\rfloor=2\) errores; detecta hasta 4.</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">11. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. \(\neg(p\land q)\) es equivalente a</p>
+    <div class="opts">
+      <button class="opt">\(\neg p\land\neg q\)</button>
+      <button class="opt" data-ok>\(\neg p\lor\neg q\)</button>
+      <button class="opt">\(p\lor q\)</button>
+    </div>
+    <p class="why">Es una ley de De Morgan: negar una conjunción da una disyunción de negaciones.</p>
+  </div>
+  <div class="q">
+    <p>2. Un árbol con \(n\) vértices tiene</p>
+    <div class="opts">
+      <button class="opt">\(n\) aristas</button>
+      <button class="opt" data-ok>\(n-1\) aristas</button>
+      <button class="opt">\(n+1\) aristas</button>
+    </div>
+    <p class="why">Es conexo y sin ciclos; cada arista añadida después de la primera conecta un vértice nuevo.</p>
+  </div>
+  <div class="q">
+    <p>3. Un código con distancia mínima 3 corrige</p>
+    <div class="opts">
+      <button class="opt">2 errores</button>
+      <button class="opt" data-ok>1 error</button>
+      <button class="opt">3 errores</button>
+    </div>
+    <p class="why">\(\lfloor(3-1)/2\rfloor=1\). Para corregir 2 haría falta distancia al menos 5.</p>
+  </div>
+</div>
+
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Rosen, <em>Matemática discreta y sus aplicaciones</em>, 8.ª ed.</td><td>1–10</td><td>Lógica, combinatoria, grafos, números, códigos</td><td>Curso completo</td></tr>
+    <tr><td>Grimaldi, <em>Matemática discreta y combinatoria</em>, 5.ª ed.</td><td>1–9</td><td>Combinatoria y recurrencias</td><td>Más ejercicios</td></tr>
+    <tr><td>Levine, <em>Discrete Mathematics: An Open Introduction</em>, 3.ª ed.</td><td>—</td><td>Curso abierto</td><td>Gratuito y con ejercicios</td></tr>
+    <tr><td>Stallings, <em>Cryptography and Network Security</em>, 8.ª ed.</td><td>2–9</td><td>Criptografía y códigos</td><td>Aplicación a redes</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://discrete.openmathbooks.org/dmoi3.html">Discrete Mathematics: An Open Introduction</a>.</p>
+
+<h2 id="faq">13. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Para qué sirve demostrar en ingeniería?</summary><div><p>Para garantizar que un protocolo no se bloquea, que un código corrige lo que promete o que un algoritmo termina. Una demostración evita confiar solo en pruebas empíricas.</p></div></details>
+  <details><summary>¿Qué diferencia hay entre combinación y permutación?</summary><div><p>La permutación importa el orden; la combinación no. Elegir un comité es combinación; asignar puestos es permutación.</p></div></details>
+  <details><summary>¿Por qué el CRC usa polinomios?</summary><div><p>Porque la división polinómica sobre \(\mathbb F_2\) detecta eficientemente ráfagas de errores y se implementa con registros de desplazamiento y XOR, sin coste elevado.</p></div></details>
+  <details><summary>¿RSA es seguro con números pequeños?</summary><div><p>No. Con \(n=33\) se factoriza al instante. La seguridad práctica usa módulos de 2048 o 3072 bits, exponentes adecuados y esquemas de relleno como OAEP. Nunca se implementa RSA “a mano” en producción.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de matemática discreta para ingeniería. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Matemática discreta · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

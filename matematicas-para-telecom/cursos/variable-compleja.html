@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Variable compleja · Matemáticas para Telecom</title>
+  <meta name="description" content="Variable compleja: números complejos, forma polar y Euler, funciones analíticas, Cauchy–Riemann, integrales de contorno, Cauchy, series de Taylor y Laurent, residuos, integrales reales y transformaciones conformes. Ejemplos y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 4 · Variable compleja</p>
+<h1>Variable compleja</h1>
+<p class="lead">Los números complejos no son una curiosidad: son la forma natural de describir ondas, fasores, impedancias y campos. La variable compleja lleva esa idea más lejos: funciones de una variable compleja, derivadas e integrales, y un resultado sorprendente —la <strong>fórmula integral de Cauchy</strong>— que permite calcular integrales reales difíciles mediante residuos.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Operar con números complejos en forma binómica, polar y exponencial; calcular potencias y raíces.</li>
+    <li>Reconocer funciones analíticas y aplicar las ecuaciones de Cauchy–Riemann.</li>
+    <li>Calcular integrales de contorno con el teorema y la fórmula de Cauchy.</li>
+    <li>Desarrollar en series de Taylor y Laurent; clasificar singularidades y calcular residuos.</li>
+    <li>Aplicar el teorema de los residuos a integrales reales y a problemas de telecom.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">cálculo, trigonometría y series</span>
+  <p>Necesitas derivar e integrar, manejar identidades trigonométricas y reconocer series geométricas. La fórmula de Euler \(e^{i\theta}=\cos\theta+i\sen\theta\) se usa constantemente. Repaso: <a href="../../repaso/matematica.html#complejos">complejos y Euler</a> · <a href="../../calculo-diferencial-e-integral/temas/integrales.html">integrales</a> · <a href="../../repaso/matematica.html#series">series</a>.</p>
+</div>
+
+<h2 id="numeros">1. Números complejos</h2>
+<p>Un número complejo es \(z=x+iy\), con \(x,y\in\mathbb R\) e \(i^2=-1\). \(x=\operatorname{Re}z\) es la parte real e \(y=\operatorname{Im}z\) la imaginaria. El conjugado es \(\bar z=x-iy\) y el módulo \(|z|=\sqrt{x^2+y^2}\).</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Operación</th><th>Fórmula</th></tr></thead>
+  <tbody>
+    <tr><td>Suma</td><td>\((x_1+iy_1)+(x_2+iy_2)=(x_1+x_2)+i(y_1+y_2)\)</td></tr>
+    <tr><td>Producto</td><td>\((x_1+iy_1)(x_2+iy_2)=(x_1x_2-y_1y_2)+i(x_1y_2+x_2y_1)\)</td></tr>
+    <tr><td>Cociente</td><td>\(\dfrac{z_1}{z_2}=\dfrac{z_1\bar z_2}{|z_2|^2}\)</td></tr>
+    <tr><td>Conjugado</td><td>\(z\bar z=|z|^2\)</td></tr>
+  </tbody>
+</table></div>
+<p>En forma polar, \(z=r(\cos\theta+i\sen\theta)=re^{i\theta}\), con \(r=|z|\) y \(\theta=\arg z\). Entonces</p>
+$$z_1z_2=r_1r_2e^{i(\theta_1+\theta_2)},\qquad \frac{z_1}{z_2}=\frac{r_1}{r_2}e^{i(\theta_1-\theta_2)},\qquad z^n=r^ne^{in\theta}.$$
+<p>Las \(n\) raíces \(n\)-ésimas son</p>
+$$z_k=\sqrt[n]{r}\,e^{i(\theta+2\pi k)/n},\qquad k=0,1,\dots,n-1.$$
+<div class="example">
+<h4>Ejemplo 1.1 — Potencias y raíces</h4>
+<p>\(z=1+i\) tiene \(r=\sqrt2\), \(\theta=\pi/4\). Entonces \(z^4=(\sqrt2)^4e^{i\pi}=4(-1)=-4\). Las raíces cúbicas de 1 son \(1,\ e^{2\pi i/3},\ e^{4\pi i/3}\), situadas en un triángulo equilátero sobre la circunferencia unitaria.</p>
+</div>
+
+<h2 id="funciones">2. Funciones complejas y analiticidad</h2>
+<p>Una función \(f(z)=u(x,y)+iv(x,y)\) asigna a cada \(z\) un complejo. El límite y la continuidad se definen como en \(\mathbb R^2\), pero la derivada compleja exige que el cociente</p>
+$$f'(z_0)=\lim_{h\to0}\frac{f(z_0+h)-f(z_0)}{h}$$
+<p>exista por cualquier dirección \(h\to0\). Esa exigencia es mucho más fuerte que la diferenciabilidad real.</p>
+<div class="box def"><span class="box-title">Ecuaciones de Cauchy–Riemann</span>
+<p>Si \(f=u+iv\) es derivable en \(z_0\), entonces en ese punto</p>
+$$u_x=v_y,\qquad u_y=-v_x.$$
+<p>Si \(u,v\) tienen derivadas parciales continuas y cumplen Cauchy–Riemann en un entorno, entonces \(f\) es analítica allí. Además \(f'(z)=u_x+iv_x=v_y-iu_y\).</p></div>
+<p>Una función es <strong>analítica</strong> en un dominio si es derivable en todos los puntos de un entorno. Polinomios, exponenciales y funciones racionales (fuera de los polos) son analíticas; \(\bar z\), \(|z|^2\) y \(\operatorname{Re}z\) no lo son.</p>
+<div class="example">
+<h4>Ejemplo 2.1 — Cauchy–Riemann</h4>
+<p>\(f(z)=z^2=(x^2-y^2)+i(2xy)\). \(u_x=2x=v_y\), \(u_y=-2y=-v_x\). Se cumple en todo el plano: \(f\) es entera y \(f'(z)=2z\).</p>
+</div>
+<p>Si \(f=u+iv\) es analítica, \(u\) y \(v\) son <strong>armónicas</strong>: \(\nabla^2u=0\), \(\nabla^2v=0\). Por eso la variable compleja es natural en electrostática y en problemas de potencial.</p>
+
+<h2 id="elementales">3. Funciones elementales</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Función</th><th>Definición</th><th>Observación</th></tr></thead>
+  <tbody>
+    <tr><td>Exponencial</td><td>\(e^z=e^x(\cos y+i\sen y)\)</td><td>Periódica: \(e^{z+2\pi i}=e^z\)</td></tr>
+    <tr><td>Logaritmo</td><td>\(\ln z=\ln|z|+i\arg z\)</td><td>Multivaluado; la rama principal usa \(-\pi<\arg z\le\pi\)</td></tr>
+    <tr><td>Potencia</td><td>\(z^a=e^{a\ln z}\)</td><td>Puede ser multivaluada</td></tr>
+    <tr><td>Seno y coseno</td><td>\(\sen z=\dfrac{e^{iz}-e^{-iz}}{2i}\), \(\cos z=\dfrac{e^{iz}+e^{-iz}}{2}\)</td><td>No están acotados en el plano complejo</td></tr>
+    <tr><td>Seno y coseno hiperbólicos</td><td>\(\senh z=-i\sen(iz)\), \(\cosh z=\cos(iz)\)</td><td>Aparecen en líneas y guías</td></tr>
+  </tbody>
+</table></div>
+<p>La rama principal del logaritmo es analítica en \(\mathbb C\setminus(-\infty,0]\). El corte de rama es una línea donde la función deja de ser continua; elegir bien la rama es esencial en propagación y en funciones de Green.</p>
+
+<h2 id="contorno">4. Integrales de contorno</h2>
+<p>Para una curva \(C\) parametrizada por \(z(t)\), \(a\le t\le b\),</p>
+$$\int_C f(z)\,dz=\int_a^b f(z(t))z'(t)\,dt.$$
+<div class="box def"><span class="box-title">Teorema de Cauchy</span>
+<p>Si \(f\) es analítica en un dominio simplemente conexo y \(C\) es una curva cerrada contenida en él, entonces \(\displaystyle\oint_C f(z)\,dz=0\).</p></div>
+<div class="box def"><span class="box-title">Fórmula integral de Cauchy</span>
+<p>Si \(f\) es analítica dentro y sobre una curva cerrada simple \(C\), y \(z_0\) está en el interior,</p>
+$$f(z_0)=\frac{1}{2\pi i}\oint_C\frac{f(z)}{z-z_0}\,dz.$$
+<p>Derivando, \(f^{(n)}(z_0)=\dfrac{n!}{2\pi i}\displaystyle\oint_C\frac{f(z)}{(z-z_0)^{n+1}}dz\).</p></div>
+<p>Consecuencia: una función analítica tiene derivadas de todos los órdenes y es desarrollable en serie de potencias. Es una propiedad mucho más fuerte que en el caso real.</p>
+<div class="example">
+<h4>Ejemplo 4.1 — Cauchy</h4>
+<p>\(\displaystyle\oint_{|z|=2}\frac{e^z}{z-1}dz=2\pi i\,e^1=2\pi ie\), porque \(f(z)=e^z\) es analítica y \(1\) está dentro del círculo.</p>
+</div>
+
+<h2 id="series">5. Series, singularidades y residuos</h2>
+<p>Alrededor de un punto \(z_0\), una función analítica se desarrolla en <strong>serie de Taylor</strong>:</p>
+$$f(z)=\sum_{n=0}^\infty a_n(z-z_0)^n,\qquad a_n=\frac{f^{(n)}(z_0)}{n!}.$$
+<p>Si hay una singularidad, se usa la <strong>serie de Laurent</strong>, que admite potencias negativas:</p>
+$$f(z)=\sum_{n=-\infty}^{\infty}c_n(z-z_0)^n.$$
+<p>El coeficiente \(c_{-1}\) es el <strong>residuo</strong> \(\operatorname{Res}(f,z_0)\). Clasificación:</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Tipo</th><th>Serie de Laurent</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Evitable</td><td>Sin potencias negativas</td><td>\(\frac{\sen z}{z}\) en 0</td></tr>
+    <tr><td>Polo de orden \(m\)</td><td>Hasta \((z-z_0)^{-m}\)</td><td>\(\frac{1}{z^2}\) en 0 (orden 2)</td></tr>
+    <tr><td>Esencial</td><td>Infinitas potencias negativas</td><td>\(e^{1/z}\) en 0</td></tr>
+  </tbody>
+</table></div>
+<p>Para un polo simple, \(\operatorname{Res}(f,z_0)=\displaystyle\lim_{z\to z_0}(z-z_0)f(z)\). Para \(f=P/Q\) con polo simple en \(z_0\), \(\operatorname{Res}(f,z_0)=P(z_0)/Q'(z_0)\).</p>
+
+<h2 id="residuos">6. Teorema de los residuos</h2>
+<div class="box def"><span class="box-title">Teorema de los residuos</span>
+<p>Si \(f\) es analítica dentro y sobre una curva cerrada simple \(C\), salvo en un número finito de singularidades \(z_k\) interiores, entonces</p>
+$$\oint_C f(z)\,dz=2\pi i\sum_k\operatorname{Res}(f,z_k).$$
+</div>
+<p>Este teorema convierte integrales de contorno en sumas de residuos y permite calcular integrales reales. Los tres casos típicos:</p>
+<ul>
+  <li><strong>Integrales racionales en toda la recta:</strong> cerrar con un semicírculo en el semiplano superior y sumar residuos allí.</li>
+  <li><strong>Integrales con \(\sen\) o \(\cos\):</strong> usar \(e^{iz}\) y el lema de Jordan.</li>
+  <li><strong>Integrales sobre \([0,2\pi]\):</strong> sustituir \(z=e^{i\theta}\), \(d\theta=dz/(iz)\), \(\cos\theta=(z+z^{-1})/2\).</li>
+</ul>
+<div class="example">
+<h4>Ejemplo 6.1 — Integral real</h4>
+<p>\(\displaystyle\int_{-\infty}^{\infty}\frac{dx}{1+x^2}\). Polos en \(z=\pm i\); el del semiplano superior es \(i\). \(\operatorname{Res}\left(\frac{1}{1+z^2},i\right)=\frac{1}{2i}\). La integral vale \(2\pi i\cdot\frac{1}{2i}=\pi\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.2 — Integral trigonométrica</h4>
+<p>\(\displaystyle\int_0^{2\pi}\frac{d\theta}{2+\cos\theta}\). Con \(z=e^{i\theta}\) se reduce a \(\oint\frac{2\,dz}{i(z^2+4z+1)}\). El polo interior es \(z=-2+\sqrt3\), con residuo \(\frac{1}{i\sqrt3}\). Resultado: \(\frac{2\pi}{\sqrt3}\).</p>
+</div>
+
+<h2 id="conformes">7. Transformaciones conformes</h2>
+<p>Una aplicación analítica con derivada no nula conserva ángulos localmente: es <strong>conforme</strong>. Las transformaciones de Möbius</p>
+$$w=\frac{az+b}{cz+d},\qquad ad-bc\ne0,$$
+<p>llevan rectas y circunferencias en rectas y circunferencias. Se usan para resolver problemas de potencial en geometrías complicadas transformándolas en geometrías sencillas.</p>
+<p>Ejemplos clásicos: \(w=z^2\) duplica ángulos; \(w=e^z\) transforma franjas horizontales en sectores; \(w=1/z\) invierte respecto de la circunferencia unitaria. En electromagnetismo, la transformación conforme permite obtener campos alrededor de bordes y placas.</p>
+
+<h2 id="telecom">8. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>Fasores e impedancias:</strong> \(Z=R+jX\), respuesta en frecuencia \(H(j\omega)\).</li>
+  <li><strong>Líneas de transmisión:</strong> impedancia característica compleja, coeficiente de reflexión \(\Gamma\), carta de Smith (plano complejo).</li>
+  <li><strong>Electromagnetismo:</strong> campos armónicos, vectores complejos, teorema de Poynting complejo.</li>
+  <li><strong>Filtros y estabilidad:</strong> polos y ceros en el plano \(s\) o \(z\); criterio de estabilidad.</li>
+  <li><strong>Propagación:</strong> constante de propagación compleja \(\gamma=\alpha+j\beta\): atenuación y fase.</li>
+</ul>
+
+<h2 id="ejemplos">9. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 9.1 — Operaciones</h4>
+<p>\(\dfrac{1+i}{1-i}=\dfrac{(1+i)^2}{2}=\dfrac{2i}{2}=i\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.2 — Módulo y argumento</h4>
+<p>\(z=-1+i\): \(|z|=\sqrt2\), \(\arg z=3\pi/4\) (segundo cuadrante). Forma polar: \(\sqrt2e^{3\pi i/4}\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.3 — Polo y residuo</h4>
+<p>\(f(z)=\dfrac{1}{z^2+1}\) tiene polos simples en \(\pm i\). En \(z=i\): \(\operatorname{Res}=\frac{1}{2i}=-\frac{i}{2}\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.4 — Cauchy con derivada</h4>
+<p>\(\displaystyle\oint_{|z|=1}\frac{e^z}{z^2}dz=2\pi i\,f'(0)=2\pi i\), con \(f(z)=e^z\), \(f'(0)=1\).</p>
+</div>
+
+<h2 id="ejercicios">10. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Calcula \((2+3i)(1-i)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(2-2i+3i-3i^2=2+i+3=5+i\).</p></div></details></li>
+  <li>Halla \(|3-4i|\) y su conjugado.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(|3-4i|=5\); conjugado \(3+4i\).</p></div></details></li>
+  <li>Escribe \(-1\) en forma exponencial y halla sus raíces cuadradas.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(-1=e^{i\pi}\); raíces \(e^{i\pi/2}=i\) y \(e^{i3\pi/2}=-i\).</p></div></details></li>
+  <li>Comprueba si \(f(z)=\bar z\) es analítica.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(u=x\), \(v=-y\): \(u_x=1\), \(v_y=-1\); no se cumple \(u_x=v_y\). No es analítica en ningún punto.</p></div></details></li>
+  <li>Calcula \(\oint_{|z|=1}\frac{dz}{z}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(2\pi i\) (residuo 1 en \(z=0\)).</p></div></details></li>
+  <li>Calcula \(\oint_{|z|=2}\frac{\cos z}{z-1}dz\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(2\pi i\cos1\), por la fórmula integral de Cauchy.</p></div></details></li>
+  <li>Halla el residuo de \(f(z)=\frac{1}{z^2+4}\) en \(z=2i\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\frac{1}{2z}\big|_{2i}=\frac{1}{4i}=-\frac{i}{4}\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int_{-\infty}^{\infty}\frac{dx}{x^2+4}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Polo en \(2i\), residuo \(\frac{1}{4i}\); integral \(2\pi i\cdot\frac{1}{4i}=\frac{\pi}{2}\).</p></div></details></li>
+  <li>Clasifica la singularidad de \(f(z)=\frac{\sen z}{z}\) en \(z=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Evitable: \(\sen z/z=1-z^2/6+\cdots\), no hay potencias negativas. Se define \(f(0)=1\).</p></div></details></li>
+  <li>Clasifica la singularidad de \(f(z)=e^{1/z}\) en \(z=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Esencial: \(e^{1/z}=1+1/z+1/(2!z^2)+\cdots\) tiene infinitas potencias negativas.</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">11. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. Una función es analítica en un punto si</p>
+    <div class="opts">
+      <button class="opt">es continua allí</button>
+      <button class="opt" data-ok>es derivable en un entorno del punto</button>
+      <button class="opt">tiene partes real e imaginaria continuas</button>
+    </div>
+    <p class="why">La analiticidad exige derivada compleja en un entorno, no solo continuidad ni derivadas parciales reales.</p>
+  </div>
+  <div class="q">
+    <p>2. El residuo es</p>
+    <div class="opts">
+      <button class="opt">el coeficiente \(c_0\)</button>
+      <button class="opt" data-ok>el coeficiente \(c_{-1}\) de la serie de Laurent</button>
+      <button class="opt">el valor de la función en el polo</button>
+    </div>
+    <p class="why">El teorema de los residuos solo necesita el coeficiente de \((z-z_0)^{-1}\); los demás términos integran cero sobre una curva cerrada.</p>
+  </div>
+  <div class="q">
+    <p>3. Si \(f\) es analítica en un dominio simplemente conexo, \(\oint_C f(z)dz\) sobre una curva cerrada vale</p>
+    <div class="opts">
+      <button class="opt" data-ok>0</button>
+      <button class="opt">\(2\pi i\)</button>
+      <button class="opt">depende de la curva</button>
+    </div>
+    <p class="why">Es el teorema de Cauchy: sin singularidades dentro, la integral cerrada es cero.</p>
+  </div>
+</div>
+
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Churchill y Brown, <em>Variable compleja y aplicaciones</em>, 8.ª ed.</td><td>1–8</td><td>Números complejos, funciones, integrales, series, residuos, transformaciones</td><td>Curso completo</td></tr>
+    <tr><td>Kreyszig, <em>Matemáticas avanzadas para ingeniería</em>, 10.ª ed.</td><td>13–18</td><td>Variable compleja y aplicaciones</td><td>Enfoque ingenieril</td></tr>
+    <tr><td>Ahlfors, <em>Complex Analysis</em>, 3.ª ed.</td><td>1–5</td><td>Teoría</td><td>Para profundizar</td></tr>
+    <tr><td>MIT 18.04</td><td>—</td><td>Vídeos y apuntes</td><td>Curso abierto</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://ocw.mit.edu/courses/18-04-complex-variables-with-applications-spring-2018/">MIT 18.04 Complex Variables with Applications</a>.</p>
+
+<h2 id="faq">13. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué \(e^{i\pi}=-1\)?</summary><div><p>Porque \(e^{i\theta}=\cos\theta+i\sen\theta\). Con \(\theta=\pi\): \(\cos\pi=-1\), \(\sen\pi=0\). Es la identidad de Euler, que reúne cinco constantes fundamentales.</p></div></details>
+  <details><summary>¿Qué es un polo?</summary><div><p>Una singularidad aislada donde la función tiende a infinito y su serie de Laurent tiene un número finito de potencias negativas. El orden es la mayor potencia negativa. En los filtros, los polos determinan la respuesta y la estabilidad.</p></div></details>
+  <details><summary>¿Para qué sirve la carta de Smith?</summary><div><p>Es una representación del plano complejo del coeficiente de reflexión \(\Gamma\). Permite resolver gráficamente adaptación de impedancias, líneas y transformaciones de impedancia sin calcular con números complejos en cada paso.</p></div></details>
+  <details><summary>¿Las integrales de contorno dependen del camino?</summary><div><p>En general sí. Si \(f\) es analítica en un dominio simplemente conexo, la integral entre dos puntos es independiente del camino; si hay singularidades, el valor depende de cuántas veces rodea el camino a cada una (número de vueltas).</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de variable compleja para ingeniería. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Variable compleja · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

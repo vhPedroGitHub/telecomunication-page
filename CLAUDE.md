@@ -80,6 +80,7 @@ telecomunication-page/
 ├── assets/js/                    ← utilidades compartidas (temas, quizzes, KaTeX, etc.)
 ├── repaso/                       ← páginas de repaso de prerrequisitos (matemática, física, probabilidad…)
 ├── calculo-diferencial-e-integral/ ← curso complementario propio (límites, derivadas, integrales)
+├── matematicas-para-telecom/     ← itinerario de 10 cursos de matemáticas + hub
 ├── <asignatura>/
 │   ├── CLAUDE.md                 ← contexto + inventario + ESTADO de la asignatura
 │   ├── index.html                ← página principal de la asignatura
@@ -185,6 +186,7 @@ El repo es **público**. Los materiales fuente están **fuera** del repo a prop�
 | Gestión y Seguridad de Redes | ⬜ pendiente | solo estructura |
 | Estudios Sociales de la CyT | ⛔ sin materiales | carpeta fuente vacía |
 | Cálculo diferencial e integral | ✅ completo | curso complementario propio: límites, derivadas e integrales + 3 simuladores |
+| Matemáticas para Telecom | ✅ completo | itinerario de 10 cursos con teoría, ejemplos, ejercicios y 5 interactivos compartidos en `assets/js/mate.js` |
 | Repaso de prerrequisitos | 🟡 iniciada | matemática, probabilidad, circuitos, electrónica digital y analógica, física EM |
 | Portal raíz + CI/CD | ✅ hecho | `index.html`, `assets/css/base.css`, workflow |
 
@@ -192,6 +194,14 @@ Leyenda: ✅ completo · 🟡 en progreso · ⬜ pendiente · ⛔ bloqueado.
 
 ## 12. Bitácora global
 
+- **2026-10-21** — Itinerario **Matemáticas para Telecom** (`matematicas-para-telecom/`): hub con
+  10 cursos (cálculo multivariable, álgebra lineal, EDO, variable compleja, series y transformadas,
+  probabilidad y estadística, métodos numéricos, matemática discreta, optimización y ecuaciones en
+  diferencias), cada uno con teoría, teoremas, tablas, aplicaciones, ejemplos, ejercicios con
+  respuesta, autoevaluación y bibliografía. Cinco interactivos compartidos en `assets/js/mate.js`
+  (transformación 2×2, campo de pendientes/Euler, Fourier, normal y descenso de gradiente) y acento
+  `--c-mate`. Tarjeta en el portal raíz y fila en `README.md`. Verificado en Chromium headless
+  (consola, KaTeX, 390 px y controles).
 - **2026-10-21** — Curso complementario **Cálculo diferencial e integral** (`calculo-diferencial-e-integral/`):
   portada + tres bloques (límites y continuidad, derivadas, integrales) con teoría, teoremas,
   tablas de reglas y derivadas/integrales comunes, ejemplos resueltos, ejercicios con solución,

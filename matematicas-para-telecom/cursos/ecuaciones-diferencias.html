@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ecuaciones en diferencias · Matemáticas para Telecom</title>
+  <meta name="description" content="Ecuaciones en diferencias: sucesiones, primer y segundo orden, ecuaciones homogéneas y no homogéneas, sistemas y estabilidad, transformada Z, funciones de transferencia y filtros digitales. Ejemplos y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 10 · Ecuaciones en diferencias</p>
+<h1>Ecuaciones en diferencias</h1>
+<p class="lead">Un filtro digital, un algoritmo iterativo o un modelo de cola avanzan paso a paso: el valor de hoy depende de los anteriores. Las ecuaciones en diferencias son la versión discreta de las ecuaciones diferenciales, y la transformada Z es su herramienta de resolución, igual que Laplace lo es en tiempo continuo.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Plantear y resolver ecuaciones en diferencias de primer y segundo orden.</li>
+    <li>Distinguir los casos de raíces reales, repetidas y complejas.</li>
+    <li>Resolver ecuaciones no homogéneas y reconocer la resonancia.</li>
+    <li>Analizar sistemas discretos y su estabilidad con autovalores.</li>
+    <li>Usar la transformada Z y funciones de transferencia en filtros digitales.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">sucesiones, álgebra y algo de variable compleja</span>
+  <p>Necesitas factorizar polinomios, manejar potencias y entender los números complejos. Repaso: <a href="../../repaso/matematica.html#series">sucesiones y series</a> · <a href="../../repaso/matematica.html#complejos">complejos</a> · <a href="variable-compleja.html">variable compleja</a>. La parte de sistemas conecta con <a href="series-transformadas.html">series y transformadas</a>.</p>
+</div>
+
+<h2 id="sucesiones">1. Sucesiones y diferencias</h2>
+<p>Una sucesión \(x_n\) está definida para \(n=0,1,2,\dots\). La <strong>diferencia primera</strong> es \(\Delta x_n=x_{n+1}-x_n\); la segunda, \(\Delta^2x_n=\Delta x_{n+1}-\Delta x_n=x_{n+2}-2x_{n+1}+x_n\). Una ecuación en diferencias relaciona \(x_n\) con sus diferencias o con términos anteriores.</p>
+<p>El <strong>orden</strong> es la diferencia entre el índice mayor y el menor que aparecen. Una ecuación de orden \(k\) necesita \(k\) condiciones iniciales. Es <strong>lineal</strong> si la incógnita y sus desplazamientos aparecen a la primera potencia.</p>
+<p>Resolver una ecuación en diferencias es encontrar una fórmula cerrada para \(x_n\), o al menos describir su comportamiento cuando \(n\to\infty\).</p>
+
+<h2 id="primer-orden">2. Primer orden</h2>
+<p>La ecuación lineal de primer orden es</p>
+$$x_{n+1}=ax_n+b.$$
+<p>Si \(a\ne1\), el <strong>punto fijo</strong> es \(x^*=\frac{b}{1-a}\). La solución es</p>
+$$x_n=a^n(x_0-x^*)+x^*.$$
+<p>Si \(|a|<1\), la sucesión converge a \(x^*\); si \(|a|>1\), diverge (salvo que empiece exactamente en el punto fijo); si \(a=-1\), oscila indefinidamente. Si \(a=1\), \(x_n=x_0+nb\), que crece linealmente salvo \(b=0\).</p>
+<div class="example">
+<h4>Ejemplo 2.1 — Interés compuesto</h4>
+<p>Un capital \(C_n\) al \(5\,\%\) anual más una aportación de 1000 €: \(C_{n+1}=1{,}05C_n+1000\). El punto fijo es \(1000/(-0{,}05)=-20000\), que no tiene interpretación física aquí; la solución crece exponencialmente. Para un préstamo, el signo y la interpretación cambian.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 2.2 — Convergencia</h4>
+<p>\(x_{n+1}=0{,}5x_n+3\), \(x_0=10\). Punto fijo \(x^*=6\). \(x_n=6+4(0{,}5)^n\): \(10,8,7,6{,}5,\dots\to6\).</p>
+</div>
+
+<h2 id="segundo-orden">3. Segundo orden homogéneo</h2>
+<p>La forma general con coeficientes constantes es</p>
+$$x_{n+2}+px_{n+1}+qx_n=0.$$
+<p>Se prueba \(x_n=r^n\), lo que conduce a la <strong>ecuación característica</strong> \(r^2+pr+q=0\).</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Raíces</th><th>Solución general</th></tr></thead>
+  <tbody>
+    <tr><td>\(r_1\ne r_2\) reales</td><td>\(x_n=C_1r_1^n+C_2r_2^n\)</td></tr>
+    <tr><td>\(r\) doble</td><td>\(x_n=(C_1+C_2n)r^n\)</td></tr>
+    <tr><td>Complejas \(re^{\pm i\theta}\)</td><td>\(x_n=r^n(C_1\cos n\theta+C_2\sen n\theta)\)</td></tr>
+  </tbody>
+</table></div>
+<p>Las constantes se determinan con \(x_0\) y \(x_1\). Si las raíces tienen módulo menor que 1, todas las soluciones decaen a cero; si alguna tiene módulo mayor que 1, hay crecimiento exponencial.</p>
+<div class="example">
+<h4>Ejemplo 3.1 — Raíces reales</h4>
+<p>\(x_{n+2}-5x_{n+1}+6x_n=0\), \(x_0=1\), \(x_1=2\). Característica \(r^2-5r+6=0\Rightarrow r=2,3\). \(C_1+C_2=1\), \(2C_1+3C_2=2\Rightarrow C_1=1,C_2=0\). \(x_n=2^n\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 3.2 — Raíz doble</h4>
+<p>\(x_{n+2}-4x_{n+1}+4x_n=0\). \((r-2)^2=0\). \(x_n=(C_1+C_2n)2^n\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 3.3 — Raíces complejas</h4>
+<p>\(x_{n+2}+x_n=0\). \(r^2+1=0\Rightarrow r=\pm i=e^{\pm i\pi/2}\). \(x_n=C_1\cos(\pi n/2)+C_2\sen(\pi n/2)\): sucesión periódica de periodo 4.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 3.4 — Fibonacci</h4>
+<p>\(F_{n+2}=F_{n+1}+F_n\), \(F_0=0,F_1=1\). Característica \(r^2-r-1=0\), raíces \(\varphi,\psi\). \(F_n=(\varphi^n-\psi^n)/\sqrt5\).</p>
+</div>
+
+<h2 id="no-homogeneas">4. Ecuaciones no homogéneas</h2>
+<p>Para \(x_{n+2}+px_{n+1}+qx_n=g_n\), la solución general es \(x_n=x_n^{(h)}+x_n^{(p)}\), suma de la homogénea y una particular. Si \(g_n\) es constante, se prueba una constante; si es un polinomio, un polinomio del mismo grado; si es \(c^n\), se prueba \(Ar^n\).</p>
+<p><strong>Resonancia:</strong> si la forma de la particular ya es solución de la homogénea, se multiplica por \(n\) (o por \(n^2\) si la raíz es doble). Es el análogo discreto de la resonancia en ecuaciones diferenciales.</p>
+<div class="example">
+<h4>Ejemplo 4.1 — Término constante</h4>
+<p>\(x_{n+1}-0{,}5x_n=1\). Particular constante \(x^*=1/(1-0{,}5)=2\). Solución: \(x_n=2+(x_0-2)(0{,}5)^n\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 4.2 — Resonancia</h4>
+<p>\(x_{n+1}-x_n=1\). La homogénea es constante (\(r=1\)); una particular constante no sirve. Se prueba \(x_n=Cn\): \(C(n+1)-Cn=C=1\). Solución \(x_n=x_0+n\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 4.3 — Exponencial</h4>
+<p>\(x_{n+1}-2x_n=3^n\). Se prueba \(x_n=A3^n\): \(3A3^n-2A3^n=A3^n=3^n\Rightarrow A=1\). Solución \(x_n=C2^n+3^n\).</p>
+</div>
+
+<h2 id="sistemas">5. Sistemas y estabilidad</h2>
+<p>Un sistema lineal discreto se escribe \(\mathbf x_{n+1}=A\mathbf x_n\). Su solución es \(\mathbf x_n=A^n\mathbf x_0\). Si \(A\) es diagonalizable, \(A=PDP^{-1}\) y</p>
+$$\mathbf x_n=PD^nP^{-1}\mathbf x_0.$$
+<p>Los autovalores \(\lambda_i\) determinan el comportamiento: \(\mathbf x_n\to0\) si \(|\lambda_i|<1\) para todo \(i\) (estable); crece si algún \(|\lambda_i|>1\). El <strong>radio espectral</strong> \(\rho(A)=\max|\lambda_i|\) resume la estabilidad: el sistema es estable si \(\rho(A)<1\).</p>
+<p>Si hay autovalores complejos \(re^{\pm i\theta}\), la respuesta oscila con frecuencia angular \(\theta\) y amplitud que crece o decrece como \(r^n\).</p>
+<div class="example">
+<h4>Ejemplo 5.1 — Sistema</h4>
+<p>\(A=\begin{pmatrix}0{,}5&0\\0&0{,}8\end{pmatrix}\). Autovalores \(0{,}5\) y \(0{,}8\), ambos menores que 1: el origen es estable y las componentes decaen a ritmos distintos.</p>
+</div>
+
+<h2 id="z">6. Transformada Z</h2>
+<p>Para una sucesión causal \(x_n\) (\(x_n=0\) para \(n<0\)), la <strong>transformada Z</strong> es</p>
+$$X(z)=\sum_{n=0}^\infty x_nz^{-n}.$$
+<p>La propiedad de desplazamiento es \(\mathcal Z\{x_{n-1}\}=z^{-1}X(z)\) (con condiciones iniciales nulas). Por eso una ecuación en diferencias se convierte en una ecuación algebraica en \(z\).</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Sucesión</th><th>Transformada Z</th></tr></thead>
+  <tbody>
+    <tr><td>\(\delta_n\)</td><td>\(1\)</td></tr>
+    <tr><td>\(u_n\) (escalón)</td><td>\(\frac{1}{1-z^{-1}}\), \(|z|>1\)</td></tr>
+    <tr><td>\(a^n\)</td><td>\(\frac{1}{1-az^{-1}}\), \(|z|>|a|\)</td></tr>
+    <tr><td>\(n\)</td><td>\(\frac{z^{-1}}{(1-z^{-1})^2}\)</td></tr>
+  </tbody>
+</table></div>
+<p>La <strong>función de transferencia</strong> es \(H(z)=Y(z)/X(z)\) con condiciones iniciales nulas. Para un sistema causal, es estable si todos los polos están dentro del círculo unitario \(|z|<1\).</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Filtro de primer orden</h4>
+<p>\(y_n-0{,}5y_{n-1}=x_n\). \(H(z)=\frac{1}{1-0{,}5z^{-1}}\), polo en \(z=0{,}5\). Como \(|0{,}5|<1\), es estable. Con entrada escalón, \(y_n=2-0{,}5^n\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.2 — Media móvil</h4>
+<p>\(y_n=\frac12(x_n+x_{n-1})\). \(H(z)=\frac12(1+z^{-1})=\frac{z+1}{2z}\): cero en \(z=-1\), polo en \(z=0\). Es un filtro FIR (respuesta finita al impulso) y siempre estable si los coeficientes son finitos.</p>
+</div>
+
+<h2 id="telecom">7. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>Filtros digitales:</strong> FIR e IIR; la ecuación en diferencias es la implementación directa.</li>
+  <li><strong>Procesamiento de señales:</strong> suavizado, diferenciación, integración y ecualización.</li>
+  <li><strong>Control digital:</strong> reguladores discretos y estabilidad de lazos muestreados.</li>
+  <li><strong>Protocolos:</strong> ventanas deslizantes, temporizadores y control de congestión (por ejemplo, TCP).</li>
+  <li><strong>Colas y tráfico:</strong> evolución del número de paquetes en un buffer.</li>
+  <li><strong>Algoritmos:</strong> recurrencias de complejidad y métodos iterativos.</li>
+</ul>
+<p>En un filtro IIR, la realimentación puede hacer que un polo se acerque al círculo unitario y aparezcan oscilaciones o inestabilidad por redondeo. En punto fijo hay que vigilar el rango y la cuantización de coeficientes.</p>
+
+<h2 id="ejemplos">8. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 8.1 — Primer orden con condiciones</h4>
+<p>\(x_{n+1}=3x_n-2\), \(x_0=4\). Punto fijo \(x^*=-2/(-2)=1\). \(x_n=1+3(3)^n=1+3^{n+1}\). Comprobación: \(n=0\Rightarrow4\); \(n=1\Rightarrow10\), y \(3\cdot4-2=10\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 8.2 — Segundo orden</h4>
+<p>\(x_{n+2}-3x_{n+1}+2x_n=0\), \(x_0=0\), \(x_1=1\). Raíces 1 y 2: \(x_n=C_1+C_2 2^n\). De \(C_1+C_2=0\) y \(C_1+2C_2=1\): \(C_2=1,C_1=-1\). \(x_n=2^n-1\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 8.3 — Filtro IIR</h4>
+<p>\(y_n=0{,}8y_{n-1}+x_n\). Polo \(0{,}8\), estable. Respuesta al escalón: \(y_n=\frac{1-0{,}8^{n+1}}{1-0{,}8}=5(1-0{,}8^{n+1})\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 8.4 — Inestabilidad</h4>
+<p>\(y_n=1{,}2y_{n-1}+x_n\). Polo \(1{,}2>1\): inestable. Cualquier perturbación inicial crece como \(1{,}2^n\).</p>
+</div>
+
+<h2 id="ejercicios">9. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Resuelve \(x_{n+1}=2x_n\), \(x_0=3\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(x_n=3\cdot2^n\).</p></div></details></li>
+  <li>Resuelve \(x_{n+1}=0{,}2x_n+8\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Punto fijo \(8/0{,}8=10\). \(x_n=10+(x_0-10)(0{,}2)^n\to10\).</p></div></details></li>
+  <li>Resuelve \(x_{n+2}-4x_{n+1}+3x_n=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(r^2-4r+3=0\Rightarrow r=1,3\). \(x_n=C_1+C_2 3^n\).</p></div></details></li>
+  <li>Resuelve \(x_{n+2}+2x_{n+1}+x_n=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\((r+1)^2=0\). \(x_n=(C_1+C_2n)(-1)^n\).</p></div></details></li>
+  <li>Resuelve \(x_{n+2}+4x_n=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(r=\pm2i=2e^{\pm i\pi/2}\). \(x_n=2^n(C_1\cos(\pi n/2)+C_2\sen(\pi n/2))\).</p></div></details></li>
+  <li>Halla una particular de \(x_{n+1}-3x_n=2\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Constante \(A\): \(A-3A=2\Rightarrow A=-1\).</p></div></details></li>
+  <li>¿Cuándo es estable un sistema \(\mathbf x_{n+1}=A\mathbf x_n\)?
+    <details class="sol"><summary>Respuesta</summary><div><p>Cuando todos los autovalores de \(A\) tienen módulo menor que 1 (radio espectral \(<1\)).</p></div></details></li>
+  <li>Halla \(H(z)\) de \(y_n=0{,}5y_{n-1}+x_n\) y su polo.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(H(z)=1/(1-0{,}5z^{-1})\); polo \(z=0{,}5\), estable.</p></div></details></li>
+  <li>¿Es estable \(y_n=-1{,}5y_{n-1}+x_n\)?
+    <details class="sol"><summary>Respuesta</summary><div><p>No: el polo es \(-1{,}5\), de módulo mayor que 1; además oscila por el signo.</p></div></details></li>
+  <li>Calcula los dos primeros términos de \(y_n=0{,}5y_{n-1}+1\) con \(y_{-1}=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(y_0=1\); \(y_1=1{,}5\).</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">10. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. La solución de \(x_{n+1}=ax_n+b\), con \(a\ne1\), es</p>
+    <div class="opts">
+      <button class="opt">\(x_n=a^nx_0+b\)</button>
+      <button class="opt" data-ok>\(x_n=a^n(x_0-x^*)+x^*\), con \(x^*=b/(1-a)\)</button>
+      <button class="opt">\(x_n=x_0+nb\)</button>
+    </div>
+    <p class="why">Se escribe la ecuación respecto del punto fijo: \(x_{n+1}-x^*=a(x_n-x^*)\), y se itera.</p>
+  </div>
+  <div class="q">
+    <p>2. Un sistema discreto causal es estable si sus polos están</p>
+    <div class="opts">
+      <button class="opt">fuera del círculo unitario</button>
+      <button class="opt" data-ok>dentro del círculo unitario</button>
+      <button class="opt">en el eje imaginario</button>
+    </div>
+    <p class="why">La respuesta contiene \(r^n\); para que decaiga, \(|r|<1\). Es el análogo discreto de “parte real negativa”.</p>
+  </div>
+  <div class="q">
+    <p>3. Si la ecuación característica tiene raíz doble \(r\), la solución contiene</p>
+    <div class="opts">
+      <button class="opt">solo \(r^n\)</button>
+      <button class="opt" data-ok>\((C_1+C_2n)r^n\)</button>
+      <button class="opt">\(\cos n\theta\)</button>
+    </div>
+    <p class="why">La raíz doble aporta un factor lineal en \(n\), igual que en las EDO de segundo orden.</p>
+  </div>
+</div>
+
+<h2 id="biblio">11. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Oppenheim y Schafer, <em>Discrete-Time Signal Processing</em>, 3.ª ed.</td><td>2–5</td><td>Ecuaciones en diferencias, Z, filtros</td><td>Referencia principal</td></tr>
+    <tr><td>Proakis y Manolakis, <em>Tratamiento digital de señales</em>, 4.ª ed.</td><td>3–5</td><td>Sistemas discretos y Z</td><td>Enfoque aplicado</td></tr>
+    <tr><td>Elaydi, <em>An Introduction to Difference Equations</em>, 3.ª ed.</td><td>1–4</td><td>Teoría y estabilidad</td><td>Enfoque matemático</td></tr>
+    <tr><td>Kreyszig, <em>Matemáticas avanzadas para ingeniería</em>, 10.ª ed.</td><td>12</td><td>Transformada Z</td><td>Introducción</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://openstax.org/details/books/calculus-volume-2">OpenStax Calculus Volume 2</a> (series y sucesiones).</p>
+
+<h2 id="faq">12. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Qué diferencia hay entre una ecuación diferencial y una en diferencias?</summary><div><p>La primera describe un proceso continuo; la segunda, uno discreto (muestras, iteraciones, pasos). La estructura es paralela: lineal, orden, homogénea, particular, estabilidad. Laplace corresponde a Z.</p></div></details>
+  <details><summary>¿Por qué la transformada Z usa \(z^{-1}\)?</summary><div><p>Porque \(z^{-1}\) representa un retardo unitario. Así, \(x_{n-1}\) se convierte en \(z^{-1}X(z)\), y un filtro se describe como una función racional en \(z^{-1}\), que es exactamente lo que implementa el código.</p></div></details>
+  <details><summary>¿Todo filtro FIR es estable?</summary><div><p>Sí, si sus coeficientes son finitos: su respuesta al impulso tiene duración finita y no hay realimentación. Los IIR tienen polos y pueden ser inestables si algún polo sale del círculo unitario.</p></div></details>
+  <details><summary>¿Cómo se relaciona el polo con la frecuencia?</summary><div><p>Un polo complejo \(re^{i\theta}\) produce una resonancia cerca de la frecuencia angular \(\theta\) (normalizada). Cuanto más cerca del círculo unitario (\(r\to1\)), más estrecha y pronunciada es la resonancia.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de ecuaciones en diferencias y procesamiento digital. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Ecuaciones en diferencias · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

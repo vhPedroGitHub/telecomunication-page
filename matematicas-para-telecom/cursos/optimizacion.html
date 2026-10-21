@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Optimización · Matemáticas para Telecom</title>
+  <meta name="description" content="Optimización para telecomunicaciones: convexidad, condiciones de primer y segundo orden, multiplicadores de Lagrange, KKT, programación lineal y dualidad, optimización convexa, descenso de gradiente y Newton, water-filling, asignación de potencia y beamforming. Descenso de gradiente interactivo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../../assets/js/mate.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 9 · Optimización</p>
+<h1>Optimización</h1>
+<p class="lead">Asignar potencia, elegir rutas, diseñar filtros o entrenar un detector son problemas de optimización: maximizar una calidad o minimizar un coste bajo restricciones. La teoría distingue problemas fáciles (convexos) de problemas difíciles, y los algoritmos permiten resolverlos con garantías.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Formular un problema de optimización con variables, objetivo y restricciones.</li>
+    <li>Reconocer funciones y conjuntos convexos; usar las condiciones de optimalidad.</li>
+    <li>Resolver problemas con restricciones de igualdad mediante Lagrange.</li>
+    <li>Aplicar las condiciones KKT y entender la dualidad.</li>
+    <li>Resolver programación lineal y problemas convexos típicos.</li>
+    <li>Implementar descenso de gradiente y entender su convergencia.</li>
+    <li>Aplicar water-filling y asignación de recursos en telecom.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">cálculo multivariable y álgebra lineal</span>
+  <p>Necesitas gradiente, matriz hessiana, autovalores y sistemas lineales. Repaso: <a href="calculo-multivariable.html">cálculo multivariable</a> · <a href="algebra-lineal.html">álgebra lineal</a>.</p>
+</div>
+
+<h2 id="formulacion">1. Formulación</h2>
+<p>Un problema de optimización tiene la forma</p>
+$$\min_{\mathbf x\in\mathcal X} f(\mathbf x)\quad\text{sujeto a}\quad g_i(\mathbf x)\le0,\quad h_j(\mathbf x)=0.$$
+<p>\(f\) es la <strong>función objetivo</strong>, \(g_i\) las restricciones de desigualdad y \(h_j\) las de igualdad. El <strong>conjunto factible</strong> \(\mathcal X\) es el de puntos que cumplen todas las restricciones. Un punto es <strong>óptimo global</strong> si ninguna solución factible mejora su valor; es <strong>local</strong> si solo compite con un entorno.</p>
+<p>Maximizar \(f\) equivale a minimizar \(-f\). Es habitual escribir los problemas en forma de minimización para unificar la teoría.</p>
+<div class="box def"><span class="box-title">Convexidad</span>
+<p>Un conjunto \(C\) es convexo si para todo \(x,y\in C\) y \(0\le t\le1\), \(tx+(1-t)y\in C\). Una función es convexa si</p>
+$$f(tx+(1-t)y)\le tf(x)+(1-t)f(y).$$
+<p>Si \(f\) es convexa y el conjunto factible es convexo, todo mínimo local es global. Es la propiedad que hace que un problema sea tratable.</p></div>
+<p>Para funciones derivables: \(f\) convexa \(\Leftrightarrow\) \(f(y)\ge f(x)+\nabla f(x)^T(y-x)\); si además es dos veces derivable, \(\nabla^2f(x)\succeq0\) (semidefinida positiva) en todo el dominio.</p>
+
+<h2 id="sin-restricciones">2. Optimización sin restricciones</h2>
+<p>Si \(f\) es derivable, un mínimo interior cumple \(\nabla f(\mathbf x^*)=0\) (condición de primer orden). La condición de segundo orden pide que la hessiana sea semidefinida positiva; si es definida positiva, el punto es un mínimo local estricto.</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Hessiana en el punto crítico</th><th>Tipo de punto</th></tr></thead>
+  <tbody>
+    <tr><td>Definida positiva (autovalores \(>0\))</td><td>Mínimo local</td></tr>
+    <tr><td>Definida negativa (autovalores \(<0\))</td><td>Máximo local</td></tr>
+    <tr><td>Indefinida (signos mixtos)</td><td>Punto de silla</td></tr>
+    <tr><td>Semidefinida (algún cero)</td><td>Hay que analizar más</td></tr>
+  </tbody>
+</table></div>
+<div class="example">
+<h4>Ejemplo 2.1 — Cuadrática</h4>
+<p>\(f(x,y)=x^2+y^2-2x-4y\). \(\nabla f=(2x-2,2y-4)=0\Rightarrow(x,y)=(1,2)\). La hessiana es \(\begin{pmatrix}2&0\\0&2\end{pmatrix}\), definida positiva: mínimo global. \(f(1,2)=-5\).</p>
+</div>
+
+<h2 id="lagrange">3. Restricciones de igualdad: Lagrange</h2>
+<p>Para minimizar \(f(\mathbf x)\) sujeto a \(h(\mathbf x)=0\), se forma el <strong>lagrangiano</strong></p>
+$$\mathcal L(\mathbf x,\lambda)=f(\mathbf x)+\lambda h(\mathbf x),$$
+<p>y se resuelve \(\nabla_{\mathbf x}\mathcal L=0\), \(h(\mathbf x)=0\). Geométricamente, en el óptimo los gradientes de \(f\) y \(h\) son paralelos: no se puede mejorar \(f\) sin salir de la restricción.</p>
+<div class="example">
+<h4>Ejemplo 3.1 — Producto con suma fija</h4>
+<p>Maximizar \(xy\) sujeto a \(x+y=10\). \(\mathcal L=xy+\lambda(x+y-10)\). De \(\partial_x=y+\lambda=0\) y \(\partial_y=x+\lambda=0\) se obtiene \(x=y\). Con la restricción, \(x=y=5\) y el producto máximo es 25.</p>
+</div>
+<p>Con varias restricciones de igualdad se usan varios multiplicadores: \(\mathcal L=f+\sum_j\lambda_jh_j\).</p>
+
+<h2 id="kkt">4. Restricciones de desigualdad: KKT</h2>
+<p>Para \(\min f(\mathbf x)\) sujeto a \(g_i(\mathbf x)\le0\), el lagrangiano es \(\mathcal L=f+\sum_i\mu_ig_i\), con \(\mu_i\ge0\). Las <strong>condiciones de Karush–Kuhn–Tucker</strong> son:</p>
+<ul>
+  <li><strong>Estacionariedad:</strong> \(\nabla f+\sum_i\mu_i\nabla g_i=0\).</li>
+  <li><strong>Factibilidad:</strong> \(g_i(\mathbf x)\le0\).</li>
+  <li><strong>Holgura complementaria:</strong> \(\mu_ig_i(\mathbf x)=0\).</li>
+  <li><strong>Dualidad:</strong> \(\mu_i\ge0\).</li>
+</ul>
+<p>La holgura complementaria dice que una restricción inactiva (\(g_i<0\)) tiene multiplicador nulo; si \(\mu_i>0\), la restricción está activa (\(g_i=0\)). Para problemas convexos que cumplen una condición de Slater, KKT es necesaria y suficiente.</p>
+<div class="example">
+<h4>Ejemplo 4.1 — KKT</h4>
+<p>Minimizar \((x-2)^2\) sujeto a \(x\le1\). Sin restricción el óptimo sería \(x=2\), no factible. Con \(g=x-1\le0\): \(2(x-2)+\mu=0\), \(\mu(x-1)=0\), \(\mu\ge0\). Como la restricción está activa, \(x=1\) y \(\mu=2>0\). Solución: \(x=1\), \(f=1\).</p>
+</div>
+
+<h2 id="lp">5. Programación lineal</h2>
+<p>Un problema lineal tiene objetivo y restricciones lineales:</p>
+$$\min\ \mathbf c^T\mathbf x\quad\text{s.a.}\quad A\mathbf x=\mathbf b,\ \mathbf x\ge0.$$
+<p>El conjunto factible es un poliedro; si hay óptimo, se alcanza en un vértice (o en una cara). El <strong>método simplex</strong> recorre vértices mejorando el objetivo. Los métodos de punto interior son alternativa para problemas grandes.</p>
+<p>El <strong>dual</strong> de un problema lineal de minimización es</p>
+$$\max\ \mathbf b^T\mathbf y\quad\text{s.a.}\quad A^T\mathbf y\le\mathbf c.$$
+<p>La <strong>dualidad fuerte</strong> garantiza que, si ambos son factibles, sus óptimos coinciden. Los multiplicadores duales se interpretan como precios sombra: cuánto mejora el objetivo al relajar una restricción.</p>
+<div class="example">
+<h4>Ejemplo 5.1 — LP gráfico</h4>
+<p>Maximizar \(3x+2y\) con \(x+y\le4\), \(x\le2\), \(y\le3\), \(x,y\ge0\). Los vértices son \((0,0),(2,0),(2,2),(1,3),(0,3)\). Valores: 0, 6, 10, 9, 6. Óptimo \((2,2)\), valor 10.</p>
+</div>
+
+<h2 id="convexa">6. Optimización convexa</h2>
+<p>Dentro de la optimización convexa hay familias con algoritmos muy eficientes:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Familia</th><th>Objetivo/restricciones</th><th>Ejemplo telecom</th></tr></thead>
+  <tbody>
+    <tr><td>LP</td><td>Lineales</td><td>Encaminamiento, planificación</td></tr>
+    <tr><td>QP</td><td>Cuadrático convexo + lineales</td><td>Minimizar potencia, beamforming</td></tr>
+    <tr><td>SOCP</td><td>Conos de segundo orden</td><td>Diseño robusto, control de potencia</td></tr>
+    <tr><td>SDP</td><td>Matrices semidefinidas</td><td>Relajaciones, detección MIMO</td></tr>
+  </tbody>
+</table></div>
+<p>Herramientas como CVX, CVXPY, YALMIP o los solvers MOSEK/SCS permiten describir el problema en forma casi matemática. La clave es modelar: comprobar convexidad, escribir restricciones y elegir el solver.</p>
+
+<h2 id="algoritmos">7. Algoritmos</h2>
+<p><strong>Descenso de gradiente:</strong></p>
+$$\mathbf x_{k+1}=\mathbf x_k-\eta\nabla f(\mathbf x_k).$$
+<p>Con paso \(\eta\) adecuado y \(f\) convexa y suave, converge al mínimo. Si \(\eta\) es demasiado grande, diverge; si es muy pequeño, avanza lentamente. Para una función \(L\)-suave, basta \(\eta<2/L\); en la práctica se usa búsqueda de línea o paso decreciente.</p>
+<p><strong>Método de Newton:</strong> \(\mathbf x_{k+1}=\mathbf x_k-[\nabla^2f(\mathbf x_k)]^{-1}\nabla f(\mathbf x_k)\). Converge cuadráticamente cerca del óptimo, pero cada paso es caro y requiere hessiana definida positiva.</p>
+<p><strong>Gradiente conjugado:</strong> para cuadráticas definidas positivas, resuelve en a lo sumo \(n\) pasos en aritmética exacta. <strong>Descenso estocástico (SGD):</strong> usa un subconjunto de datos por paso; es el estándar en aprendizaje automático y en estimación adaptativa.</p>
+<div class="sim" id="sim-opt">
+  <div class="sim-title">Descenso de gradiente en una variable</div>
+  <div class="controls">
+    <label>Función
+      <select id="opt-fn">
+        <option value="cuad">f(x) = x²</option>
+        <option value="cuartica">f(x) = x⁴ − 3x² + 2</option>
+        <option value="barranco">f(x) = 0,1x² + 0,5 sen(3x) + 1</option>
+      </select>
+    </label>
+    <label>Tasa η <input type="range" id="opt-lr" min="0.01" max="0.4" step="0.01" value="0.1"></label>
+    <label>Iteraciones <input type="range" id="opt-it" min="1" max="30" step="1" value="10"></label>
+  </div>
+  <canvas id="opt-canvas" aria-label="Descenso de gradiente sobre una función"></canvas>
+  <div class="readout" id="opt-out"></div>
+</div>
+
+<h2 id="telecom">8. Aplicaciones en Telecom</h2>
+<h3 id="waterfilling">8.1 Water-filling</h3>
+<p>Para maximizar la capacidad total de varios canales paralelos con ruidos \(\sigma_i^2\) y potencia total \(P\):</p>
+$$\max_{\mathbf p\ge0}\ \sum_i\log_2\left(1+\frac{p_i}{\sigma_i^2}\right)\quad\text{s.a.}\quad\sum_ip_i\le P.$$
+<p>Las condiciones KKT dan la solución <strong>water-filling</strong>:</p>
+$$p_i=\left(\frac{1}{\lambda\ln2}-\sigma_i^2\right)^+,$$
+<p>es decir, se llena primero el canal menos ruidoso y se deja sin potencia el que tiene ruido por encima del nivel del agua \(1/(\lambda\ln2)\).</p>
+<div class="example">
+<h4>Ejemplo 8.1 — Dos canales</h4>
+<p>\(\sigma_1^2=0{,}5\), \(\sigma_2^2=1\), \(P=3\). Sea \(a=1/(\lambda\ln2)\) el nivel de agua. Con ambos canales activos, \(p_1=a-0{,}5\) y \(p_2=a-1\), y la restricción de potencia da \(2a-1{,}5=3\Rightarrow a=2{,}25\). Por tanto \(p_1=1{,}75\) y \(p_2=1{,}25\), ambos positivos: la solución es válida.</p>
+</div>
+<h3 id="otras">8.2 Otras aplicaciones</h3>
+<ul>
+  <li><strong>Asignación de potencia:</strong> maximizar suma de capacidades o minimizar potencia con QoS.</li>
+  <li><strong>Beamforming:</strong> elegir pesos de antenas para maximizar SINR o minimizar interferencia.</li>
+  <li><strong>Planificación de red:</strong> LP para rutas, capacidad y coste; flujo máximo y mínimo coste.</li>
+  <li><strong>Detección MIMO:</strong> mínimos cuadrados, ML y relajaciones semidefinidas.</li>
+  <li><strong>Control de congestión:</strong> optimización distribuida y precios sombra.</li>
+  <li><strong>Aprendizaje:</strong> ajuste de modelos y asignación dinámica de recursos.</li>
+</ul>
+
+<h2 id="ejemplos">9. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 9.1 — Gradiente</h4>
+<p>\(f(x)=x^2\), \(x_0=2\), \(\eta=0{,}1\): \(x_1=2-0{,}1\cdot4=1{,}6\); \(x_2=1{,}28\); \(x_3=1{,}024\). Converge a 0.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.2 — Newton</h4>
+<p>Para \(f(x)=x^2-4x+1\), \(f'=2x-4\), \(f''=2\). Newton da \(x_1=x_0-\frac{2x_0-4}{2}=2\) en un paso desde cualquier \(x_0\): es cuadrática.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.3 — Lagrange con dos variables</h4>
+<p>Minimizar \(x^2+y^2\) sujeto a \(x+y=4\). \(\mathcal L=x^2+y^2+\lambda(x+y-4)\). \(2x+\lambda=0\), \(2y+\lambda=0\Rightarrow x=y=2\). Mínimo \(8\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.4 — Interpretación dual</h4>
+<p>En un LP de asignación de capacidad, el multiplicador de la restricción de potencia indica cuánto aumentaría la capacidad total al disponer de 1 vatio adicional. Es un precio sombra, útil para decidir si conviene ampliar el presupuesto.</p>
+</div>
+
+<h2 id="ejercicios">10. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Halla el mínimo de \(f(x)=x^2-6x+5\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f'=2x-6=0\Rightarrow x=3\); \(f''=2>0\). Mínimo \(f(3)=-4\).</p></div></details></li>
+  <li>Clasifica el punto crítico de \(f(x,y)=x^2-y^2\) en \((0,0)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Hessiana \(\operatorname{diag}(2,-2)\), indefinida: punto de silla.</p></div></details></li>
+  <li>Maximiza \(x+y\) sujeto a \(x^2+y^2=1\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Lagrange: \(1=2\lambda x\), \(1=2\lambda y\Rightarrow x=y=\pm1/\sqrt2\). Máximo en \((1/\sqrt2,1/\sqrt2)\): \(\sqrt2\).</p></div></details></li>
+  <li>Resuelve \(\min x^2\) sujeto a \(x\ge2\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Sin restricción sería 0, no factible. Restricción activa: \(x=2\), valor 4.</p></div></details></li>
+  <li>¿Qué significa holgura complementaria?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\mu_ig_i=0\): si una restricción no está activa, su multiplicador es cero; si el multiplicador es positivo, la restricción está activa.</p></div></details></li>
+  <li>Resuelve el LP: maximizar \(x+y\) con \(x\le2\), \(y\le3\), \(x,y\ge0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Óptimo en \((2,3)\), valor 5.</p></div></details></li>
+  <li>¿Qué ventaja tiene un problema convexo?
+    <details class="sol"><summary>Respuesta</summary><div><p>Todo mínimo local es global y las condiciones KKT son suficientes; los algoritmos tienen garantías de convergencia.</p></div></details></li>
+  <li>Aplica un paso de gradiente a \(f(x)=x^2+2x\), \(x_0=0\), \(\eta=0{,}1\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f'=2x+2\); \(x_1=0-0{,}1\cdot2=-0{,}2\).</p></div></details></li>
+  <li>Dos canales con ruidos 1 y 2 y potencia total 3. Halla el water-filling.
+    <details class="sol"><summary>Respuesta</summary><div><p>Nivel \(a=(P+\sigma_1^2+\sigma_2^2)/2=(3+1+2)/2=3\). \(p_1=3-1=2\), \(p_2=3-2=1\).</p></div></details></li>
+  <li>¿Por qué Newton puede fallar lejos del óptimo?
+    <details class="sol"><summary>Respuesta</summary><div><p>Porque la aproximación cuadrática local puede ser mala, la hessiana puede no ser definida positiva o el paso puede salir del dominio. Se usan versiones con búsqueda de línea o cuasi-Newton.</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">11. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. En un problema convexo, un mínimo local es</p>
+    <div class="opts">
+      <button class="opt" data-ok>global</button>
+      <button class="opt">solo local</button>
+      <button class="opt">siempre un punto de silla</button>
+    </div>
+    <p class="why">La convexidad elimina la posibilidad de mínimos locales que no sean globales.</p>
+  </div>
+  <div class="q">
+    <p>2. La holgura complementaria implica que</p>
+    <div class="opts">
+      <button class="opt">todas las restricciones están activas</button>
+      <button class="opt" data-ok>si una restricción está inactiva, su multiplicador es nulo</button>
+      <button class="opt">el problema es lineal</button>
+    </div>
+    <p class="why">\(\mu_ig_i=0\): al menos uno de los dos es cero. Si la restricción no está activa, \(\mu_i=0\).</p>
+  </div>
+  <div class="q">
+    <p>3. En water-filling, se asigna más potencia a</p>
+    <div class="opts">
+      <button class="opt">los canales con más ruido</button>
+      <button class="opt" data-ok>los canales con menos ruido</button>
+      <button class="opt">todos por igual</button>
+    </div>
+    <p class="why">La solución llena primero los canales menos ruidosos hasta el nivel de agua; los muy ruidosos pueden quedar sin potencia.</p>
+  </div>
+</div>
+
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Boyd y Vandenberghe, <em>Convex Optimization</em></td><td>1–5, 11</td><td>Convexidad, dualidad, KKT, aplicaciones</td><td>Referencia principal</td></tr>
+    <tr><td>Luenberger y Ye, <em>Linear and Nonlinear Programming</em>, 4.ª ed.</td><td>1–8</td><td>LP, métodos, dualidad</td><td>Enfoque clásico</td></tr>
+    <tr><td>Palomar y Eldar, <em>Convex Optimization in Signal Processing and Communications</em></td><td>1–6</td><td>Aplicaciones telecom</td><td>Especializado</td></tr>
+    <tr><td>Boyd, <em>EE364a Course Reader</em></td><td>—</td><td>Apuntes y vídeos</td><td>Curso abierto</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://web.stanford.edu/~boyd/cvxbook/">Convex Optimization (Boyd y Vandenberghe)</a>.</p>
+
+<h2 id="faq">13. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Cómo sé si un problema es convexo?</summary><div><p>Comprueba que el objetivo y las restricciones de desigualdad sean convexos y que las de igualdad sean afines. En la práctica se usan reglas de composición: suma de convexas, composición con funciones afines, etc. Si no lo es, puede seguir siendo tratable, pero pierdes las garantías.</p></div></details>
+  <details><summary>¿Qué es un precio sombra?</summary><div><p>El multiplicador dual de una restricción: mide cuánto mejora el objetivo al relajarla una unidad. Es útil para decidir inversiones y para diseñar mecanismos de precios en redes.</p></div></details>
+  <details><summary>¿Gradiente o Newton?</summary><div><p>Gradiente es barato por iteración y robusto; Newton converge más rápido cerca del óptimo pero necesita la hessiana y es más caro. En problemas grandes se usan cuasi-Newton (BFGS), gradiente conjugado o métodos adaptativos.</p></div></details>
+  <details><summary>¿Por qué el water-filling deja canales sin usar?</summary><div><p>Porque si el ruido de un canal supera el nivel de agua, la potencia necesaria para obtener una ganancia útil sería mayor que la que aporta. Es óptimo concentrar la potencia en los canales favorables.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de optimización para ingeniería. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Optimización · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

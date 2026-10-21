@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cálculo multivariable y vectorial · Matemáticas para Telecom</title>
+  <meta name="description" content="Cálculo multivariable: funciones de varias variables, derivadas parciales, gradiente, derivada direccional, plano tangente, extremos y Lagrange, integrales dobles y triples, campos vectoriales, integrales de línea, Green, Stokes y Gauss. Ejemplos y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 1 · Cálculo multivariable y análisis vectorial</p>
+<h1>Cálculo multivariable y vectorial</h1>
+<p class="lead">Los fenómenos de telecomunicaciones ocurren en el espacio: un campo eléctrico depende de \(x,y,z\) y del tiempo; una antena radia en todas direcciones; una línea de transmisión tiene parámetros distribuidos. Este curso extiende el cálculo de una variable a <strong>funciones de varias variables y campos vectoriales</strong>, y culmina en los teoremas de Green, Stokes y Gauss, que son la base matemática de las ecuaciones de Maxwell.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Describir funciones de varias variables, su dominio, curvas y superficies de nivel.</li>
+    <li>Calcular derivadas parciales, gradiente, derivada direccional y plano tangente; aplicar la regla de la cadena.</li>
+    <li>Hallar extremos libres y con restricciones (multiplicadores de Lagrange).</li>
+    <li>Calcular integrales dobles y triples en coordenadas cartesianas, polares, cilíndricas y esféricas.</li>
+    <li>Integrar campos vectoriales y aplicar Green, Stokes y Gauss; interpretar divergencia y rotor.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">Cálculo I, álgebra y geometría analítica</span>
+  <p>Necesitas derivar e integrar una variable, reconocer curvas y superficies, y manejar vectores, producto escalar y vectorial. Repasa: <a href="../../calculo-diferencial-e-integral/temas/derivadas.html">derivadas</a> · <a href="../../calculo-diferencial-e-integral/temas/integrales.html">integrales</a> · <a href="../../repaso/matematica.html#trig">trigonometría</a>. El producto vectorial se usará para normales y rotacionales.</p>
+</div>
+
+<h2 id="funciones">1. Funciones de varias variables</h2>
+<p>Una función escalar de dos variables \(f:D\subset\mathbb R^2\to\mathbb R\) asigna a cada punto \((x,y)\) un número \(f(x,y)\). El <strong>dominio</strong> es el conjunto de puntos donde la expresión está definida. Para \(f(x,y)=\sqrt{9-x^2-y^2}\), el dominio es el disco \(x^2+y^2\le9\); la gráfica es la mitad superior de una esfera.</p>
+<p>Una <strong>curva de nivel</strong> es el conjunto \(f(x,y)=k\). En un mapa topográfico son las curvas de igual altura; en telecom, las curvas de igual potencia, igual atenuación o igual retardo. Para \(f(x,y)=x^2+y^2\), las curvas de nivel son circunferencias.</p>
+<p>Para tres variables, \(f(x,y,z)=k\) define una <strong>superficie de nivel</strong>. Ejemplo: \(f(x,y,z)=x^2+y^2+z^2\), las superficies son esferas.</p>
+
+<h2 id="limites">2. Límites y continuidad</h2>
+<p>\(\displaystyle\lim_{(x,y)\to(a,b)}f(x,y)=L\) significa que \(f(x,y)\) se acerca a \(L\) por <em>cualquier</em> camino que lleve a \((a,b)\). Es más exigente que en una variable: hay infinitas trayectorias.</p>
+<div class="box def"><span class="box-title">Continuidad</span>
+<p>\(f\) es continua en \((a,b)\) si \(f(a,b)\) existe, el límite existe y ambos coinciden. Los polinomios y las funciones racionales (donde el denominador no se anula) son continuos en su dominio; la composición de continuas es continua.</p></div>
+<p>Para demostrar que un límite <strong>no</strong> existe, basta encontrar dos caminos que den valores distintos. Ejemplo: \(f(x,y)=\dfrac{xy}{x^2+y^2}\). Por \(y=x\): \(\frac{x^2}{2x^2}=\frac12\). Por \(y=0\): \(0\). Los límites difieren; el límite no existe.</p>
+<p><strong>Coordenadas polares</strong> ayudan si el punto es el origen: \(x=r\cos\theta\), \(y=r\sen\theta\), y \((x,y)\to(0,0)\) equivale a \(r\to0\) independientemente de \(\theta\). Si el resultado no depende de \(\theta\) y tiende a \(L\), el límite es \(L\).</p>
+
+<h2 id="parciales">3. Derivadas parciales</h2>
+<p>La derivada parcial respecto de \(x\) trata a \(y\) como constante:</p>
+$$\frac{\partial f}{\partial x}=f_x=\lim_{h\to0}\frac{f(x+h,y)-f(x,y)}{h}.$$
+<p>Análogamente \(f_y\). Geométricamente, \(f_x(a,b)\) es la pendiente de la curva que resulta de cortar la superficie con el plano \(y=b\).</p>
+<div class="example">
+<h4>Ejemplo 3.1 — Derivadas parciales</h4>
+<p>\(f(x,y)=x^2y+e^{xy}\). Entonces</p>
+$$f_x=2xy+ye^{xy},\qquad f_y=x^2+xe^{xy}.$$
+<p>Las derivadas cruzadas \(f_{xy}\) y \(f_{yx}\) coinciden si son continuas (teorema de Clairaut): \(f_{xy}=2x+e^{xy}+xye^{xy}=f_{yx}\).</p>
+</div>
+<p><strong>Diferencial total:</strong> para pequeños incrementos,</p>
+$$df=f_x\,dx+f_y\,dy,\qquad \Delta f\approx f_x\Delta x+f_y\Delta y.$$
+<p>Es la base de la propagación de errores: si una magnitud medida depende de varias variables, su incertidumbre se estima con las derivadas parciales.</p>
+
+<h2 id="gradiente">4. Gradiente, derivada direccional y plano tangente</h2>
+<div class="eq key">
+$$\nabla f=(f_x,f_y,f_z),\qquad D_{\mathbf u}f=\nabla f\cdot\mathbf u\quad(|\mathbf u|=1).$$
+<div class="eq-label">Gradiente y derivada direccional</div></div>
+<p>El gradiente apunta en la dirección de <strong>máximo crecimiento</strong> y es perpendicular a las curvas (o superficies) de nivel. La derivada direccional mide la rapidez de cambio en la dirección \(\mathbf u\).</p>
+<p>El <strong>plano tangente</strong> a \(z=f(x,y)\) en \((a,b)\) es</p>
+$$z=f(a,b)+f_x(a,b)(x-a)+f_y(a,b)(y-b).$$
+<p>Para una superficie implícita \(F(x,y,z)=0\), el plano tangente es \(\nabla F(a,b,c)\cdot(x-a,y-b,z-c)=0\), y \(\nabla F\) es la normal.</p>
+<div class="example">
+<h4>Ejemplo 4.1 — Plano tangente</h4>
+<p>\(f(x,y)=x^2+y^2\) en \((1,2)\). \(f(1,2)=5\), \(f_x=2x\Rightarrow2\), \(f_y=2y\Rightarrow4\). Plano: \(z=5+2(x-1)+4(y-2)=2x+4y-5\).</p>
+</div>
+<p><strong>Regla de la cadena:</strong> si \(z=f(x,y)\) con \(x=x(t)\), \(y=y(t)\),</p>
+$$\frac{dz}{dt}=f_x\frac{dx}{dt}+f_y\frac{dy}{dt}=\nabla f\cdot\mathbf r'(t).$$
+<p>Si \(x=x(u,v)\), \(y=y(u,v)\), se suman las contribuciones parciales correspondientes.</p>
+
+<h2 id="extremos">5. Extremos y multiplicadores de Lagrange</h2>
+<p>Un extremo local interior exige \(\nabla f=0\) (punto crítico), si \(f\) es diferenciable. Para clasificarlo se usa el <strong>hessiano</strong>:</p>
+$$H=\begin{pmatrix}f_{xx}&f_{xy}\\f_{xy}&f_{yy}\end{pmatrix},\qquad D=\det H=f_{xx}f_{yy}-f_{xy}^2.$$
+<p>Si \(D>0\) y \(f_{xx}>0\): mínimo; si \(D>0\) y \(f_{xx}<0\): máximo; si \(D<0\): punto de silla; si \(D=0\), el criterio no decide.</p>
+<p>Para extremos con restricción \(g(x,y)=0\), se resuelve el sistema</p>
+$$\nabla f=\lambda\nabla g,\qquad g(x,y)=0.$$
+<p>El multiplicador \(\lambda\) mide la sensibilidad del óptimo a un cambio en la restricción (precio sombra).</p>
+<div class="example">
+<h4>Ejemplo 5.1 — Lagrange</h4>
+<p>Maximizar \(f(x,y)=xy\) sujeto a \(x+y=10\), con \(x,y>0\). \(\nabla f=(y,x)\), \(\nabla g=(1,1)\), luego \(y=\lambda\), \(x=\lambda\): \(x=y\). Con la restricción, \(x=y=5\) y \(f=25\). Es el rectángulo de área máxima para un perímetro fijo.</p>
+</div>
+
+<h2 id="integrales">6. Integrales múltiples</h2>
+<p>La integral doble \(\iint_D f(x,y)\,dA\) suma el volumen bajo la superficie sobre la región \(D\). Se calcula por <strong>integrales iteradas</strong> (Fubini):</p>
+$$\iint_D f(x,y)\,dA=\int_a^b\int_{g_1(x)}^{g_2(x)}f(x,y)\,dy\,dx.$$
+<p>Si la región es más sencilla en el otro orden, se invierte. En <strong>polares</strong>, \(dA=r\,dr\,d\theta\) (no olvidar la \(r\)):</p>
+$$\iint_D f(r\cos\theta,r\sen\theta)\,r\,dr\,d\theta.$$
+<p>En tres dimensiones: \(dV=dz\,dy\,dx\) en cartesianas, \(dV=r\,dz\,dr\,d\theta\) en cilíndricas y \(dV=\rho^2\sen\phi\,d\rho\,d\phi\,d\theta\) en esféricas.</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Integral doble</h4>
+<p>\(\displaystyle\iint_D(x+y)\,dA\) sobre el rectángulo \(D=[0,1]\times[0,2]\):</p>
+$$\int_0^1\int_0^2(x+y)\,dy\,dx=\int_0^1\left[xy+\frac{y^2}{2}\right]_0^2dx=\int_0^1(2x+2)\,dx=\left[x^2+2x\right]_0^1=3.$$
+</div>
+<div class="example">
+<h4>Ejemplo 6.2 — Polar</h4>
+<p>Área del disco \(x^2+y^2\le R^2\): \(\int_0^{2\pi}\int_0^R r\,dr\,d\theta=2\pi\cdot\frac{R^2}{2}=\pi R^2\).</p>
+</div>
+
+<h2 id="campos">7. Campos vectoriales e integrales de línea</h2>
+<p>Un campo vectorial asigna un vector a cada punto: \(\mathbf F(x,y,z)=(P,Q,R)\). Ejemplos físicos: campo eléctrico, campo magnético, velocidad de un fluido.</p>
+<p>La <strong>integral de línea</strong> a lo largo de una curva \(C\) parametrizada por \(\mathbf r(t)\), \(a\le t\le b\), es</p>
+$$\int_C\mathbf F\cdot d\mathbf r=\int_a^b\mathbf F(\mathbf r(t))\cdot\mathbf r'(t)\,dt.$$
+<p>Si \(\mathbf F=\nabla f\) (campo conservativo), la integral depende solo de los extremos:</p>
+$$\int_C\nabla f\cdot d\mathbf r=f(\mathbf r(b))-f(\mathbf r(a)).$$
+<p>Condición necesaria y suficiente (en dominios simplemente conexos): \(\nabla\times\mathbf F=0\). El potencial \(f\) se obtiene integrando \(P=f_x\), \(Q=f_y\), \(R=f_z\).</p>
+
+<h2 id="green">8. Green, Stokes y Gauss</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Teorema</th><th>Fórmula</th><th>Interpretación</th></tr></thead>
+  <tbody>
+    <tr><td>Green</td><td>\(\displaystyle\oint_C(P\,dx+Q\,dy)=\iint_D(Q_x-P_y)\,dA\)</td><td>Circulación en el borde = integral del rotor en el interior</td></tr>
+    <tr><td>Stokes</td><td>\(\displaystyle\oint_C\mathbf F\cdot d\mathbf r=\iint_S(\nabla\times\mathbf F)\cdot d\mathbf S\)</td><td>Circulación en el borde de una superficie = flujo del rotor</td></tr>
+    <tr><td>Gauss (divergencia)</td><td>\(\displaystyle\oiint_S\mathbf F\cdot d\mathbf S=\iiint_V\nabla\cdot\mathbf F\,dV\)</td><td>Flujo por la frontera = integral de la divergencia en el volumen</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Divergencia</strong> \(\nabla\cdot\mathbf F=P_x+Q_y+R_z\) mide la fuente o sumidero por unidad de volumen. <strong>Rotor</strong> \(\nabla\times\mathbf F\) mide la circulación local (tendencia a girar). En electromagnetismo:</p>
+$$\nabla\cdot\mathbf E=\frac{\rho}{\varepsilon_0},\qquad \nabla\times\mathbf E=-\frac{\partial\mathbf B}{\partial t},$$
+$$\nabla\cdot\mathbf B=0,\qquad \nabla\times\mathbf B=\mu_0\mathbf J+\mu_0\varepsilon_0\frac{\partial\mathbf E}{\partial t}.$$
+<p>Las formas integrales de Maxwell son exactamente Gauss, Faraday (Stokes) y Ampère–Maxwell (Stokes).</p>
+
+<h2 id="telecom">9. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>Electromagnetismo:</strong> gradiente de potencial, divergencia de \(\mathbf D\), rotor de \(\mathbf E\), flujo y circulación.</li>
+  <li><strong>Antenas:</strong> superficies de fase, gradiente de fase, densidad de potencia (vector de Poynting) e integración sobre el diagrama de radiación.</li>
+  <li><strong>Líneas y guías:</strong> campos transversales, condiciones de frontera e integrales de flujo.</li>
+  <li><strong>Propagación:</strong> superficies de nivel de fase, rayos perpendiculares a los frentes de onda.</li>
+  <li><strong>Optimización de cobertura:</strong> extremos de funciones de dos variables (potencia, interferencia, atenuación).</li>
+</ul>
+
+<h2 id="ejemplos">10. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 10.1 — Derivada direccional</h4>
+<p>\(f(x,y)=x^2+y^2\) en \((1,1)\), dirección \(\mathbf u=(1,1)/\sqrt2\). \(\nabla f=(2x,2y)=(2,2)\). \(D_{\mathbf u}f=(2,2)\cdot(1,1)/\sqrt2=4/\sqrt2=2\sqrt2\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.2 — Campo conservativo</h4>
+<p>\(\mathbf F=(2xy,x^2+3y^2)\). Se cumple \(P_y=2x=Q_x\). Buscamos \(f\): \(f_x=2xy\Rightarrow f=x^2y+g(y)\); \(f_y=x^2+g'(y)=x^2+3y^2\Rightarrow g'(y)=3y^2\Rightarrow g=y^3\). Potencial: \(f=x^2y+y^3+C\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.3 — Green</h4>
+<p>\(\oint_C(x\,dy-y\,dx)\) sobre el círculo unitario. Con \(P=-y\), \(Q=x\), \(Q_x-P_y=1-(-1)=2\). La integral es \(2\iint_D dA=2\pi\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.4 — Gauss</h4>
+<p>Flujo de \(\mathbf F=(x,y,z)\) a través de la esfera de radio \(R\): \(\nabla\cdot\mathbf F=3\), volumen \(\frac43\pi R^3\), flujo \(=4\pi R^3\). Coincide con el cálculo directo \(\mathbf F\cdot\mathbf n=R\) sobre el área \(4\pi R^2\).</p>
+</div>
+
+<h2 id="ejercicios">11. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Halla el dominio de \(f(x,y)=\ln(9-x^2-y^2)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(9-x^2-y^2>0\Rightarrow x^2+y^2<9\): disco abierto de radio 3.</p></div></details></li>
+  <li>Calcula \(f_x\) y \(f_y\) para \(f(x,y)=x^3y^2-2xy+5\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(f_x=3x^2y^2-2y\), \(f_y=2x^3y-2x\).</p></div></details></li>
+  <li>Demuestra que \(\lim_{(x,y)\to(0,0)}\frac{x^2-y^2}{x^2+y^2}\) no existe.
+    <details class="sol"><summary>Respuesta</summary><div><p>Por \(y=0\): \(1\). Por \(x=0\): \(-1\). Caminos distintos, límites distintos.</p></div></details></li>
+  <li>Halla el plano tangente a \(z=x^2+2y^2\) en \((1,1)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(z(1,1)=3\), \(z_x=2\), \(z_y=4\). Plano: \(z=3+2(x-1)+4(y-1)=2x+4y-3\).</p></div></details></li>
+  <li>Maximiza \(f(x,y)=x^2y\) sujeto a \(x+y=3\), \(x,y>0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Lagrange: \(2xy=\lambda\), \(x^2=\lambda\), \(x+y=3\). De \(2xy=x^2\Rightarrow x=2y\). Entonces \(3y=3\Rightarrow y=1\), \(x=2\). \(f=4\).</p></div></details></li>
+  <li>Calcula \(\displaystyle\int_0^1\int_0^{1-x}(x+y)\,dy\,dx\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\int_0^1\left[xy+\frac{y^2}{2}\right]_0^{1-x}dx=\int_0^1\left(x(1-x)+\frac{(1-x)^2}{2}\right)dx=\frac13\).</p></div></details></li>
+  <li>Calcula el área de la región \(r\le2\cos\theta\), \(-\pi/2\le\theta\le\pi/2\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\int_{-\pi/2}^{\pi/2}\int_0^{2\cos\theta}r\,dr\,d\theta=2\int_{-\pi/2}^{\pi/2}\cos^2\theta\,d\theta=\pi\). En efecto, es el círculo \((x-1)^2+y^2\le1\), de radio 1.</p></div></details></li>
+  <li>Comprueba que \(\mathbf F=(y\cos x,\sen x+z^2,2yz)\) es conservativo y halla su potencial.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\nabla\times\mathbf F=0\). \(f_x=y\cos x\Rightarrow f=y\sen x+g(y,z)\); \(f_y=\sen x+g_y=\sen x+z^2\Rightarrow g=yz^2+h(z)\); \(f_z=2yz+h'=2yz\Rightarrow h=C\). \(f=y\sen x+yz^2+C\).</p></div></details></li>
+  <li>Calcula \(\iint_S\mathbf F\cdot d\mathbf S\) para \(\mathbf F=(x,y,z)\) sobre la superficie del cubo \(0\le x,y,z\le1\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Gauss: \(\nabla\cdot\mathbf F=3\), volumen 1, flujo 3.</p></div></details></li>
+  <li>Calcula \(\nabla\cdot\mathbf F\) y \(\nabla\times\mathbf F\) para \(\mathbf F=(x^2,xy,z)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\nabla\cdot\mathbf F=2x+x+1=3x+1\). \(\nabla\times\mathbf F=(0,0,y)\).</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">12. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. El gradiente \(\nabla f\) es perpendicular a</p>
+    <div class="opts">
+      <button class="opt" data-ok>las curvas de nivel de \(f\)</button>
+      <button class="opt">el plano tangente</button>
+      <button class="opt">el eje \(x\) siempre</button>
+    </div>
+    <p class="why">En cada punto, \(\nabla f\) apunta hacia el máximo crecimiento y es normal a la curva (o superficie) de nivel que pasa por ese punto.</p>
+  </div>
+  <div class="q">
+    <p>2. Si \(\nabla\times\mathbf F=0\) en un dominio simplemente conexo, entonces</p>
+    <div class="opts">
+      <button class="opt">\(\mathbf F\) es constante</button>
+      <button class="opt" data-ok>\(\mathbf F\) es conservativo</button>
+      <button class="opt">\(\nabla\cdot\mathbf F=0\)</button>
+    </div>
+    <p class="why">Rotor nulo implica que existe un potencial \(f\) con \(\mathbf F=\nabla f\); la integral de línea depende solo de los extremos.</p>
+  </div>
+  <div class="q">
+    <p>3. En coordenadas polares, \(dA=\)</p>
+    <div class="opts">
+      <button class="opt">\(dr\,d\theta\)</button>
+      <button class="opt" data-ok>\(r\,dr\,d\theta\)</button>
+      <button class="opt">\(r^2\,dr\,d\theta\)</button>
+    </div>
+    <p class="why">El factor \(r\) es el jacobiano de la transformación a polares; olvidarlo es el error más común en integrales dobles.</p>
+  </div>
+</div>
+
+<h2 id="biblio">13. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Stewart, <em>Cálculo de varias variables</em>, 8.ª ed.</td><td>14–16</td><td>14.1–14.8, 15.1–15.9, 16.1–16.9</td><td>Derivadas parciales, integrales múltiples, campos y teoremas</td></tr>
+    <tr><td>OpenStax, <em>Calculus Volume 3</em></td><td>2–6</td><td>Derivadas parciales, integrales múltiples, campos vectoriales</td><td>Texto abierto con ejemplos</td></tr>
+    <tr><td>Marsden y Tromba, <em>Cálculo vectorial</em>, 6.ª ed.</td><td>1–8</td><td>Todo el curso</td><td>Enfoque geométrico y aplicaciones físicas</td></tr>
+    <tr><td>Spivak, <em>Calculus on Manifolds</em></td><td>1–5</td><td>Formas diferenciales y Stokes</td><td>Para profundizar el rigor</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://openstax.org/details/books/calculus-volume-3">OpenStax Calculus Volume 3</a> · <a href="https://ocw.mit.edu/courses/18-02sc-multivariable-calculus-fall-2010/">MIT 18.02 Multivariable Calculus</a>.</p>
+
+<h2 id="faq">14. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué hay que comprobar el límite por varios caminos?</summary><div><p>En una variable solo hay dos formas de acercarse (izquierda y derecha). En el plano hay infinitas curvas. Para demostrar que un límite existe hay que probar que todos los caminos dan lo mismo, normalmente con una cota o con polares; para demostrar que no existe basta con dos caminos distintos.</p></div></details>
+  <details><summary>¿Qué diferencia hay entre derivada parcial y derivada direccional?</summary><div><p>La parcial es la derivada en la dirección de un eje coordenado. La direccional permite cualquier dirección unitaria y se obtiene proyectando el gradiente sobre esa dirección. El gradiente es la dirección de máxima derivada direccional.</p></div></details>
+  <details><summary>¿Para qué sirven Green, Stokes y Gauss en telecom?</summary><div><p>Son las formas integrales de las ecuaciones de Maxwell. Permiten pasar de la descripción local (divergencia y rotor) a la global (flujo y circulación), que es la que se usa para calcular campos en antenas, guías y líneas.</p></div></details>
+  <details><summary>¿Necesito dibujar las regiones de integración?</summary><div><p>Sí, casi siempre. Dibujar la región ayuda a elegir el orden de integración y los límites; en polares, cilíndricas o esféricas evita olvidar el jacobiano y facilita ver la simetría.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de cálculo multivariable y análisis vectorial. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Cálculo multivariable · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Probabilidad y estadística · Matemáticas para Telecom</title>
+  <meta name="description" content="Probabilidad y estadística para telecomunicaciones: axiomas, probabilidad condicional y Bayes, variables aleatorias, distribuciones binomial, Poisson, exponencial, uniforme y normal, esperanza y varianza, CLT, estimación, intervalos de confianza, contrastes, regresión y aplicaciones a ruido y BER. Distribución normal interactiva.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../../assets/js/mate.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 6 · Probabilidad y estadística</p>
+<h1>Probabilidad y estadística</h1>
+<p class="lead">El ruido, la atenuación, los errores de transmisión y la demanda de tráfico son fenómenos aleatorios. La probabilidad modela esa incertidumbre; la estadística extrae conclusiones de datos medidos. Sin ambas no se puede diseñar un enlace, dimensionar una red ni interpretar una medida.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Calcular probabilidades con los axiomas, la regla de la suma, la condicional y Bayes.</li>
+    <li>Manejar variables aleatorias, funciones de masa, densidad y distribución.</li>
+    <li>Calcular esperanza, varianza y momentos; usar las distribuciones habituales.</li>
+    <li>Entender el teorema central del límite y su papel en la estimación.</li>
+    <li>Construir intervalos de confianza e interpretar contrastes de hipótesis.</li>
+    <li>Aplicar todo ello a ruido, BER, desvanecimiento y tráfico telefónico.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">cálculo, combinatoria y algo de álgebra</span>
+  <p>Necesitas integrar, sumar series y contar (permutaciones y combinaciones). Repaso: <a href="../../calculo-diferencial-e-integral/temas/integrales.html">integrales</a> · <a href="../../repaso/probabilidad.html#discreta">probabilidad discreta</a> · <a href="../../repaso/matematica.html#series">series</a>.</p>
+</div>
+
+<h2 id="probabilidad">1. Probabilidad</h2>
+<p>Un <strong>espacio muestral</strong> \(\Omega\) contiene los resultados posibles; un <strong>suceso</strong> \(A\) es un subconjunto. Una probabilidad \(P\) cumple:</p>
+<ul>
+  <li>\(P(A)\ge0\).</li>
+  <li>\(P(\Omega)=1\).</li>
+  <li>Si \(A_1,A_2,\dots\) son disjuntos, \(P(\bigcup A_i)=\sum P(A_i)\).</li>
+</ul>
+<p>Consecuencias: \(P(\varnothing)=0\), \(P(A^c)=1-P(A)\), \(P(A\cup B)=P(A)+P(B)-P(A\cap B)\).</p>
+<p>Si los resultados son equiprobables, \(P(A)=\frac{\text{casos favorables}}{\text{casos posibles}}\). Las combinaciones \(\binom nk=\frac{n!}{k!(n-k)!}\) cuentan subconjuntos y aparecen en la binomial.</p>
+
+<h3 id="condicional">1.1 Probabilidad condicional y Bayes</h3>
+<p>La probabilidad de \(A\) dado \(B\) es</p>
+$$P(A\mid B)=\frac{P(A\cap B)}{P(B)},\qquad P(B)>0.$$
+<p>Dos sucesos son <strong>independientes</strong> si \(P(A\cap B)=P(A)P(B)\), equivalente a \(P(A\mid B)=P(A)\).</p>
+<p><strong>Ley de la probabilidad total:</strong> si \(B_1,\dots,B_n\) forman una partición,</p>
+$$P(A)=\sum_{i=1}^nP(A\mid B_i)P(B_i).$$
+<div class="box def"><span class="box-title">Teorema de Bayes</span>
+$$P(B_i\mid A)=\frac{P(A\mid B_i)P(B_i)}{\sum_jP(A\mid B_j)P(B_j)}.$$
+<p>Actualiza una creencia previa \(P(B_i)\) con la evidencia \(A\). Es la base de los receptores óptimos y de los diagnósticos.</p></div>
+<div class="example">
+<h4>Ejemplo 1.1 — Bayes</h4>
+<p>Una enfermedad afecta al \(1\,\%\) de la población. La prueba tiene sensibilidad \(99\,\%\) y especificidad \(95\,\%\). Si da positivo,</p>
+$$P(D\mid+)=\frac{0{,}99\cdot0{,}01}{0{,}99\cdot0{,}01+0{,}05\cdot0{,}99}=\frac{0{,}0099}{0{,}0594}\approx16{,}7\,\%.$$
+<p>La mayoría de los positivos son falsos positivos porque la enfermedad es rara: es la falacia de la tasa base.</p>
+</div>
+
+<h2 id="variables">2. Variables aleatorias</h2>
+<p>Una variable aleatoria \(X\) asigna un número a cada resultado. Su <strong>función de distribución</strong> es \(F_X(x)=P(X\le x)\).</p>
+<ul>
+  <li><strong>Discreta:</strong> función de masa \(p_X(x)=P(X=x)\), con \(\sum p_X(x)=1\).</li>
+  <li><strong>Continua:</strong> densidad \(f_X(x)\ge0\), con \(F_X(x)=\int_{-\infty}^x f_X(u)du\) y \(\int f_X=1\).</li>
+</ul>
+<p>Para una continua, \(P(a<X<b)=\int_a^bf_X(x)dx\). La densidad no es una probabilidad: puede ser mayor que 1 si el intervalo es estrecho.</p>
+
+<h2 id="esperanza">3. Esperanza, varianza y momentos</h2>
+$$\mathbb E[X]=\sum_xx\,p_X(x)\quad\text{o}\quad\mathbb E[X]=\int_{-\infty}^\infty x f_X(x)dx.$$
+<p>Propiedades: \(\mathbb E[aX+b]=a\mathbb E[X]+b\), \(\mathbb E[X+Y]=\mathbb E[X]+\mathbb E[Y]\) (siempre). La <strong>varianza</strong> es</p>
+$$\operatorname{Var}(X)=\mathbb E[(X-\mu)^2]=\mathbb E[X^2]-\mu^2,\qquad \operatorname{Var}(aX+b)=a^2\operatorname{Var}(X).$$
+<p>La desviación típica es \(\sigma=\sqrt{\operatorname{Var}(X)}\). El momento de orden \(k\) es \(\mathbb E[X^k]\); el momento central mide la dispersión alrededor de la media.</p>
+<div class="box def"><span class="box-title">Desigualdad de Chebyshev</span>
+$$P(|X-\mu|\ge k\sigma)\le\frac{1}{k^2}.$$
+<p>Para \(k=2\), al menos el \(75\,\%\) de la probabilidad está en \(\mu\pm2\sigma\); para \(k=3\), al menos el \(88{,}9\,\%\). Es universal, aunque poco ajustada.</p></div>
+
+<h2 id="distribuciones">4. Distribuciones habituales</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Distribución</th><th>Situación</th><th>Media</th><th>Varianza</th></tr></thead>
+  <tbody>
+    <tr><td>Bernoulli(\(p\))</td><td>Éxito/fracaso</td><td>\(p\)</td><td>\(p(1-p)\)</td></tr>
+    <tr><td>Binomial(\(n,p\))</td><td>Número de éxitos en \(n\) ensayos independientes</td><td>\(np\)</td><td>\(np(1-p)\)</td></tr>
+    <tr><td>Poisson(\(\lambda\))</td><td>Número de eventos en un intervalo</td><td>\(\lambda\)</td><td>\(\lambda\)</td></tr>
+    <tr><td>Uniforme(\(a,b\))</td><td>Todos los valores igual de probables</td><td>\(\frac{a+b}{2}\)</td><td>\(\frac{(b-a)^2}{12}\)</td></tr>
+    <tr><td>Exponencial(\(\lambda\))</td><td>Tiempo entre eventos Poisson</td><td>\(1/\lambda\)</td><td>\(1/\lambda^2\)</td></tr>
+    <tr><td>Normal(\(\mu,\sigma^2\))</td><td>Suma de muchos efectos pequeños</td><td>\(\mu\)</td><td>\(\sigma^2\)</td></tr>
+  </tbody>
+</table></div>
+<p>Fórmulas clave:</p>
+$$P(X=k)=\binom nk p^k(1-p)^{n-k},\qquad P(X=k)=\frac{\lambda^ke^{-\lambda}}{k!},$$
+$$f_X(x)=\lambda e^{-\lambda x}\ (x\ge0),\qquad f_X(x)=\frac{1}{\sigma\sqrt{2\pi}}e^{-(x-\mu)^2/(2\sigma^2)}.$$
+<p>La exponencial no tiene memoria: \(P(T>s+t\mid T>s)=P(T>t)\). La normal se estandariza con \(Z=(X-\mu)/\sigma\) y se consulta en tablas o con la función \(Q\).</p>
+
+<h2 id="conjuntas">5. Distribuciones conjuntas</h2>
+<p>Para dos variables, \(f_{X,Y}(x,y)\) describe la probabilidad conjunta. Las marginales se obtienen integrando la otra variable. \(X\) e \(Y\) son independientes si \(f_{X,Y}=f_Xf_Y\).</p>
+<p>La <strong>covarianza</strong> y la <strong>correlación</strong> miden dependencia lineal:</p>
+$$\operatorname{Cov}(X,Y)=\mathbb E[XY]-\mathbb E[X]\mathbb E[Y],\qquad \rho=\frac{\operatorname{Cov}(X,Y)}{\sigma_X\sigma_Y},\quad -1\le\rho\le1.$$
+<p>Independencia implica covarianza cero, pero lo contrario no siempre es cierto. Si \((X,Y)\) es normal bidimensional, covarianza cero sí implica independencia.</p>
+
+<h2 id="clt">6. Ley de los grandes números y teorema central del límite</h2>
+<p>La <strong>ley de los grandes números</strong> dice que la media muestral \(\bar X_n\) converge a \(\mu\) al crecer \(n\). La <strong>ley fuerte</strong> afirma convergencia casi segura.</p>
+<div class="box def"><span class="box-title">Teorema central del límite</span>
+<p>Si \(X_1,\dots,X_n\) son independientes e idénticamente distribuidas con media \(\mu\) y varianza \(\sigma^2<\infty\), entonces</p>
+$$\frac{\bar X_n-\mu}{\sigma/\sqrt n}\xrightarrow{d}\mathcal N(0,1).$$
+<p>Para \(n\) grande, \(\bar X_n\approx\mathcal N(\mu,\sigma^2/n)\), sea cual sea la distribución original.</p></div>
+<p>El error típico de la media es \(\sigma/\sqrt n\): para reducir a la mitad el error hay que cuadruplicar el número de muestras.</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Media de ruido</h4>
+<p>Un ruido tiene \(\sigma=2\) mV. Con \(n=100\) medidas, la desviación de la media es \(2/\sqrt{100}=0{,}2\) mV. Con \(n=400\), baja a \(0{,}1\) mV.</p>
+</div>
+
+<h2 id="inferencia">7. Estimación y contrastes</h2>
+<p>Un <strong>estimador</strong> es una función de la muestra. La media muestral estima \(\mu\); la cuasidesviación \(s\) estima \(\sigma\). Un estimador es insesgado si su esperanza es el parámetro.</p>
+<p><strong>Intervalo de confianza</strong> para la media con \(\sigma\) conocida:</p>
+$$\bar x\pm z_{\alpha/2}\frac{\sigma}{\sqrt n}.$$
+<p>Para un \(95\,\%\), \(z_{0{,}025}=1{,}96\). Si \(\sigma\) es desconocida y \(n\) pequeño, se usa la \(t\) de Student con \(n-1\) grados de libertad.</p>
+<p>Un <strong>contraste de hipótesis</strong> compara \(H_0\) (hipótesis nula) con \(H_1\). El <strong>p-valor</strong> es la probabilidad de observar un resultado al menos tan extremo como el obtenido si \(H_0\) es cierta. Se rechaza \(H_0\) si \(p<\alpha\), donde \(\alpha\) es el nivel de significación. Errores: tipo I (rechazar \(H_0\) verdadera) y tipo II (no rechazarla siendo falsa).</p>
+<p><strong>Regresión lineal:</strong> se ajusta \(y=\beta_0+\beta_1x\) minimizando la suma de cuadrados. La pendiente es \(\hat\beta_1=\frac{\operatorname{Cov}(x,y)}{\operatorname{Var}(x)}\) y \(R^2\) mide la fracción de varianza explicada.</p>
+
+<h2 id="sim">8. Interactivo: distribución normal</h2>
+<p>Cambia \(\mu\), \(\sigma\) y el valor \(x\). El área sombreada es \(P(X\le x)\); el eje se reajusta y se muestra el valor \(z\) estandarizado.</p>
+<div class="sim" id="sim-normal">
+  <div class="sim-title">Normal: densidad y probabilidad acumulada</div>
+  <div class="controls">
+    <label>Media μ <input type="range" id="prob-mu" min="0" max="10" step="0.1" value="5"></label>
+    <label>Desviación σ <input type="range" id="prob-sigma" min="0.4" max="3" step="0.1" value="1"></label>
+    <label>Valor x <input type="range" id="prob-z" min="0" max="10" step="0.1" value="6.5"></label>
+  </div>
+  <canvas id="prob-canvas" aria-label="Densidad normal y área acumulada"></canvas>
+  <div class="readout" id="prob-out"></div>
+</div>
+
+<h2 id="telecom">9. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>Ruido térmico:</strong> modelo gaussiano; potencia \(N=kTB\).</li>
+  <li><strong>BER:</strong> probabilidad de error de bit; para BPSK en AWGN, \(P_b=Q(\sqrt{2E_b/N_0})\).</li>
+  <li><strong>Desvanecimiento:</strong> la envolvente en un canal Rayleigh sigue una distribución de Rayleigh; la potencia, exponencial.</li>
+  <li><strong>Tráfico:</strong> llegadas Poisson y duraciones exponenciales; modelos M/M/1 y Erlang.</li>
+  <li><strong>Fiabilidad:</strong> tiempo hasta fallo exponencial o Weibull; disponibilidad y MTBF.</li>
+  <li><strong>Medidas:</strong> intervalos de confianza para atenuación, potencia recibida y tasa de error.</li>
+</ul>
+<p>En un sistema M/M/1 con tasa de llegada \(\lambda\) y de servicio \(\mu\), la utilización es \(\rho=\lambda/\mu<1\) y el número medio de clientes en el sistema es \(\rho/(1-\rho)\). Al acercarse \(\rho\to1\), la cola crece sin límite.</p>
+
+<h2 id="ejemplos">10. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 10.1 — Binomial</h4>
+<p>Un enlace tiene probabilidad de error \(0{,}1\) por paquete. En 10 paquetes, \(P(X=0)=0{,}9^{10}=0{,}3487\); \(P(X\ge1)=0{,}6513\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.2 — Poisson</h4>
+<p>Llegan 3 llamadas por minuto de media. \(P(X=0)=e^{-3}=0{,}0498\); \(P(X\le1)=e^{-3}(1+3)=0{,}1991\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.3 — Exponencial</h4>
+<p>El tiempo entre fallos tiene media 5 años (\(\lambda=0{,}2\)). \(P(T>10)=e^{-2}=0{,}1353\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.4 — Normal</h4>
+<p>\(X\sim\mathcal N(100,15^2)\). \(P(85<X<115)=P(-1<Z<1)\approx68{,}3\,\%\). \(P(X>130)=P(Z>2)\approx2{,}28\,\%\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.5 — Intervalo de confianza</h4>
+<p>Se miden 25 potencias con \(\bar x=-30\) dBm y \(\sigma=2\) dB. IC del \(95\,\%\): \(-30\pm1{,}96\cdot2/5=-30\pm0{,}784\), es decir \([-30{,}78,-29{,}22]\) dBm.</p>
+</div>
+
+<h2 id="ejercicios">11. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Se lanzan dos dados. ¿Probabilidad de suma 7?
+    <details class="sol"><summary>Respuesta</summary><div><p>Hay 6 casos favorables de 36: \(1/6\).</p></div></details></li>
+  <li>\(P(A)=0{,}4\), \(P(B)=0{,}5\), \(P(A\cap B)=0{,}2\). ¿Son independientes? ¿Cuánto vale \(P(A\cup B)\)?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(P(A)P(B)=0{,}2=P(A\cap B)\): son independientes. \(P(A\cup B)=0{,}4+0{,}5-0{,}2=0{,}7\).</p></div></details></li>
+  <li>\(X\sim\text{Bin}(20,0{,}2)\). Halla media y varianza.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\mu=4\), \(\sigma^2=20\cdot0{,}2\cdot0{,}8=3{,}2\).</p></div></details></li>
+  <li>\(X\sim\text{Poisson}(4)\). Calcula \(P(X=2)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(P(X=2)=e^{-4}4^2/2=8e^{-4}\approx0{,}1465\).</p></div></details></li>
+  <li>Una exponencial tiene media 10. Halla \(P(X>5)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\lambda=0{,}1\); \(P(X>5)=e^{-0{,}5}\approx0{,}6065\).</p></div></details></li>
+  <li>Estandariza \(X=130\) si \(\mu=100\), \(\sigma=15\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(z=(130-100)/15=2\).</p></div></details></li>
+  <li>¿Qué porcentaje de una normal está en \(\mu\pm3\sigma\)?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(99{,}73\,\%\).</p></div></details></li>
+  <li>Media muestral 50, \(\sigma=8\), \(n=64\). IC del \(95\,\%\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(50\pm1{,}96\cdot8/8=50\pm1{,}96\), es decir \([48{,}04,\,51{,}96]\).</p></div></details></li>
+  <li>Un contraste tiene \(p=0{,}03\) y \(\alpha=0{,}05\). ¿Se rechaza \(H_0\)?
+    <details class="sol"><summary>Respuesta</summary><div><p>Sí, porque \(p<\alpha\). Hay evidencia estadística contra \(H_0\) al nivel del \(5\,\%\).</p></div></details></li>
+  <li>¿Qué significa \(R^2=0{,}81\) en una regresión?
+    <details class="sol"><summary>Respuesta</summary><div><p>El modelo explica el \(81\,\%\) de la variabilidad observada; el \(19\,\%\) restante se debe a otros factores o al azar.</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">12. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. Si \(A\) y \(B\) son independientes, \(P(A\mid B)\) es</p>
+    <div class="opts">
+      <button class="opt" data-ok>\(P(A)\)</button>
+      <button class="opt">\(P(A)P(B)\)</button>
+      <button class="opt">\(P(A)+P(B)\)</button>
+    </div>
+    <p class="why">La independencia significa que saber que ocurrió \(B\) no cambia la probabilidad de \(A\).</p>
+  </div>
+  <div class="q">
+    <p>2. La varianza de una binomial \(B(n,p)\) es</p>
+    <div class="opts">
+      <button class="opt">\(np\)</button>
+      <button class="opt" data-ok>\(np(1-p)\)</button>
+      <button class="opt">\(p(1-p)\)</button>
+    </div>
+    <p class="why">Es la suma de \(n\) varianzas Bernoulli independientes, cada una \(p(1-p)\).</p>
+  </div>
+  <div class="q">
+    <p>3. El teorema central del límite afirma que la media muestral se aproxima a una normal cuando</p>
+    <div class="opts">
+      <button class="opt">la población es normal</button>
+      <button class="opt" data-ok>\(n\) es grande, con varianza finita</button>
+      <button class="opt">la muestra es pequeña</button>
+    </div>
+    <p class="why">No exige normalidad de la población; solo independencia, misma distribución y varianza finita.</p>
+  </div>
+</div>
+
+<h2 id="biblio">13. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Walpole, Myers y Myers, <em>Probabilidad y estadística para ingeniería</em>, 9.ª ed.</td><td>1–10</td><td>Probabilidad, variables, distribuciones, estimación, contrastes</td><td>Curso completo</td></tr>
+    <tr><td>Papoulis y Pillai, <em>Probability, Random Variables and Stochastic Processes</em>, 4.ª ed.</td><td>1–7</td><td>Procesos aleatorios</td><td>Enfoque telecom</td></tr>
+    <tr><td>Proakis, <em>Digital Communications</em>, 5.ª ed.</td><td>2–4</td><td>Ruido y detección</td><td>BER y receptores</td></tr>
+    <tr><td>OpenStax, <em>Introductory Statistics 2e</em></td><td>1–10</td><td>Estadística aplicada</td><td>Curso abierto</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://openstax.org/details/books/introductory-statistics-2e">OpenStax Introductory Statistics 2e</a>.</p>
+
+<h2 id="faq">14. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Probabilidad y estadística son lo mismo?</summary><div><p>No. La probabilidad parte de un modelo conocido y deduce probabilidades de resultados. La estadística parte de datos y deduce propiedades del modelo o de la población. Se necesitan mutuamente.</p></div></details>
+  <details><summary>¿Por qué el p-valor no es la probabilidad de que \(H_0\) sea cierta?</summary><div><p>El p-valor es \(P(\text{datos tan extremos}\mid H_0)\), no \(P(H_0\mid\text{datos})\). Confundirlos es un error frecuente; para lo segundo hace falta un enfoque bayesiano con una probabilidad previa.</p></div></details>
+  <details><summary>¿Cuándo se usa Poisson y cuándo binomial?</summary><div><p>Binomial cuenta éxitos en un número fijo de ensayos. Poisson cuenta eventos en un intervalo continuo (tiempo, longitud, área) cuando son raros e independientes. Con \(n\) grande y \(p\) pequeño, binomial se aproxima por Poisson con \(\lambda=np\).</p></div></details>
+  <details><summary>¿Qué es el ruido AWGN?</summary><div><p>Ruido blanco gaussiano aditivo: muestras independientes con distribución normal, media cero y varianza constante, y espectro plano. Es un modelo idealizado pero muy útil para analizar receptores y calcular BER.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de probabilidad y estadística para ingeniería. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Probabilidad y estadística · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

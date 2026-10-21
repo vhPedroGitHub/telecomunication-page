@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Series y transformadas · Matemáticas para Telecom</title>
+  <meta name="description" content="Series numéricas y de potencias, series de Fourier, transformada de Fourier, muestreo y Nyquist, DFT y FFT, transformada de Laplace. Serie de Fourier interactiva, ejemplos de espectros y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../../assets/js/mate.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 5 · Series y transformadas</p>
+<h1>Series y transformadas</h1>
+<p class="lead">Una señal se puede describir en el tiempo o descomponerse en frecuencias. Las series de Fourier hacen lo primero para señales periódicas; la transformada de Fourier, para señales no periódicas; la DFT y la FFT lo hacen con datos muestreados. Este curso es la base matemática del análisis espectral.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Decidir la convergencia de series numéricas y calcular series geométricas y de potencias.</li>
+    <li>Desarrollar funciones en series de Fourier y leer su espectro de amplitud y fase.</li>
+    <li>Usar la transformada de Fourier y sus propiedades: desplazamiento, derivación, convolución.</li>
+    <li>Relacionar muestreo, aliasing, teorema de Nyquist, DFT y FFT.</li>
+    <li>Aplicar estas herramientas al análisis de señales y sistemas de telecomunicaciones.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">cálculo, trigonometría y números complejos</span>
+  <p>Necesitas integrar por partes, usar identidades trigonométricas y escribir \(e^{i\theta}=\cos\theta+i\sen\theta\). Repaso: <a href="../../calculo-diferencial-e-integral/temas/integrales.html">integrales</a> · <a href="../../repaso/matematica.html#series">series</a> · <a href="../../repaso/matematica.html#complejos">complejos</a>. El curso de <a href="variable-compleja.html">variable compleja</a> ayuda con los residuos y los espectros.</p>
+</div>
+
+<h2 id="series-numericas">1. Series numéricas</h2>
+<p>Una serie \(\sum_{n=1}^\infty a_n\) converge si la sucesión de sumas parciales \(S_N=\sum_{n=1}^N a_n\) tiene límite finito. Si no, diverge. La convergencia absoluta (\(\sum|a_n|\) converge) implica convergencia.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Serie</th><th>Forma</th><th>Converge si</th><th>Suma</th></tr></thead>
+  <tbody>
+    <tr><td>Geométrica</td><td>\(\sum_{n=0}^\infty ar^n\)</td><td>\(|r|<1\)</td><td>\(\frac{a}{1-r}\)</td></tr>
+    <tr><td>P</td><td>\(\sum_{n=1}^\infty\frac{1}{n^p}\)</td><td>\(p>1\)</td><td>\(\frac{\pi^2}{6}\) si \(p=2\)</td></tr>
+    <tr><td>Armónica</td><td>\(\sum_{n=1}^\infty\frac1n\)</td><td>Nunca</td><td>—</td></tr>
+    <tr><td>Alternada</td><td>\(\sum(-1)^na_n\)</td><td>\(a_n\downarrow0\)</td><td>—</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Criterios:</strong> comparación, comparación por paso al límite, cociente (\(\lim|a_{n+1}/a_n|<1\)), raíz (\(\lim\sqrt[n]{|a_n|}<1\)) e integral. Si el término general no tiende a cero, la serie diverge.</p>
+<div class="example">
+<h4>Ejemplo 1.1 — Geométrica</h4>
+<p>\(\sum_{n=0}^\infty(1/2)^n=\frac{1}{1-1/2}=2\). En cambio \(\sum_{n=1}^\infty 1/n\) diverge, aunque sus términos tiendan a cero: la suma crece como \(\ln N\).</p>
+</div>
+
+<h2 id="potencias">2. Series de potencias y Taylor</h2>
+<p>Una serie de potencias \(\sum a_n(x-x_0)^n\) converge en un intervalo \((x_0-R,x_0+R)\), donde \(R\) es el radio de convergencia:</p>
+$$R=\frac{1}{\limsup_{n\to\infty}\sqrt[n]{|a_n|}}\quad\text{o}\quad R=\lim_{n\to\infty}\left|\frac{a_n}{a_{n+1}}\right|.$$
+<p>Dentro del intervalo se puede derivar e integrar término a término. Los desarrollos básicos son:</p>
+$$e^x=\sum_{n=0}^\infty\frac{x^n}{n!},\qquad \sen x=\sum_{n=0}^\infty\frac{(-1)^nx^{2n+1}}{(2n+1)!},\qquad \cos x=\sum_{n=0}^\infty\frac{(-1)^nx^{2n}}{(2n)!},$$
+$$\frac{1}{1-x}=\sum_{n=0}^\infty x^n\ (|x|<1),\qquad \ln(1+x)=\sum_{n=1}^\infty\frac{(-1)^{n+1}x^n}{n}\ (|x|<1).$$
+<div class="example">
+<h4>Ejemplo 2.1 — Aproximación</h4>
+<p>\(e^{0{,}1}\approx1+0{,}1+0{,}005+0{,}000167=1{,}105167\). El valor real es \(1{,}105170\ldots\); el error es del orden de \(10^{-6}\).</p>
+</div>
+
+<h2 id="fourier-serie">3. Series de Fourier</h2>
+<p>Una señal periódica \(f(t)\) de periodo \(T\) se descompone en senos y cosenos de frecuencias múltiplas de \(f_0=1/T\):</p>
+$$f(t)=\frac{a_0}{2}+\sum_{n=1}^\infty\left(a_n\cos n\omega_0t+b_n\sen n\omega_0t\right),\qquad \omega_0=\frac{2\pi}{T},$$
+<p>con</p>
+$$a_n=\frac{2}{T}\int_{-T/2}^{T/2}f(t)\cos n\omega_0t\,dt,\qquad b_n=\frac{2}{T}\int_{-T/2}^{T/2}f(t)\sen n\omega_0t\,dt.$$
+<p>\(a_0/2\) es el valor medio (componente de continua). Las simetrías simplifican:</p>
+<ul>
+  <li><strong>Par</strong> \(f(-t)=f(t)\): todos los \(b_n=0\).</li>
+  <li><strong>Impar</strong> \(f(-t)=-f(t)\): todos los \(a_n=0\) (salvo \(a_0\)).</li>
+  <li><strong>Semionda</strong> \(f(t+T/2)=-f(t)\): solo armónicos impares.</li>
+</ul>
+<div class="box def"><span class="box-title">Convergencia y fenómeno de Gibbs</span>
+<p>Si \(f\) es continua a trozos y tiene derivada a trozos continua, la serie converge al valor de \(f\) en los puntos de continuidad y al punto medio del salto en las discontinuidades. Cerca de un salto, las sumas parciales presentan un sobreimpulso de aproximadamente el \(9\,\%\) del salto, que no desaparece al aumentar \(N\): es el fenómeno de Gibbs.</p></div>
+
+<h3 id="espectro">3.1 Espectro</h3>
+<p>La <strong>amplitud</strong> de cada armónico es \(A_n=\sqrt{a_n^2+b_n^2}\) y su <strong>fase</strong> \(\phi_n=-\arctan(b_n/a_n)\). El conjunto de pares \((n f_0,A_n)\) es el espectro de amplitud: líneas en múltiplos de \(f_0\).</p>
+<p>La <strong>identidad de Parseval</strong> reparte la potencia:</p>
+$$\frac{1}{T}\int_{-T/2}^{T/2}|f(t)|^2dt=\frac{a_0^2}{4}+\frac12\sum_{n=1}^\infty(a_n^2+b_n^2).$$
+
+<h3 id="forma-compleja">3.2 Forma compleja</h3>
+<p>Con \(c_n=\frac1T\int_{-T/2}^{T/2}f(t)e^{-in\omega_0t}dt\),</p>
+$$f(t)=\sum_{n=-\infty}^{\infty}c_ne^{in\omega_0t}.$$
+<p>Para \(n>0\), \(|c_n|=A_n/2\). La forma compleja simplifica las manipulaciones y conecta directamente con la transformada de Fourier.</p>
+
+<h2 id="sim">4. Interactivo: suma de armónicos</h2>
+<p>Elige la onda y el número de armónicos \(N\). La línea discontinua es la señal ideal; la continua, la suma parcial de Fourier. Observa cómo se aproxima y cómo aparece el sobreimpulso en los saltos.</p>
+<div class="sim" id="sim-fourier">
+  <div class="sim-title">Serie de Fourier: suma parcial</div>
+  <div class="controls">
+    <label>Onda
+      <select id="fourier-wave">
+        <option value="cuadrada">Cuadrada</option>
+        <option value="diente">Diente de sierra</option>
+        <option value="triangular">Triangular</option>
+      </select>
+    </label>
+    <label>Armónicos N <input type="range" id="fourier-n" min="1" max="41" step="2" value="9"></label>
+  </div>
+  <canvas id="fourier-canvas" aria-label="Serie de Fourier de una onda periódica"></canvas>
+  <div class="readout" id="fourier-out"></div>
+</div>
+
+<h2 id="fourier-transform">5. Transformada de Fourier</h2>
+<p>Para una señal no periódica (o de energía finita) se pasa al límite \(T\to\infty\). La <strong>transformada de Fourier</strong> es</p>
+$$F(\omega)=\int_{-\infty}^{\infty}f(t)e^{-i\omega t}dt,$$
+<p>y la inversa</p>
+$$f(t)=\frac{1}{2\pi}\int_{-\infty}^{\infty}F(\omega)e^{i\omega t}d\omega.$$
+<p>\(F(\omega)\) es compleja: \(|F(\omega)|\) es el espectro de amplitud y \(\arg F(\omega)\) el de fase. Existen convenciones alternativas con \(1/\sqrt{2\pi}\) o con la frecuencia \(f\) en lugar de \(\omega\); lo importante es ser coherente.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Propiedad</th><th>Señal</th><th>Transformada</th></tr></thead>
+  <tbody>
+    <tr><td>Linealidad</td><td>\(\alpha f+\beta g\)</td><td>\(\alpha F+\beta G\)</td></tr>
+    <tr><td>Desplazamiento en tiempo</td><td>\(f(t-t_0)\)</td><td>\(e^{-i\omega t_0}F(\omega)\)</td></tr>
+    <tr><td>Modulación</td><td>\(e^{i\omega_0t}f(t)\)</td><td>\(F(\omega-\omega_0)\)</td></tr>
+    <tr><td>Derivación</td><td>\(f'(t)\)</td><td>\(i\omega F(\omega)\)</td></tr>
+    <tr><td>Convolución</td><td>\(f*g\)</td><td>\(F(\omega)G(\omega)\)</td></tr>
+    <tr><td>Producto</td><td>\(f(t)g(t)\)</td><td>\(\frac{1}{2\pi}F*G\)</td></tr>
+    <tr><td>Parseval</td><td>\(\int|f|^2dt\)</td><td>\(\frac{1}{2\pi}\int|F|^2d\omega\)</td></tr>
+  </tbody>
+</table></div>
+<div class="example">
+<h4>Ejemplo 5.1 — Pulso rectangular</h4>
+<p>Para \(f(t)=1\) si \(|t|<T/2\) y \(0\) fuera, \(F(\omega)=\int_{-T/2}^{T/2}e^{-i\omega t}dt=\frac{2\sen(\omega T/2)}{\omega}\). El espectro es un <em>sinc</em>: lóbulo principal de ancho \(4\pi/T\) y lóbulos laterales decrecientes.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 5.2 — Exponencial causal</h4>
+<p>\(f(t)=e^{-at}u(t)\), \(a>0\). \(F(\omega)=\frac{1}{a+i\omega}\), con \(|F|=\frac{1}{\sqrt{a^2+\omega^2}}\). Es la respuesta de un filtro RC de primer orden.</p>
+</div>
+
+<h2 id="muestreo">6. Muestreo, DFT y FFT</h2>
+<p>Muestrear es multiplicar por un tren de impulsos de periodo \(T_s=1/f_s\). El espectro de la señal muestreada es una repetición del original cada \(f_s\). Para no solapar las copias:</p>
+<div class="box def"><span class="box-title">Teorema de muestreo (Nyquist–Shannon)</span>
+<p>Si una señal tiene ancho de banda \(B\) (ninguna componente por encima de \(B\)), se puede reconstruir exactamente a partir de muestras tomadas a \(f_s>2B\). La frecuencia \(2B\) es la <strong>frecuencia de Nyquist</strong>. Si \(f_s<2B\), las componentes altas se pliegan sobre las bajas: <strong>aliasing</strong>.</p></div>
+<p>En la práctica se usa un filtro antialiasing antes del conversor y una frecuencia de muestreo superior a \(2B\) (a menudo \(2{,}5\) a \(4\) veces) para dejar margen a la transición del filtro.</p>
+<p>La <strong>DFT</strong> de \(N\) muestras es</p>
+$$X[k]=\sum_{n=0}^{N-1}x[n]e^{-2\pi ikn/N},\qquad k=0,\dots,N-1,$$
+<p>y la inversa \(x[n]=\frac1N\sum_{k=0}^{N-1}X[k]e^{2\pi ikn/N}\). El bin \(k\) corresponde a la frecuencia \(kf_s/N\). La <strong>FFT</strong> calcula la misma DFT en \(O(N\log N)\) en lugar de \(O(N^2)\).</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Resolución espectral</h4>
+<p>Con \(f_s=8\,\text{kHz}\) y \(N=1024\), la separación entre bins es \(f_s/N\approx7{,}8\) Hz y la ventana dura \(N/f_s=128\) ms. Para resolver dos tonos separados 50 Hz hace falta una resolución mejor que 50 Hz, es decir, al menos \(1/50=20\) ms de señal; 128 ms es más que suficiente.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 6.2 — Aliasing</h4>
+<p>Se muestrea a \(8\,\text{kHz}\) una señal de \(5\,\text{kHz}\). Como supera \(f_s/2=4\,\text{kHz}\), aparece una imagen en \(8-5=3\,\text{kHz}\). El tono reconstruido es de \(3\,\text{kHz}\), no de \(5\).</p>
+</div>
+
+<h2 id="laplace">7. Transformada de Laplace</h2>
+<p>La transformada de Laplace \(F(s)=\int_0^\infty f(t)e^{-st}dt\), con \(s=\sigma+i\omega\), es la herramienta natural para sistemas causales y condiciones iniciales. Se relaciona con Fourier evaluando en \(s=i\omega\) (si la región de convergencia incluye el eje imaginario).</p>
+<p>Pares habituales: \(\mathcal L\{1\}=1/s\), \(\mathcal L\{e^{at}\}=1/(s-a)\), \(\mathcal L\{\sen\omega t\}=\omega/(s^2+\omega^2)\), \(\mathcal L\{u(t-a)\}=e^{-as}/s\). La propiedad clave para EDO es \(\mathcal L\{f'\}=sF(s)-f(0)\).</p>
+<p>En teoría de sistemas, la <strong>función de transferencia</strong> \(H(s)\) es la transformada de Laplace de la respuesta al impulso; sus polos y ceros determinan estabilidad y respuesta en frecuencia. El curso de <a href="ecuaciones-diferenciales.html">ecuaciones diferenciales</a> desarrolla el método.</p>
+
+<h2 id="telecom">8. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>Espectro:</strong> ancho de banda, ocupación espectral, máscaras de emisión.</li>
+  <li><strong>Modulación:</strong> AM, FM y modulaciones digitales se entienden como desplazamientos y convoluciones en frecuencia.</li>
+  <li><strong>Filtros:</strong> respuesta en frecuencia \(H(\omega)\); convolución en tiempo equivale a producto en frecuencia.</li>
+  <li><strong>Muestreo y ADC:</strong> Nyquist, antialiasing, cuantización y reconstrucción.</li>
+  <li><strong>OFDM:</strong> la FFT implementa la modulación y demodulación de subportadoras ortogonales.</li>
+  <li><strong>Análisis de ruido:</strong> densidad espectral de potencia y relación señal/ruido.</li>
+</ul>
+
+<h2 id="ejemplos">9. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 9.1 — Serie de onda cuadrada</h4>
+<p>Para \(f(t)=1\) en \((0,\pi)\) y \(-1\) en \((-\pi,0)\), con periodo \(2\pi\), los coeficientes de coseno son cero y \(b_n=\frac{4}{n\pi}\) para \(n\) impar. Entonces</p>
+$$f(t)=\frac4\pi\left(\sen t+\frac{\sen3t}{3}+\frac{\sen5t}{5}+\cdots\right).$$
+<p>El valor medio es cero y solo hay armónicos impares, como corresponde a la simetría de semionda.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.2 — Valor eficaz</h4>
+<p>Para la onda cuadrada de amplitud 1, el valor eficaz es 1. Parseval: \(\frac{a_0^2}{4}+\frac12\sum b_n^2=1\). Los armónicos aportan la energía que falta a la componente continua (que aquí es cero).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.3 — DFT de \(N=4\)</h4>
+<p>Si \(x=[1,0,0,0]\), \(X[k]=1\) para \(k=0,1,2,3\): un impulso en tiempo tiene espectro plano. Si \(x=[1,1,1,1]\), \(X[0]=4\) y \(X[k]=0\) para \(k\ne0\): una constante solo tiene componente de continua.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.4 — Filtro RC</h4>
+<p>\(H(\omega)=\frac{1}{1+i\omega RC}\). La frecuencia de corte es \(f_c=\frac{1}{2\pi RC}\); por encima, la ganancia cae \(20\) dB por década (filtro de primer orden).</p>
+</div>
+
+<h2 id="ejercicios">10. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Calcula \(\sum_{n=0}^\infty(2/3)^n\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(1/(1-2/3)=3\).</p></div></details></li>
+  <li>Estudia la convergencia de \(\sum_{n=1}^\infty\frac{1}{n^2+1}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Converge por comparación con \(1/n^2\), que es una p-serie con \(p=2>1\).</p></div></details></li>
+  <li>Halla el radio de convergencia de \(\sum_{n=1}^\infty\frac{x^n}{n}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(R=\lim n/(n+1)=1\). En \(x=-1\) converge (alternada armónica); en \(x=1\) diverge (armónica).</p></div></details></li>
+  <li>Desarrolla \(\cos x\) hasta orden 4 alrededor de 0.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\cos x\approx1-\frac{x^2}{2}+\frac{x^4}{24}\).</p></div></details></li>
+  <li>Calcula los coeficientes \(b_n\) de la onda cuadrada de amplitud 1 y periodo \(2\pi\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(b_n=\frac{4}{n\pi}\) para \(n\) impar y \(0\) para \(n\) par; \(a_n=0\).</p></div></details></li>
+  <li>¿Qué armónicos tiene una señal con simetría de semionda?
+    <details class="sol"><summary>Respuesta</summary><div><p>Solo los impares; los pares se anulan.</p></div></details></li>
+  <li>Calcula \(\mathcal F\{e^{-3t}u(t)\}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\frac{1}{3+i\omega}\), con \(|F|=1/\sqrt{9+\omega^2}\).</p></div></details></li>
+  <li>Una señal de 2 kHz se muestrea a 5 kHz. ¿Hay aliasing?
+    <details class="sol"><summary>Respuesta</summary><div><p>No: \(2<f_s/2=2{,}5\) kHz. Cumple Nyquist, aunque el margen es pequeño.</p></div></details></li>
+  <li>Con \(f_s=16\) kHz y \(N=512\), ¿qué resolución frecuencial se obtiene?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\Delta f=f_s/N=16000/512=31{,}25\) Hz.</p></div></details></li>
+  <li>¿Qué ventaja aporta la FFT frente a la DFT directa?
+    <details class="sol"><summary>Respuesta</summary><div><p>Reduce el coste de \(O(N^2)\) a \(O(N\log N)\); para \(N=1024\), unas 100 veces menos operaciones.</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">11. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. La serie de Fourier de una función impar solo contiene</p>
+    <div class="opts">
+      <button class="opt">cosenos</button>
+      <button class="opt" data-ok>senos</button>
+      <button class="opt">términos constantes</button>
+    </div>
+    <p class="why">Las integrales de \(f(t)\cos n\omega_0t\) se anulan por simetría; quedan los senos.</p>
+  </div>
+  <div class="q">
+    <p>2. Para muestrear sin aliasing una señal de ancho de banda \(B\), se necesita</p>
+    <div class="opts">
+      <button class="opt">\(f_s>B\)</button>
+      <button class="opt" data-ok>\(f_s>2B\)</button>
+      <button class="opt">\(f_s<B/2\)</button>
+    </div>
+    <p class="why">Es el criterio de Nyquist–Shannon. En la práctica se añade margen y un filtro antialiasing.</p>
+  </div>
+  <div class="q">
+    <p>3. La convolución en tiempo corresponde en frecuencia a</p>
+    <div class="opts">
+      <button class="opt" data-ok>un producto</button>
+      <button class="opt">una suma</button>
+      <button class="opt">otra convolución</button>
+    </div>
+    <p class="why">\(\mathcal F\{f*g\}=F(\omega)G(\omega)\): por eso filtrar se implementa multiplicando espectros.</p>
+  </div>
+</div>
+
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Oppenheim y Willsky, <em>Señales y sistemas</em>, 2.ª ed.</td><td>3–5</td><td>Series y transformadas de Fourier, muestreo</td><td>Referencia principal</td></tr>
+    <tr><td>Proakis y Manolakis, <em>Tratamiento digital de señales</em>, 4.ª ed.</td><td>2–7</td><td>DFT, FFT, filtros</td><td>Enfoque digital</td></tr>
+    <tr><td>Kreyszig, <em>Matemáticas avanzadas para ingeniería</em>, 10.ª ed.</td><td>11–12</td><td>Series de Fourier y transformadas</td><td>Enfoque matemático</td></tr>
+    <tr><td>OpenStax, <em>Calculus Volume 2</em></td><td>6</td><td>Series de potencias</td><td>Repaso de series</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://openstax.org/details/books/calculus-volume-2">OpenStax Calculus Volume 2</a>.</p>
+
+<h2 id="faq">13. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Serie y transformada de Fourier son lo mismo?</summary><div><p>No. La serie describe señales periódicas con frecuencias discretas \(nf_0\). La transformada describe señales no periódicas con un continuo de frecuencias. La serie se puede ver como un caso límite de la transformada para un tren de impulsos.</p></div></details>
+  <details><summary>¿Por qué aparece el fenómeno de Gibbs si la serie converge?</summary><div><p>La serie converge puntualmente (y en media cuadrática), pero no uniformemente cerca de un salto. El sobreimpulso se estrecha al aumentar \(N\), pero su altura tiende a un valor fijo proporcional al salto.</p></div></details>
+  <details><summary>¿Qué diferencia hay entre DFT y FFT?</summary><div><p>La DFT es la transformación matemática; la FFT es un algoritmo rápido para calcularla. El resultado es el mismo (salvo redondeo); cambia el coste computacional.</p></div></details>
+  <details><summary>¿Cómo se elige la frecuencia de muestreo en un sistema real?</summary><div><p>Se parte del ancho de banda de la señal, se añade margen para el filtro antialiasing y se consideran el reloj disponible, el coste y el procesamiento posterior. Para audio se usan 44,1 o 48 kHz; para RF, muestreo paso banda o submuestreo con cuidado de las imágenes.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de señales y sistemas. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Series y transformadas · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

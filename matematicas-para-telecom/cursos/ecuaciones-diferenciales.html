@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ecuaciones diferenciales ordinarias · Matemáticas para Telecom</title>
+  <meta name="description" content="Ecuaciones diferenciales ordinarias: primer orden (separables, lineales, exactas, Bernoulli), segundo orden homogéneo y no homogéneo, sistemas, transformada de Laplace, estabilidad y aplicaciones a circuitos RLC. Campo de pendientes interactivo y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../../assets/js/mate.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 3 · Ecuaciones diferenciales ordinarias</p>
+<h1>Ecuaciones diferenciales ordinarias</h1>
+<p class="lead">Una ecuación diferencial relaciona una función con sus derivadas. Aparece siempre que un sistema físico evoluciona: la carga de un condensador, la corriente en una bobina, la temperatura de un equipo, la propagación de una señal. Resolverla es encontrar la función que cumple la relación y las condiciones iniciales.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Clasificar ecuaciones diferenciales y verificar soluciones; interpretar condiciones iniciales.</li>
+    <li>Resolver EDO de primer orden: separables, lineales, exactas y Bernoulli.</li>
+    <li>Resolver EDO lineales de segundo orden homogéneas y no homogéneas.</li>
+    <li>Plantear sistemas de EDO y analizar estabilidad mediante autovalores.</li>
+    <li>Usar la transformada de Laplace para problemas con condiciones iniciales y funciones escalón.</li>
+    <li>Modelar circuitos RC, RL y RLC y sistemas de primer y segundo orden.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">Cálculo I, álgebra lineal y algo de complejos</span>
+  <p>Necesitas derivar, integrar, factorizar polinomios y resolver sistemas lineales. La ecuación característica puede tener raíces complejas, así que conviene recordar \(e^{i\theta}=\cos\theta+i\sen\theta\). Repaso: <a href="../../calculo-diferencial-e-integral/temas/derivadas.html">derivadas</a> · <a href="../../calculo-diferencial-e-integral/temas/integrales.html">integrales</a> · <a href="../../repaso/matematica.html#complejos">complejos</a>.</p>
+</div>
+
+<h2 id="conceptos">1. Conceptos básicos</h2>
+<p>Una <strong>ecuación diferencial ordinaria</strong> (EDO) contiene una función incógnita de una variable y sus derivadas. El <strong>orden</strong> es el de la derivada más alta. Es <strong>lineal</strong> si la incógnita y sus derivadas aparecen a la primera potencia y sin productos entre ellas:</p>
+$$a_n(x)y^{(n)}+\cdots+a_1(x)y'+a_0(x)y=g(x).$$
+<p>Una <strong>solución</strong> es una función que, sustituida en la ecuación, la convierte en identidad. La solución general contiene tantas constantes como el orden; las <strong>condiciones iniciales</strong> \(y(x_0)=y_0,\ y'(x_0)=y_1,\dots\) fijan esas constantes.</p>
+<div class="box def"><span class="box-title">Existencia y unicidad (Picard–Lindelöf)</span>
+<p>Para \(y'=f(x,y)\) con \(y(x_0)=y_0\): si \(f\) y \(\partial f/\partial y\) son continuas en un rectángulo alrededor de \((x_0,y_0)\), existe una única solución en algún intervalo que contiene a \(x_0\).</p></div>
+<p><strong>Verificación:</strong> siempre se puede comprobar una solución sustituyéndola en la EDO y en las condiciones iniciales. Es el hábito más rentable del tema.</p>
+
+<h2 id="primer-orden">2. EDO de primer orden</h2>
+<h3 id="separables">2.1 Separables</h3>
+<p>Si \(y'=g(x)h(y)\), se separan las variables:</p>
+$$\frac{dy}{h(y)}=g(x)\,dx\quad\Longrightarrow\quad\int\frac{dy}{h(y)}=\int g(x)\,dx.$$
+<div class="example">
+<h4>Ejemplo 2.1 — Separable</h4>
+<p>\(y'=2xy\). Separando, \(\frac{dy}{y}=2x\,dx\). Integrando, \(\ln|y|=x^2+C\), luego \(y=Ke^{x^2}\).</p>
+</div>
+
+<h3 id="lineales">2.2 Lineales de primer orden</h3>
+<p>La forma estándar es \(y'+P(x)y=Q(x)\). Se multiplica por el <strong>factor integrante</strong></p>
+$$\mu(x)=e^{\int P(x)\,dx},$$
+<p>y el miembro izquierdo se convierte en \((\mu y)'\). Por tanto,</p>
+$$\mu y=\int\mu Q\,dx+C\quad\Longrightarrow\quad y=\frac{1}{\mu}\left(\int\mu Q\,dx+C\right).$$
+<div class="example">
+<h4>Ejemplo 2.2 — Lineal</h4>
+<p>\(y'+2y=4\). Aquí \(P=2\), \(\mu=e^{2x}\). Entonces \((e^{2x}y)'=4e^{2x}\), e integrando \(e^{2x}y=2e^{2x}+C\). Solución: \(y=2+Ce^{-2x}\).</p>
+</div>
+
+<h3 id="exactas">2.3 Exactas</h3>
+<p>Una ecuación \(M(x,y)\,dx+N(x,y)\,dy=0\) es exacta si \(\partial M/\partial y=\partial N/\partial x\). Entonces existe un potencial \(F(x,y)\) con \(F_x=M\), \(F_y=N\), y la solución es \(F(x,y)=C\). Si no es exacta, a veces se encuentra un factor integrante.</p>
+
+<h3 id="bernoulli">2.4 Bernoulli</h3>
+<p>\(y'+P(x)y=Q(x)y^n\), con \(n\ne0,1\). La sustitución \(u=y^{1-n}\) la convierte en lineal:</p>
+$$u'+(1-n)P(x)u=(1-n)Q(x).$$
+
+<h2 id="aplicaciones-1">3. Aplicaciones de primer orden</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Modelo</th><th>EDO</th><th>Solución típica</th></tr></thead>
+  <tbody>
+    <tr><td>Circuito RC (descarga)</td><td>\(RC\,v'+v=0\)</td><td>\(v(t)=V_0e^{-t/RC}\)</td></tr>
+    <tr><td>Circuito RL</td><td>\(L\,i'+Ri=V\)</td><td>\(i(t)=\frac VR\left(1-e^{-Rt/L}\right)\)</td></tr>
+    <tr><td>Enfriamiento de Newton</td><td>\(T'=-k(T-T_a)\)</td><td>\(T=T_a+(T_0-T_a)e^{-kt}\)</td></tr>
+    <tr><td>Crecimiento logístico</td><td>\(P'=rP(1-P/K)\)</td><td>\(P=\frac{K}{1+Ce^{-rt}}\)</td></tr>
+  </tbody>
+</table></div>
+<p>La constante de tiempo \(\tau=RC\) o \(\tau=L/R\) marca la rapidez de la respuesta: en \(t=\tau\) se ha recorrido el \(63{,}2\,\%\) del cambio total; en \(5\tau\), prácticamente el \(100\,\%\).</p>
+
+<h2 id="segundo-orden">4. EDO lineales de segundo orden</h2>
+<p>La forma homogénea con coeficientes constantes es</p>
+$$ay''+by'+cy=0.$$
+<p>Se propone \(y=e^{rx}\), lo que conduce a la <strong>ecuación característica</strong> \(ar^2+br+c=0\). Hay tres casos:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Discriminante</th><th>Raíces</th><th>Solución general</th></tr></thead>
+  <tbody>
+    <tr><td>\(\Delta>0\)</td><td>\(r_1\ne r_2\) reales</td><td>\(y=C_1e^{r_1x}+C_2e^{r_2x}\)</td></tr>
+    <tr><td>\(\Delta=0\)</td><td>\(r\) doble</td><td>\(y=(C_1+C_2x)e^{rx}\)</td></tr>
+    <tr><td>\(\Delta<0\)</td><td>\(\alpha\pm i\beta\)</td><td>\(y=e^{\alpha x}(C_1\cos\beta x+C_2\sen\beta x)\)</td></tr>
+  </tbody>
+</table></div>
+<p>El <strong>principio de superposición</strong> dice que la solución general de la homogénea es una combinación lineal de dos soluciones independientes. Para la no homogénea \(ay''+by'+cy=g(x)\), la solución general es</p>
+$$y=y_h+y_p,$$
+<p>donde \(y_h\) es la solución de la homogénea e \(y_p\) una solución particular.</p>
+
+<h3 id="coeficientes">4.1 Coeficientes indeterminados</h3>
+<p>Si \(g(x)\) es un polinomio, una exponencial, un seno o un coseno (o una suma/producto de ellos), se propone una \(y_p\) de la misma forma con coeficientes desconocidos. Si la forma propuesta ya es solución de la homogénea, se multiplica por \(x\) (o \(x^2\) si hay repetición).</p>
+<div class="example">
+<h4>Ejemplo 4.1 — No homogénea</h4>
+<p>\(y''-3y'+2y=e^{3x}\). La homogénea tiene \(r^2-3r+2=0\Rightarrow r=1,2\), así que \(y_h=C_1e^x+C_2e^{2x}\). Proponemos \(y_p=Ae^{3x}\): \((9-9+2)Ae^{3x}=e^{3x}\Rightarrow A=\frac12\). Solución: \(y=C_1e^x+C_2e^{2x}+\frac12e^{3x}\).</p>
+</div>
+
+<h3 id="variacion">4.2 Variación de parámetros</h3>
+<p>Si \(y_1,y_2\) son soluciones independientes de la homogénea, se busca \(y_p=u_1y_1+u_2y_2\) con</p>
+$$u_1'=-\frac{y_2g}{aW},\qquad u_2'=\frac{y_1g}{aW},\qquad W=y_1y_2'-y_1'y_2,$$
+<p>donde \(W\) es el wronskiano. Es más general que coeficientes indeterminados, pero exige integrar.</p>
+
+<h2 id="sistemas">5. Sistemas de EDO</h2>
+<p>Un sistema lineal de primer orden se escribe \(\mathbf x'=A\mathbf x+\mathbf b(t)\). Si \(A\) es diagonalizable, \(A=PDP^{-1}\) y el cambio \(\mathbf x=P\mathbf y\) desacopla el sistema en ecuaciones escalares. La solución de la homogénea es</p>
+$$\mathbf x(t)=c_1e^{\lambda_1t}\mathbf v_1+\cdots+c_ne^{\lambda_nt}\mathbf v_n.$$
+<p><strong>Estabilidad:</strong> el origen es asintóticamente estable si todas las partes reales de los autovalores son negativas; inestable si alguna es positiva; centro si son imaginarios puros (oscilación sin decaimiento).</p>
+
+<h2 id="laplace">6. Transformada de Laplace</h2>
+<p>La transformada de Laplace convierte una EDO lineal con coeficientes constantes en una ecuación algebraica:</p>
+$$\mathcal L\{y(t)\}=Y(s)=\int_0^\infty y(t)e^{-st}dt.$$
+<p>Propiedades clave: \(\mathcal L\{y'\}=sY(s)-y(0)\), \(\mathcal L\{y''\}=s^2Y(s)-sy(0)-y'(0)\), y \(\mathcal L\{e^{at}\}=\frac{1}{s-a}\), \(\mathcal L\{\sen\omega t\}=\frac{\omega}{s^2+\omega^2}\), \(\mathcal L\{u(t-a)\}=\frac{e^{-as}}{s}\).</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Laplace</h4>
+<p>\(y'+y=1\), \(y(0)=0\). Transformando: \(sY+Y=\frac1s\), luego \(Y=\frac{1}{s(s+1)}=\frac1s-\frac1{s+1}\). Antitransformando: \(y(t)=1-e^{-t}\).</p>
+</div>
+<p>La transformada también permite tratar funciones definidas a trozos, impulsos y retardos, y relaciona la convolución con el producto: \(\mathcal L\{f*g\}=F(s)G(s)\).</p>
+
+<h2 id="sim">7. Interactivo: campo de pendientes y Euler</h2>
+<p>El campo de pendientes dibuja \(y'=f(x,y)\) en cada punto. La curva azul es una solución aproximada por el método de Euler desde la condición inicial; cambia \(h\) para ver cómo mejora o empeora la aproximación.</p>
+<div class="sim" id="sim-ode">
+  <div class="sim-title">Campo de direcciones y solución numérica</div>
+  <div class="controls">
+    <label>Ecuación
+      <select id="ode-fn">
+        <option value="logistico">y′ = y(1 − y)</option>
+        <option value="decaimiento">y′ = −2y + 4</option>
+        <option value="mixta">y′ = x − y</option>
+        <option value="oscilador">y′ = −0,8y</option>
+      </select>
+    </label>
+    <label>Paso h <input type="range" id="ode-h" min="0.05" max="0.8" step="0.05" value="0.2"></label>
+  </div>
+  <canvas id="ode-canvas" aria-label="Campo de pendientes y solución aproximada de una ecuación diferencial"></canvas>
+  <div class="readout" id="ode-out"></div>
+</div>
+
+<h2 id="telecom">8. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>Circuitos:</strong> RC, RL y RLC; respuesta transitoria y régimen permanente.</li>
+  <li><strong>Líneas de transmisión:</strong> ecuaciones del telegrafista, propagación y reflexiones.</li>
+  <li><strong>Filtros:</strong> respuesta temporal de filtros analógicos; constante de tiempo y ancho de banda.</li>
+  <li><strong>Control:</strong> sistemas de primer y segundo orden, estabilidad, sobreimpulso y tiempo de establecimiento.</li>
+  <li><strong>Enlaces:</strong> modelos de degradación, carga de baterías y temperatura de equipos.</li>
+</ul>
+
+<h2 id="ejemplos">9. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 9.1 — Circuito RC</h4>
+<p>Un condensador de \(1\,\mu\text F\) cargado a \(10\) V se descarga por \(1\,\text{k}\Omega\). \(RC=10^{-3}\) s. \(v(t)=10e^{-1000t}\) V. En \(t=1\) ms, \(v=10e^{-1}\approx3{,}68\) V.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.2 — Segundo orden</h4>
+<p>\(y''+4y=0\). Característica \(r^2+4=0\Rightarrow r=\pm2i\). Solución: \(y=C_1\cos2t+C_2\sen2t\). Amplitud \(A=\sqrt{C_1^2+C_2^2}\), fase \(\phi=\arctan(C_2/C_1)\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.3 — Condiciones iniciales</h4>
+<p>\(y''-y=0\), \(y(0)=2\), \(y'(0)=0\). Raíces \(r=\pm1\): \(y=C_1e^t+C_2e^{-t}\). \(y(0)=C_1+C_2=2\); \(y'(0)=C_1-C_2=0\Rightarrow C_1=C_2=1\). \(y=e^t+e^{-t}=2\cosh t\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.4 — Sistema</h4>
+<p>\(\mathbf x'=\begin{pmatrix}0&1\\-1&0\end{pmatrix}\mathbf x\). Autovalores \(\pm i\): oscilador armónico. La solución es una combinación de \(\cos t\) y \(\sen t\); el origen es un centro.</p>
+</div>
+
+<h2 id="ejercicios">10. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Resuelve \(y'=3x^2y\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\frac{dy}{y}=3x^2dx\Rightarrow\ln|y|=x^3+C\Rightarrow y=Ke^{x^3}\).</p></div></details></li>
+  <li>Resuelve \(y'+y=e^{-x}\), \(y(0)=1\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\mu=e^x\): \((e^xy)'=1\Rightarrow e^xy=x+C\Rightarrow y=(x+C)e^{-x}\). Con \(y(0)=1\), \(C=1\): \(y=(x+1)e^{-x}\).</p></div></details></li>
+  <li>Resuelve \(y''-5y'+6y=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(r^2-5r+6=0\Rightarrow r=2,3\). \(y=C_1e^{2x}+C_2e^{3x}\).</p></div></details></li>
+  <li>Resuelve \(y''+2y'+y=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\((r+1)^2=0\Rightarrow r=-1\) doble. \(y=(C_1+C_2x)e^{-x}\).</p></div></details></li>
+  <li>Resuelve \(y''+9y=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(r=\pm3i\). \(y=C_1\cos3x+C_2\sen3x\).</p></div></details></li>
+  <li>Resuelve \(y''-4y=8\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Homogénea: \(r=\pm2\), \(y_h=C_1e^{2x}+C_2e^{-2x}\). Particular constante \(y_p=-2\). \(y=C_1e^{2x}+C_2e^{-2x}-2\).</p></div></details></li>
+  <li>Resuelve \(y''+y=\sen x\) por coeficientes indeterminados.
+    <details class="sol"><summary>Respuesta</summary><div><p>La homogénea tiene \(\cos x,\sen x\), así que se propone \(y_p=Ax\cos x+Bx\sen x\). Resulta \(y_p=-\frac{x}{2}\cos x\). \(y=C_1\cos x+C_2\sen x-\frac{x}{2}\cos x\).</p></div></details></li>
+  <li>Resuelve \(y'=y\), \(y(0)=3\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(y=3e^t\).</p></div></details></li>
+  <li>Un circuito RL tiene \(L=0{,}1\) H, \(R=10\,\Omega\), \(V=5\) V e \(i(0)=0\). Halla \(i(t)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\tau=L/R=0{,}01\) s. \(i(t)=\frac{5}{10}(1-e^{-100t})=0{,}5(1-e^{-100t})\) A.</p></div></details></li>
+  <li>Clasifica la estabilidad de \(\mathbf x'=\begin{pmatrix}-1&0\\0&-3\end{pmatrix}\mathbf x\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Autovalores \(-1,-3\), ambos negativos: origen asintóticamente estable (nodo estable).</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">11. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. La solución general de \(y''+y=0\) es</p>
+    <div class="opts">
+      <button class="opt">\(C_1e^x+C_2e^{-x}\)</button>
+      <button class="opt" data-ok>\(C_1\cos x+C_2\sen x\)</button>
+      <button class="opt">\(C_1x+C_2\)</button>
+    </div>
+    <p class="why">La ecuación característica \(r^2+1=0\) tiene raíces \(\pm i\); las exponenciales complejas se combinan en seno y coseno.</p>
+  </div>
+  <div class="q">
+    <p>2. El factor integrante de \(y'+3y=6\) es</p>
+    <div class="opts">
+      <button class="opt">\(e^{-3x}\)</button>
+      <button class="opt" data-ok>\(e^{3x}\)</button>
+      <button class="opt">\(3x\)</button>
+    </div>
+    <p class="why">\(\mu=e^{\int3dx}=e^{3x}\). Multiplicando, \((e^{3x}y)'=6e^{3x}\), que se integra directamente.</p>
+  </div>
+  <div class="q">
+    <p>3. Si los autovalores de un sistema continuo tienen parte real negativa, el origen es</p>
+    <div class="opts">
+      <button class="opt" data-ok>asintóticamente estable</button>
+      <button class="opt">inestable</button>
+      <button class="opt">un centro</button>
+    </div>
+    <p class="why">Las soluciones contienen \(e^{\lambda t}\); si \(\operatorname{Re}\lambda<0\), decaen a cero.</p>
+  </div>
+</div>
+
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Boyce y DiPrima, <em>Ecuaciones diferenciales</em>, 10.ª ed.</td><td>1–7</td><td>Primer orden, segundo orden, sistemas, Laplace</td><td>Curso completo</td></tr>
+    <tr><td>Zill, <em>Ecuaciones diferenciales con aplicaciones</em>, 9.ª ed.</td><td>1–8</td><td>Métodos y aplicaciones</td><td>Ejemplos de circuitos y mecánica</td></tr>
+    <tr><td>MIT 18.03</td><td>—</td><td>Vídeos y apuntes</td><td>Curso abierto</td></tr>
+    <tr><td>Ogata, <em>Ingeniería de control moderna</em>, 5.ª ed.</td><td>2–5</td><td>Modelado y respuesta</td><td>Aplicación a control</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/">MIT 18.03 Differential Equations</a>.</p>
+
+<h2 id="faq">13. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Cómo elijo el método de resolución?</summary><div><p>Primero clasifica: ¿es de primer orden? ¿separable, lineal, exacta o Bernoulli? Si es de segundo orden con coeficientes constantes, usa la ecuación característica. Para condiciones iniciales y términos a trozos, Laplace suele ser el camino más corto. Siempre que puedas, verifica sustituyendo.</p></div></details>
+  <details><summary>¿Qué es una solución singular?</summary><div><p>Una solución que no se obtiene de la solución general para ningún valor de las constantes, como \(y=0\) en algunas ecuaciones no lineales. En los cursos de ingeniería aparecen sobre todo en ecuaciones no lineales; en las lineales, la solución general contiene todas.</p></div></details>
+  <details><summary>¿Por qué la solución de la homogénea tiene dos funciones independientes?</summary><div><p>Porque una EDO lineal de segundo orden necesita dos condiciones iniciales (valor y derivada). El espacio de soluciones tiene dimensión 2; dos soluciones con wronskiano no nulo forman una base.</p></div></details>
+  <details><summary>¿La transformada de Laplace sirve para cualquier EDO?</summary><div><p>Es especialmente útil para EDO lineales con coeficientes constantes y condiciones iniciales en \(t=0\), y para funciones escalón, impulsos y retardos. Para coeficientes variables o ecuaciones no lineales puede no simplificar; en esos casos se usan series o métodos numéricos.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de ecuaciones diferenciales para ingeniería. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Ecuaciones diferenciales · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

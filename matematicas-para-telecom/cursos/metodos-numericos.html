@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Métodos numéricos · Matemáticas para Telecom</title>
+  <meta name="description" content="Métodos numéricos: errores y condicionamiento, bisección, Newton, secante, punto fijo, eliminación de Gauss y LU, métodos iterativos, interpolación, mínimos cuadrados, integración numérica, Euler y Runge–Kutta. Ejemplos y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 7 · Métodos numéricos</p>
+<h1>Métodos numéricos</h1>
+<p class="lead">Casi ningún problema real de ingeniería se resuelve con una fórmula exacta. Los métodos numéricos construyen aproximaciones controladas: hallar una raíz, resolver un sistema, interpolar medidas, integrar una función o simular un circuito. La clave no es solo obtener un número, sino saber cuánto error tiene.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Distinguir error de truncamiento, redondeo y propagación; estimar condicionamiento y estabilidad.</li>
+    <li>Resolver ecuaciones no lineales con bisección, punto fijo, Newton y secante.</li>
+    <li>Resolver sistemas lineales por Gauss, LU e iterativos; reconocer mal condicionamiento.</li>
+    <li>Interpolar con Lagrange, Newton y splines; ajustar por mínimos cuadrados.</li>
+    <li>Integrar numéricamente con trapecio y Simpson; resolver EDO con Euler y Runge–Kutta.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">cálculo, álgebra lineal y programación básica</span>
+  <p>Necesitas derivar, integrar, resolver sistemas y manejar matrices. También ayuda saber programar bucles y funciones. Repaso: <a href="../../calculo-diferencial-e-integral/temas/derivadas.html">derivadas</a> · <a href="algebra-lineal.html">álgebra lineal</a> · <a href="../../repaso/matematica.html#series">series</a>.</p>
+</div>
+
+<h2 id="errores">1. Errores y condicionamiento</h2>
+<p>El <strong>error absoluto</strong> es \(|x-\hat x|\); el <strong>relativo</strong>, \(|x-\hat x|/|x|\) (si \(x\ne0\)). Al aproximar aparecen dos fuentes:</p>
+<ul>
+  <li><strong>Truncamiento:</strong> se sustituye un proceso infinito por uno finito (una serie, una derivada, una integral).</li>
+  <li><strong>Redondeo:</strong> los números se representan con precisión finita (doble precisión: unos 16 dígitos decimales).</li>
+</ul>
+<p>Un problema está <strong>mal condicionado</strong> si pequeños cambios en los datos producen grandes cambios en la solución. Un algoritmo es <strong>estable</strong> si no amplifica los errores de redondeo. Son conceptos distintos: un buen algoritmo no arregla un problema mal condicionado.</p>
+<p>En coma flotante conviene evitar restas de números casi iguales (cancelación catastrófica) y sumar primero los términos pequeños. Por ejemplo, \(\sqrt{x+1}-\sqrt x=\frac{1}{\sqrt{x+1}+\sqrt x}\) evita la cancelación para \(x\) grande.</p>
+
+<h2 id="raices">2. Ecuaciones no lineales</h2>
+<h3 id="biseccion">2.1 Bisección</h3>
+<p>Si \(f\) es continua en \([a,b]\) y \(f(a)f(b)<0\), hay al menos una raíz. Se evalúa en el punto medio y se conserva el subintervalo con cambio de signo. Tras \(n\) iteraciones, el error está acotado por</p>
+$$|x_n-r|\le\frac{b-a}{2^n}.$$
+<p>Converge siempre (en las hipótesis), pero despacio: se gana aproximadamente un bit por iteración.</p>
+
+<h3 id="newton">2.2 Newton–Raphson</h3>
+$$x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}.$$
+<p>Geométricamente, se sigue la tangente hasta el eje. Si \(f'(r)\ne0\) y se parte cerca de la raíz, converge cuadráticamente: el número de cifras correctas se duplica en cada paso. Puede fallar si \(f'\) se anula, si se aleja de la raíz o si hay ciclos.</p>
+<div class="example">
+<h4>Ejemplo 2.1 — \(\sqrt2\)</h4>
+<p>Resolver \(f(x)=x^2-2=0\) con \(x_0=1\). \(x_{n+1}=\frac12(x_n+2/x_n)\): \(1{,}5;\ 1{,}4167;\ 1{,}4142157;\ 1{,}4142136\). En cuatro pasos se alcanza la precisión de doble precisión.</p>
+</div>
+
+<h3 id="secante">2.3 Secante y punto fijo</h3>
+<p>La <strong>secante</strong> sustituye \(f'\) por una diferencia finita:</p>
+$$x_{n+1}=x_n-f(x_n)\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}.$$
+<p>No necesita derivada; su orden de convergencia es \(\varphi\approx1{,}618\). El <strong>punto fijo</strong> reescribe \(f(x)=0\) como \(x=g(x)\) e itera \(x_{n+1}=g(x_n)\); converge si \(|g'(r)|<1\) en un entorno de la raíz.</p>
+
+<h2 id="sistemas">3. Sistemas lineales</h2>
+<p>Para \(A\mathbf x=\mathbf b\), la <strong>eliminación de Gauss</strong> transforma \(A\) en triangular superior y resuelve por sustitución regresiva. Con pivoteo parcial se intercambian filas para usar el mayor pivote disponible y reducir errores.</p>
+<p>La <strong>factorización LU</strong> escribe \(A=LU\) (L triangular inferior unitaria, U superior). Una vez factorizada, resolver para varios \(\mathbf b\) cuesta \(O(n^2)\) en lugar de \(O(n^3)\). El coste de factorizar es \(\frac23n^3\) operaciones.</p>
+<p><strong>Métodos iterativos:</strong> Jacobi y Gauss–Seidel parten de una aproximación y actualizan componente a componente. Convergen, por ejemplo, si \(A\) es estrictamente diagonal dominante. Gauss–Seidel suele ser más rápido porque usa los valores ya actualizados.</p>
+<div class="box def"><span class="box-title">Número de condición</span>
+$$\kappa(A)=\|A\|\,\|A^{-1}\|.$$
+<p>Mide la sensibilidad de la solución: \(\frac{\|\delta\mathbf x\|}{\|\mathbf x\|}\lesssim\kappa(A)\frac{\|\delta\mathbf b\|}{\|\mathbf b\|}\). Si \(\kappa\) es enorme, pequeñas perturbaciones producen errores grandes. La matriz de Hilbert es el ejemplo clásico de mal condicionamiento.</p></div>
+<div class="example">
+<h4>Ejemplo 3.1 — Gauss</h4>
+<p>\(2x+y=5,\ x+3y=6\). De la primera, \(y=5-2x\); sustituyendo, \(x+15-6x=6\Rightarrow-5x=-9\Rightarrow x=1{,}8\), \(y=1{,}4\). Comprobación: \(3{,}6+1{,}4=5\), \(1{,}8+4{,}2=6\).</p>
+</div>
+
+<h2 id="interpolacion">4. Interpolación y ajuste</h2>
+<p>Dados \(n+1\) puntos \((x_i,y_i)\) con \(x_i\) distintos, existe un único polinomio de grado \(\le n\) que pasa por todos. La forma de <strong>Lagrange</strong> es</p>
+$$P(x)=\sum_{i=0}^ny_i\ell_i(x),\qquad \ell_i(x)=\prod_{j\ne i}\frac{x-x_j}{x_i-x_j}.$$
+<p>La forma de <strong>Newton</strong> usa diferencias divididas y permite añadir puntos sin recalcular todo. Para muchos puntos, los polinomios de grado alto oscilan (fenómeno de Runge); los <strong>splines cúbicos</strong> interpolan por tramos con continuidad de valor, pendiente y curvatura, y son mucho más estables.</p>
+<div class="example">
+<h4>Ejemplo 4.1 — Lagrange</h4>
+<p>Con \((0,1),(1,3),(2,2)\):</p>
+$$P(x)=1\frac{(x-1)(x-2)}{2}+3\frac{x(x-2)}{-1}+2\frac{x(x-1)}{2}=-\frac32x^2+\frac72x+1.$$
+<p>Comprobación: \(P(0)=1\), \(P(1)=3\), \(P(2)=2\).</p>
+</div>
+<p><strong>Mínimos cuadrados:</strong> si hay más datos que parámetros, no se interpola; se minimiza \(\sum(y_i-P(x_i))^2\). Para una recta \(y=\beta_0+\beta_1x\), las ecuaciones normales dan \(\hat\beta_1=\frac{\sum(x_i-\bar x)(y_i-\bar y)}{\sum(x_i-\bar x)^2}\), \(\hat\beta_0=\bar y-\hat\beta_1\bar x\).</p>
+
+<h2 id="integracion">5. Integración numérica</h2>
+<p>Con \(h=(b-a)/n\) y \(x_i=a+ih\):</p>
+$$T_n=\frac h2\left[f(a)+2\sum_{i=1}^{n-1}f(x_i)+f(b)\right],$$
+$$S_n=\frac h3\left[f(a)+4\sum_{\text{impares}}f(x_i)+2\sum_{\text{pares}}f(x_i)+f(b)\right].$$
+<p>El <strong>trapecio</strong> aproxima por rectas; su error es \(-\frac{(b-a)h^2}{12}f''(\xi)\). <strong>Simpson</strong> aproxima por parábolas y necesita \(n\) par; su error es \(-\frac{(b-a)h^4}{180}f^{(4)}(\xi)\). Simpson es exacto para polinomios de grado \(\le3\).</p>
+<div class="example">
+<h4>Ejemplo 5.1 — \(\int_0^1x^2dx\)</h4>
+<p>Trapecio con \(h=1/2\): \(\frac{1/2}{2}[0+2(0{,}25)+1]=0{,}375\). Simpson con \(n=2\): \(\frac{1/2}{3}[0+4(0{,}25)+1]=\frac16\cdot2=0{,}3333\). El valor exacto es \(1/3\).</p>
+</div>
+
+<h2 id="edo">6. EDO numéricas</h2>
+<p>Para \(y'=f(t,y)\), \(y(t_0)=y_0\), con paso \(h\):</p>
+<ul>
+  <li><strong>Euler:</strong> \(y_{n+1}=y_n+hf(t_n,y_n)\). Error global \(O(h)\); sencillo pero poco preciso.</li>
+  <li><strong>Heun (Euler mejorado):</strong> predictor-corrector de segundo orden.</li>
+  <li><strong>Runge–Kutta 4:</strong> cuatro evaluaciones por paso y error global \(O(h^4)\). Es el caballo de batalla.</li>
+</ul>
+<p>La <strong>estabilidad</strong> depende de \(h\) y de la ecuación. Para \(y'=\lambda y\), Euler es estable si \(|1+h\lambda|\le1\); con \(\lambda\) real negativo, \(h\le2/|\lambda|\). Un paso demasiado grande produce oscilaciones espurias o divergencia.</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Euler</h4>
+<p>\(y'=y\), \(y(0)=1\), \(h=0{,}1\): \(y_1=1{,}1\), \(y_2=1{,}21\). El valor exacto en \(t=0{,}2\) es \(e^{0{,}2}=1{,}2214\). El error acumulado es del orden de \(h\).</p>
+</div>
+
+<h2 id="autovalores">7. Autovalores y otros métodos</h2>
+<p>El <strong>método de la potencia</strong> aproxima el autovalor dominante: se elige \(\mathbf v_0\), se itera \(\mathbf v_{k+1}=A\mathbf v_k/\|A\mathbf v_k\|\), y el cociente de Rayleigh \(\mathbf v^TA\mathbf v/\mathbf v^T\mathbf v\) converge al autovalor de mayor módulo. La <strong>iteración inversa</strong> converge al de menor módulo. Para matrices simétricas, el método QR es el estándar.</p>
+<p>Otros problemas habituales: mínimos cuadrados con QR (más estable que las ecuaciones normales), valores singulares (SVD) para compresión y análisis, y métodos de Monte Carlo para integración en dimensiones altas.</p>
+
+<h2 id="telecom">8. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>Procesamiento digital:</strong> filtros, FFT y convoluciones se implementan con aritmética finita; importan el redondeo y la estabilidad.</li>
+  <li><strong>Simulación de circuitos:</strong> integración de EDO, análisis transitorio y punto de operación (Newton).</li>
+  <li><strong>Planificación de radio:</strong> interpolación de mapas de cobertura y ajuste de modelos de propagación.</li>
+  <li><strong>Estimación:</strong> mínimos cuadrados para calibrar sensores y ajustar curvas de atenuación.</li>
+  <li><strong>Optimización:</strong> ajuste de parámetros y diseño de antenas.</li>
+</ul>
+
+<h2 id="ejemplos">9. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 9.1 — Bisección</h4>
+<p>\(f(x)=x^3-x-2\) en \([1,2]\): \(f(1)=-2\), \(f(2)=4\). Tras 10 bisecciones, el error es \(\le1/2^{10}\approx0{,}00098\). La raíz es \(\approx1{,}5214\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.2 — Newton</h4>
+<p>\(f(x)=x^3-x-2\), \(f'(x)=3x^2-1\). Con \(x_0=1{,}5\): \(f(1{,}5)=-0{,}125\), \(f'(1{,}5)=5{,}75\), luego \(x_1=1{,}5+\frac{0{,}125}{5{,}75}=1{,}52174\); \(x_2\approx1{,}52138\); converge a \(1{,}5214\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.3 — LU</h4>
+<p>\(A=\begin{pmatrix}2&1\\1&3\end{pmatrix}\). Sin pivoteo, \(L=\begin{pmatrix}1&0\\1/2&1\end{pmatrix}\), \(U=\begin{pmatrix}2&1\\0&5/2\end{pmatrix}\). Para \(\mathbf b=(5,6)^T\): \(L\mathbf y=\mathbf b\Rightarrow\mathbf y=(5,3{,}5)^T\); \(U\mathbf x=\mathbf y\Rightarrow x=1{,}8,\ y=1{,}4\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 9.4 — Runge–Kutta 4</h4>
+<p>Para \(y'=y\), \(y(0)=1\), \(h=0{,}1\): \(k_1=1\), \(k_2=1{,}05\), \(k_3=1{,}0525\), \(k_4=1{,}10525\); \(y_1=1+0{,}1(1+2\cdot1{,}05+2\cdot1{,}0525+1{,}10525)/6\approx1{,}10517\), frente a \(e^{0{,}1}=1{,}10517\). Mucho mejor que Euler con el mismo paso.</p>
+</div>
+
+<h2 id="ejercicios">10. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>¿Cuántas bisecciones se necesitan para reducir el error de \([0,1]\) a \(10^{-6}\)?
+    <details class="sol"><summary>Respuesta</summary><div><p>\(2^{-n}\le10^{-6}\Rightarrow n\ge\log_2(10^6)\approx19{,}93\): 20 iteraciones.</p></div></details></li>
+  <li>Aplica dos pasos de Newton a \(f(x)=x^2-3\) desde \(x_0=2\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(x_1=2-\frac1{4}=1{,}75\); \(x_2=1{,}75-\frac{0{,}0625}{3{,}5}=1{,}73214\).</p></div></details></li>
+  <li>Resuelve por Gauss \(x+y=3,\ 2x-y=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(y=2\), \(x=1\).</p></div></details></li>
+  <li>¿Qué mide el número de condición?
+    <details class="sol"><summary>Respuesta</summary><div><p>La sensibilidad relativa de la solución ante perturbaciones relativas en los datos. Un \(\kappa\) grande indica mal condicionamiento.</p></div></details></li>
+  <li>Interpola \((0,0),(1,1),(2,4)\) con Lagrange.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(P(x)=x^2\): los tres puntos están en la parábola.</p></div></details></li>
+  <li>Calcula \(\int_0^2x^3dx\) por Simpson con \(n=2\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(h=1\): \(\frac13[0+4(1)+8]=4\), que es el valor exacto.</p></div></details></li>
+  <li>Estima \(\int_0^1e^{-x^2}dx\) por trapecio con \(h=0{,}5\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\frac{0{,}5}{2}[1+2e^{-0{,}25}+e^{-1}]\approx0{,}7314\). El valor real es \(\approx0{,}7468\), así que el trapecio con un solo paso se queda corto.</p></div></details></li>
+  <li>Da un paso de Euler para \(y'=t+y\), \(y(0)=0\), \(h=0{,}1\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(y_1=0+0{,}1(0+0)=0\). (La pendiente inicial es cero; el siguiente paso ya no lo será.)</p></div></details></li>
+  <li>¿Qué orden de error tiene RK4?
+    <details class="sol"><summary>Respuesta</summary><div><p>Error global \(O(h^4)\); por eso con pocos pasos da alta precisión.</p></div></details></li>
+  <li>¿Por qué no se usa un polinomio de grado 20 para interpolar 21 puntos equiespaciados?
+    <details class="sol"><summary>Respuesta</summary><div><p>Por el fenómeno de Runge: aparecen oscilaciones grandes en los extremos. Mejor splines o interpolación por tramos.</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">11. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. Newton converge cuadráticamente si</p>
+    <div class="opts">
+      <button class="opt">la función es lineal</button>
+      <button class="opt" data-ok>se parte cerca de una raíz simple</button>
+      <button class="opt">la derivada se anula en la raíz</button>
+    </div>
+    <p class="why">Cerca de una raíz simple con \(f'(r)\ne0\), el error se eleva al cuadrado en cada iteración. Si \(f'(r)=0\), la convergencia se degrada.</p>
+  </div>
+  <div class="q">
+    <p>2. Simpson es exacto para polinomios de grado</p>
+    <div class="opts">
+      <button class="opt">\(\le1\)</button>
+      <button class="opt">\(\le2\)</button>
+      <button class="opt" data-ok>\(\le3\)</button>
+    </div>
+    <p class="why">El término de error contiene la cuarta derivada; si \(f\) es cúbica, \(f^{(4)}=0\) y la regla es exacta.</p>
+  </div>
+  <div class="q">
+    <p>3. Un número de condición grande indica</p>
+    <div class="opts">
+      <button class="opt">que el algoritmo es inestable</button>
+      <button class="opt" data-ok>que el problema es sensible a perturbaciones</button>
+      <button class="opt">que la solución es única</button>
+    </div>
+    <p class="why">El condicionamiento es una propiedad del problema, no del algoritmo; la estabilidad es del algoritmo.</p>
+  </div>
+</div>
+
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Burden y Faires, <em>Análisis numérico</em>, 10.ª ed.</td><td>1–9</td><td>Raíces, sistemas, interpolación, integración, EDO</td><td>Curso completo</td></tr>
+    <tr><td>Chapra y Canale, <em>Métodos numéricos para ingenieros</em>, 7.ª ed.</td><td>1–8</td><td>Métodos con ejemplos de ingeniería</td><td>Enfoque aplicado</td></tr>
+    <tr><td>Golub y Van Loan, <em>Matrix Computations</em>, 4.ª ed.</td><td>1–5</td><td>Álgebra lineal numérica</td><td>Para profundizar</td></tr>
+    <tr><td>MIT 18.06</td><td>—</td><td>Álgebra lineal</td><td>Base matricial</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/">MIT 18.06 Linear Algebra</a>.</p>
+
+<h2 id="faq">13. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Basta con que el error sea pequeño en el papel?</summary><div><p>No. Hay que comprobar que el error estimado sea compatible con la tolerancia y que el problema esté bien condicionado. En coma flotante, pedir más precisión de la que permite el condicionamiento no tiene sentido.</p></div></details>
+  <details><summary>¿Por qué Gauss–Seidel converge a veces y Jacobi no?</summary><div><p>Gauss–Seidel usa información actualizada dentro de la misma iteración, lo que suele mejorar la contracción. En matrices diagonalmente dominantes ambos convergen; en otros casos puede fallar uno, el otro o los dos.</p></div></details>
+  <details><summary>¿Cuándo uso interpolación y cuándo ajuste?</summary><div><p>Interpolación si los datos son exactos y quieres pasar por todos los puntos. Ajuste por mínimos cuadrados si hay ruido y buscas la tendencia. Interpolar datos ruidosos reproduce el ruido.</p></div></details>
+  <details><summary>¿Euler sigue usándose?</summary><div><p>Como introducción y en problemas donde el paso puede ser muy pequeño o se busca simplicidad. Para precisión se prefieren Runge–Kutta, métodos multipaso o implícitos, sobre todo en problemas rígidos.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de métodos numéricos para ingeniería. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Métodos numéricos · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>

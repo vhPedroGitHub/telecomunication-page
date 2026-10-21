@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matemáticas para Telecom · 10 cursos</title>
+  <meta name="description" content="Itinerario completo de matemáticas para Ingeniería en Telecomunicaciones: cálculo multivariable, álgebra lineal, ecuaciones diferenciales, variable compleja, series y transformadas, probabilidad, métodos numéricos, matemática discreta, optimización y ecuaciones en diferencias.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../assets/css/base.css">
+  <link rel="stylesheet" href="../assets/css/course.css">
+  <script src="../assets/js/theme.js"></script>
+  <script defer src="../assets/js/course.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="./" aria-current="page">Inicio</a>
+      <a href="#cursos">Cursos</a>
+      <a href="#ruta">Ruta</a>
+      <a href="../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Itinerario completo · 10 cursos · teoría, teoremas, tablas, ejemplos y ejercicios</p>
+<h1>Matemáticas para Telecom</h1>
+<p class="lead">La carrera de Telecomunicaciones se apoya en un bloque matemático que va mucho más allá del cálculo de una variable. Este itinerario reúne los <strong>10 cursos que completan la formación</strong>: desde el cálculo multivariable y el álgebra lineal hasta la optimización, los métodos numéricos y las ecuaciones en diferencias. Cada curso es autónomo, pero el orden propuesto evita lagunas.</p>
+
+<div class="box idea"><span class="box-title">Qué hay aquí y cómo usarlo</span>
+<p>El curso de <a href="../calculo-diferencial-e-integral/">Cálculo I</a> cubre límites, derivadas e integrales de una variable. Este hub añade las herramientas que aparecen después en señales, campos, circuitos, comunicaciones, redes y control. Cada curso incluye objetivos, prerrequisitos, teoría, teoremas, fórmulas, aplicaciones en telecom, ejemplos resueltos, ejercicios con respuesta, autoevaluación y bibliografía.</p></div>
+
+<h2 id="cursos">Los 10 cursos</h2>
+
+<h3 id="fase1">Fase 1 · base inmediata</h3>
+<div class="topic-grid">
+  <a href="cursos/calculo-multivariable.html">
+    <h3>1 · Cálculo multivariable y vectorial</h3>
+    <p>Funciones de varias variables, derivadas parciales, gradiente, integrales múltiples, campos vectoriales, Green, Stokes y Gauss. Base del electromagnetismo y las antenas.</p>
+  </a>
+  <a href="cursos/algebra-lineal.html">
+    <h3>2 · Álgebra lineal</h3>
+    <p>Matrices, sistemas, espacios vectoriales, autovalores, diagonalización, ortogonalidad, mínimos cuadrados y SVD. Base de señales, MIMO, control y redes.</p>
+  </a>
+  <a href="cursos/ecuaciones-diferenciales.html">
+    <h3>3 · Ecuaciones diferenciales ordinarias</h3>
+    <p>EDO de primer y segundo orden, sistemas, transformada de Laplace, estabilidad y aplicaciones a circuitos y sistemas físicos.</p>
+  </a>
+</div>
+
+<h3 id="fase2">Fase 2 · señales, sistemas y comunicaciones</h3>
+<div class="topic-grid">
+  <a href="cursos/variable-compleja.html">
+    <h3>4 · Variable compleja</h3>
+    <p>Funciones analíticas, Cauchy–Riemann, integrales de contorno, series de Laurent, residuos y transformaciones conformes. Herramienta del electromagnetismo y los filtros.</p>
+  </a>
+  <a href="cursos/series-transformadas.html">
+    <h3>5 · Series y transformadas</h3>
+    <p>Series numéricas y de potencias, Fourier, Laplace, convolución, muestreo, DFT y FFT. El lenguaje matemático de las señales y los sistemas.</p>
+  </a>
+  <a href="cursos/probabilidad-estadistica.html">
+    <h3>6 · Probabilidad y estadística</h3>
+    <p>Probabilidad, variables aleatorias, distribuciones, estimación, intervalos de confianza, contrastes, regresión y colas. Base del ruido, la BER y el tráfico de red.</p>
+  </a>
+</div>
+
+<h3 id="fase3">Fase 3 · herramientas de ingeniería</h3>
+<div class="topic-grid">
+  <a href="cursos/metodos-numericos.html">
+    <h3>7 · Métodos numéricos</h3>
+    <p>Raíces, sistemas lineales, interpolación, integración, EDO, autovalores y mínimos cuadrados; error, condición y estabilidad. Para simular y comprobar.</p>
+  </a>
+  <a href="cursos/matematica-discreta.html">
+    <h3>8 · Matemática discreta</h3>
+    <p>Lógica, conjuntos, conteo, recurrencias, grafos, árboles, teoría de números, modular y criptografía. Base de redes, algoritmos y codificación.</p>
+  </a>
+  <a href="cursos/optimizacion.html">
+    <h3>9 · Optimización</h3>
+    <p>Programación lineal, dualidad, convexidad, Lagrange, Kuhn–Tucker, descenso de gradiente y water-filling. Planificación y asignación de recursos.</p>
+  </a>
+  <a href="cursos/ecuaciones-diferencias.html">
+    <h3>10 · Ecuaciones en diferencias y sistemas discretos</h3>
+    <p>Recurrencias, transformada Z, función de transferencia, estabilidad y espacio de estados discreto. Base del procesamiento digital y el control discreto.</p>
+  </a>
+</div>
+
+<h2 id="ruta">Ruta de estudio recomendada</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Momento</th><th>Cursos</th><th>Por qué en ese orden</th></tr></thead>
+  <tbody>
+    <tr><td>Después de Cálculo I</td><td>Álgebra lineal · Cálculo multivariable</td><td>El álgebra lineal ordena los sistemas y las transformaciones; el cálculo multivariable extiende derivadas e integrales a campos y volúmenes.</td></tr>
+    <tr><td>En paralelo o después</td><td>Ecuaciones diferenciales · Variable compleja</td><td>Las EDO describen la evolución temporal; la variable compleja explica la respuesta en frecuencia y la propagación.</td></tr>
+    <tr><td>Núcleo de Telecom</td><td>Series y transformadas · Probabilidad y estadística</td><td>Son el lenguaje de señales, ruido, modulación y capacidad. Conviene estudiarlas junto con FC I y Líneas de Transmisión.</td></tr>
+    <tr><td>Herramientas</td><td>Métodos numéricos · Matemática discreta · Optimización · Ecuaciones en diferencias</td><td>Permiten simular, diseñar redes, asignar recursos y tratar sistemas digitales.</td></tr>
+  </tbody>
+</table></div>
+<div class="box warn"><span class="box-title">No hace falta terminarlos todos antes de seguir</span>
+<p>La ruta es una guía, no un requisito. Si estás cursando Fundamentos de las Comunicaciones I, prioriza <strong>series y transformadas</strong> y <strong>probabilidad</strong>. Si estás con Líneas de Transmisión y Antenas, prioriza <strong>multivariable/vectorial</strong> y <strong>variable compleja</strong>. Si estás con Microcontroladores, prioriza <strong>discreta</strong> y <strong>ecuaciones en diferencias</strong>.</p></div>
+
+<h2 id="mapa">Mapa: curso → asignatura que lo usa</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Curso</th><th>Se usa sobre todo en</th></tr></thead>
+  <tbody>
+    <tr><td>Cálculo multivariable y vectorial</td><td>Electromagnetismo, líneas de transmisión, antenas, propagación</td></tr>
+    <tr><td>Álgebra lineal</td><td>Señales y sistemas, MIMO, DSP, control, códigos, análisis de redes</td></tr>
+    <tr><td>Ecuaciones diferenciales</td><td>Circuitos, transitorios, control, líneas, filtros</td></tr>
+    <tr><td>Variable compleja</td><td>Electromagnetismo, propagación, filtros, estabilidad</td></tr>
+    <tr><td>Series y transformadas</td><td>FC I, comunicaciones, DSP, muestreo, modulación</td></tr>
+    <tr><td>Probabilidad y estadística</td><td>Ruido, BER, tráfico, fiabilidad, simulación</td></tr>
+    <tr><td>Métodos numéricos</td><td>Simulación, MATLAB/Python, diseño y comprobación</td></tr>
+    <tr><td>Matemática discreta</td><td>Redes, algoritmos, codificación, criptografía</td></tr>
+    <tr><td>Optimización</td><td>Planificación de redes, asignación de recursos, ML</td></tr>
+    <tr><td>Ecuaciones en diferencias</td><td>Procesamiento digital, control discreto, filtros digitales</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="uso">Cómo estudiar cada curso</h2>
+<ol>
+  <li><strong>Lee los objetivos y los prerrequisitos.</strong> Si falta alguno, vuelve a la ficha o al curso correspondiente antes de seguir.</li>
+  <li><strong>Estudia la teoría con lápiz.</strong> Reproduce cada definición y cada teorema con un ejemplo propio; no leas pasivamente.</li>
+  <li><strong>Usa los interactivos</strong> para ver el concepto antes de calcular: una transformación, un campo de pendientes, una serie de Fourier o una distribución.</li>
+  <li><strong>Copia los ejemplos sin mirar</strong> y compara paso a paso. Identifica qué teorema o fórmula se usó en cada línea.</li>
+  <li><strong>Resuelve los ejercicios antes de abrir la solución.</strong> Después explica en voz alta por qué el resultado es correcto.</li>
+  <li><strong>Comprueba y aplica.</strong> Deriva una integral, sustituye una solución en la EDO, verifica una matriz o simula el resultado. El cálculo se aprende comprobando.</li>
+</ol>
+
+<h2 id="prerrequisitos">Prerrequisitos globales</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Herramienta</th><th>Dónde se repasa</th></tr></thead>
+  <tbody>
+    <tr><td>Álgebra, funciones, trigonometría, logaritmos</td><td><a href="../repaso/matematica.html">Ficha de matemática</a> · <a href="../calculo-diferencial-e-integral/">Cálculo I</a></td></tr>
+    <tr><td>Límites, derivadas e integrales de una variable</td><td><a href="../calculo-diferencial-e-integral/">Curso de Cálculo I</a></td></tr>
+    <tr><td>Números complejos y fórmula de Euler</td><td><a href="../repaso/matematica.html#complejos">Ficha de complejos</a> · curso de variable compleja</td></tr>
+    <tr><td>Probabilidad discreta y gaussiana</td><td><a href="../repaso/probabilidad.html">Ficha de probabilidad</a></td></tr>
+    <tr><td>Programación básica (Python/MATLAB)</td><td>Curso de métodos numéricos</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="bibliografia">Bibliografía de referencia</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Curso</th><th>Referencia principal</th><th>Apoyo abierto</th></tr></thead>
+  <tbody>
+    <tr><td>Cálculo multivariable</td><td>Stewart, <em>Cálculo de varias variables</em>, 8.ª ed.</td><td><a href="https://openstax.org/details/books/calculus-volume-3">OpenStax Calculus Volume 3</a></td></tr>
+    <tr><td>Álgebra lineal</td><td>Lay, <em>Álgebra lineal y sus aplicaciones</em>, 5.ª ed.</td><td><a href="https://openstax.org/details/books/linear-algebra">OpenStax Linear Algebra</a> · <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/">MIT 18.06</a></td></tr>
+    <tr><td>Ecuaciones diferenciales</td><td>Boyce y DiPrima, <em>Ecuaciones diferenciales y problemas con valores en la frontera</em>, 10.ª ed.</td><td><a href="https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/">MIT 18.03</a></td></tr>
+    <tr><td>Variable compleja</td><td>Churchill y Brown, <em>Variable compleja y aplicaciones</em>, 8.ª ed.</td><td><a href="https://ocw.mit.edu/courses/18-04-complex-variables-with-applications-spring-2018/">MIT 18.04</a></td></tr>
+    <tr><td>Series y transformadas</td><td>Oppenheim y Willsky, <em>Señales y sistemas</em>, 2.ª ed.</td><td><a href="https://openstax.org/details/books/calculus-volume-2">OpenStax Calculus Volume 2</a></td></tr>
+    <tr><td>Probabilidad y estadística</td><td>Walpole, Myers y Myers, <em>Probabilidad y estadística para ingeniería y ciencias</em>, 9.ª ed.</td><td><a href="https://openstax.org/details/books/introductory-statistics-2e">OpenStax Introductory Statistics</a></td></tr>
+    <tr><td>Métodos numéricos</td><td>Chapra y Canale, <em>Métodos numéricos para ingenieros</em>, 7.ª ed.</td><td>Apuntes y prácticas del curso</td></tr>
+    <tr><td>Matemática discreta</td><td>Rosen, <em>Matemática discreta y sus aplicaciones</em>, 8.ª ed.</td><td><a href="https://discrete.openmathbooks.org/dmoi3.html">Discrete Mathematics: An Open Introduction</a></td></tr>
+    <tr><td>Optimización</td><td>Boyd y Vandenberghe, <em>Convex Optimization</em>, Cambridge, 2004.</td><td><a href="https://web.stanford.edu/~boyd/cvxbook/">Libro gratuito (Stanford)</a></td></tr>
+    <tr><td>Ecuaciones en diferencias</td><td>Oppenheim y Schafer, <em>Discrete-Time Signal Processing</em>, 3.ª ed.</td><td>MIT 18.03 / apuntes de DSP</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="faq">Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Son 10 cursos completos o resúmenes?</summary><div><p>Son cursos de nivel universitario inicial, cada uno en una página extensa con teoría, teoremas, fórmulas, aplicaciones, ejemplos y ejercicios. No sustituyen un libro ni las clases, pero cubren el contenido esencial y permiten estudiar de forma autónoma.</p></div></details>
+  <details><summary>¿En qué orden los estudio si voy con retraso?</summary><div><p>Empieza por álgebra lineal y cálculo multivariable; después EDO. Si tu prioridad inmediata es FC I, salta a series y transformadas y probabilidad. Si estás con Líneas, prioriza variable compleja. Los cursos son autónomos, pero comparten prerequisitos.</p></div></details>
+  <details><summary>¿Necesito programar?</summary><div><p>Solo para métodos numéricos y algunas aplicaciones de optimización. Se puede seguir la teoría sin programar, pero la práctica con Python/MATLAB/Octave es muy recomendable y multiplica la comprensión.</p></div></details>
+  <details><summary>¿Dónde están los cursos de Cálculo I?</summary><div><p>En <a href="../calculo-diferencial-e-integral/">Cálculo diferencial e integral</a>: límites y continuidad, derivadas e integrales de una variable, con simuladores y 41 ejercicios.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> itinerario de matemáticas para Ingeniería en Telecomunicaciones elaborado con contenido propio a partir del temario estándar de cada área. Bibliografía por capítulo y epígrafe en cada curso; enlaces abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · 10 cursos · <a href="../">Portal de asignaturas</a></footer>
+</body>
+</html>

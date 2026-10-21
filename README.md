@@ -13,6 +13,7 @@ software complementario y preguntas frecuentes.
 | Gestión y Seguridad de Redes | [`gestion-y-seguridad/`](gestion-y-seguridad/) |
 | Estudios Sociales de la CyT | [`estudios-sociales-cyt/`](estudios-sociales-cyt/) |
 | Cálculo diferencial e integral | [`calculo-diferencial-e-integral/`](calculo-diferencial-e-integral/) |
+| Matemáticas para Telecom (10 cursos) | [`matematicas-para-telecom/`](matematicas-para-telecom/) |
 | Repaso de prerrequisitos | [`repaso/`](repaso/) |
 
 ## Ver en local

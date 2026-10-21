@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Álgebra lineal · Matemáticas para Telecom</title>
+  <meta name="description" content="Álgebra lineal para telecomunicaciones: vectores y matrices, sistemas y Gauss, rango, determinantes, espacios vectoriales, transformaciones, autovalores, diagonalización, ortogonalidad, mínimos cuadrados, SVD y matrices complejas. Interactivo y ejercicios con respuesta.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../../assets/js/mate.js"></script>
+  <style>body { --accent: var(--c-mate); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Matemáticas para Telecom</span>
+    <nav class="tabs" aria-label="Secciones">
+      <a href="../">Inicio</a>
+      <a href="../#cursos">Cursos</a>
+      <a href="../../calculo-diferencial-e-integral/">Cálculo I</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del curso"><h2>En esta página</h2><ol data-auto></ol></nav>
+<main class="content">
+<p class="meta">Curso 2 · Álgebra lineal</p>
+<h1>Álgebra lineal</h1>
+<p class="lead">El álgebra lineal es el lenguaje de los sistemas con muchas variables: una señal muestreada es un vector, un filtro es una matriz, un canal MIMO es una transformación, una red es un sistema de ecuaciones. Este curso recorre desde las operaciones básicas hasta los autovalores, la ortogonalidad y la descomposición en valores singulares, con aplicaciones directas a señales, control y comunicaciones.</p>
+
+<div class="objectives">
+  <strong>Objetivos</strong>
+  <ul>
+    <li>Operar con vectores y matrices; resolver sistemas por eliminación de Gauss y estudiar su compatibilidad.</li>
+    <li>Calcular determinantes, inversas, rango y bases de subespacios.</li>
+    <li>Interpretar una matriz como transformación lineal y calcular núcleo e imagen.</li>
+    <li>Obtener autovalores, autovectores y diagonalizar matrices; analizar estabilidad.</li>
+    <li>Aplicar ortogonalidad, mínimos cuadrados y SVD a problemas de señales y datos.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">álgebra elemental y algo de geometría</span>
+  <p>Necesitas resolver ecuaciones lineales, operar con fracciones y reconocer rectas y planos. La trigonometría aparece en rotaciones y en la descomposición de Fourier; los números complejos, al final del curso. Repaso: <a href="../../repaso/matematica.html">ficha de matemática</a> · <a href="../../repaso/matematica.html#complejos">complejos y Euler</a>.</p>
+</div>
+
+<h2 id="vectores">1. Vectores y matrices</h2>
+<p>Un vector \(\mathbf v\in\mathbb R^n\) es una lista ordenada de \(n\) números. Se suma componente a componente y se multiplica por un escalar. El <strong>producto escalar</strong> y la <strong>norma</strong> son</p>
+$$\mathbf u\cdot\mathbf v=\sum_{i=1}^n u_iv_i,\qquad \|\mathbf v\|=\sqrt{\mathbf v\cdot\mathbf v}.$$
+<p>Dos vectores son ortogonales si \(\mathbf u\cdot\mathbf v=0\). El ángulo cumple \(\cos\theta=\dfrac{\mathbf u\cdot\mathbf v}{\|\mathbf u\|\|\mathbf v\|}\).</p>
+<p>Una matriz \(A\in\mathbb R^{m\times n}\) tiene \(m\) filas y \(n\) columnas. El producto \(AB\) solo está definido si el número de columnas de \(A\) coincide con el de filas de \(B\), y \((AB)_{ij}=\sum_k a_{ik}b_{kj}\). <strong>El producto no es conmutativo</strong>: \(AB\ne BA\) en general.</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Operación</th><th>Propiedad</th></tr></thead>
+  <tbody>
+    <tr><td>Transpuesta</td><td>\((AB)^T=B^TA^T\)</td></tr>
+    <tr><td>Inversa</td><td>\((AB)^{-1}=B^{-1}A^{-1}\) si existen</td></tr>
+    <tr><td>Determinante</td><td>\(\det(AB)=\det A\det B\)</td></tr>
+    <tr><td>Traza</td><td>\(\operatorname{tr}(AB)=\operatorname{tr}(BA)\)</td></tr>
+  </tbody>
+</table></div>
+
+<h2 id="sistemas">2. Sistemas lineales y eliminación de Gauss</h2>
+<p>Un sistema \(A\mathbf x=\mathbf b\) se resuelve escalonando la matriz ampliada \([A|\mathbf b]\) con operaciones elementales: intercambiar filas, multiplicar por un escalar no nulo y sumar un múltiplo de otra fila. Al final se clasifica por el <strong>rango</strong>:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Condición</th><th>Tipo de sistema</th><th>Soluciones</th></tr></thead>
+  <tbody>
+    <tr><td>\(\operatorname{rango}(A)<\operatorname{rango}(A|\mathbf b)\)</td><td>Incompatible</td><td>Ninguna</td></tr>
+    <tr><td>\(\operatorname{rango}(A)=\operatorname{rango}(A|\mathbf b)=n\)</td><td>Compatible determinado</td><td>Una única</td></tr>
+    <tr><td>\(\operatorname{rango}(A)=\operatorname{rango}(A|\mathbf b)<n\)</td><td>Compatible indeterminado</td><td>Infinitas (parámetros libres)</td></tr>
+  </tbody>
+</table></div>
+<p>Si \(A\) es cuadrada y \(\det A\ne0\), es invertible y el sistema tiene solución única \(\mathbf x=A^{-1}\mathbf b\). En la práctica se resuelve por Gauss o factorización LU, no calculando la inversa.</p>
+<div class="example">
+<h4>Ejemplo 2.1 — Gauss</h4>
+<p>Resolver \(x+y+z=6,\ 2x-y+z=3,\ x+2y-z=2\). Partimos de la matriz ampliada y hacemos \(F_2\leftarrow F_2-2F_1\), \(F_3\leftarrow F_3-F_1\):</p>
+$$\left[\begin{array}{ccc|c}1&1&1&6\\2&-1&1&3\\1&2&-1&2\end{array}\right]\longrightarrow
+\left[\begin{array}{ccc|c}1&1&1&6\\0&-3&-1&-9\\0&1&-2&-4\end{array}\right].$$
+<p>De las dos últimas: \(-3y-z=-9\) y \(y-2z=-4\). Resolviendo, \(y=2\), \(z=3\); y de la primera, \(x=1\). Solución \((1,2,3)\). Comprobación en las tres ecuaciones: \(1+2+3=6\), \(2-2+3=3\), \(1+4-3=2\). \(\checkmark\)</p>
+</div>
+
+<h2 id="determinantes">3. Determinantes e inversa</h2>
+<p>Para \(2\times2\), \(\det\begin{pmatrix}a&b\\c&d\end{pmatrix}=ad-bc\). Para matrices mayores se desarrolla por cofactores o se usa Gauss. Propiedades clave:</p>
+<ul>
+  <li>\(\det A=0\) si y solo si las filas (o columnas) son linealmente dependientes.</li>
+  <li>Intercambiar dos filas cambia el signo; multiplicar una fila por \(k\) multiplica el determinante por \(k\).</li>
+  <li>\(\det(A^T)=\det A\), \(\det(A^{-1})=1/\det A\).</li>
+</ul>
+<p>La inversa se calcula con la adjunta o, mejor, resolviendo \(AX=I\) por Gauss-Jordan. Una matriz \(A\) es <strong>ortogonal</strong> si \(A^TA=I\); entonces \(A^{-1}=A^T\) y conserva normas y ángulos.</p>
+
+<h2 id="espacios">4. Espacios vectoriales, base y dimensión</h2>
+<p>Un espacio vectorial es un conjunto cerrado bajo suma y multiplicación por escalares. Un conjunto de vectores <strong>genera</strong> un subespacio si toda combinación lineal de ellos está en él; es <strong>linealmente independiente</strong> si ninguna combinación lineal no trivial da cero. Una <strong>base</strong> es un conjunto independiente que genera; su número de elementos es la <strong>dimensión</strong>.</p>
+<p>El <strong>espacio nulo</strong> o núcleo de \(A\) es \(\{\mathbf x:A\mathbf x=0\}\). La <strong>imagen</strong> es \(\{A\mathbf x\}\). Se cumple el teorema rango-nulidad:</p>
+$$\dim(\ker A)+\dim(\operatorname{Im}A)=n.$$
+<p>El rango es la dimensión de la imagen y coincide con el número de pivotes de la forma escalonada.</p>
+
+<h2 id="transformaciones">5. Transformaciones lineales</h2>
+<p>Una transformación \(T:\mathbb R^n\to\mathbb R^m\) es lineal si \(T(\mathbf u+\mathbf v)=T(\mathbf u)+T(\mathbf v)\) y \(T(c\mathbf u)=cT(\mathbf u)\). Toda transformación lineal se representa por una matriz \(A\) tal que \(T(\mathbf x)=A\mathbf x\); sus columnas son las imágenes de los vectores de la base canónica.</p>
+<p>Ejemplos geométricos: rotación de ángulo \(\theta\), reflexión, escala y cizalla. Una rotación en el plano es</p>
+$$R_\theta=\begin{pmatrix}\cos\theta&-\sen\theta\\\sen\theta&\cos\theta\end{pmatrix}.$$
+<p>En telecom, una transformación lineal puede modelar un canal MIMO, un banco de filtros o un cambio de base (por ejemplo, pasar de la base temporal a la frecuencial).</p>
+
+<h2 id="autovalores">6. Autovalores, autovectores y diagonalización</h2>
+<div class="box def"><span class="box-title">Autovalores y autovectores</span>
+<p>\(\lambda\) es autovalor de \(A\) si existe \(\mathbf v\ne0\) con \(A\mathbf v=\lambda\mathbf v\). Los autovectores son las direcciones que la transformación no gira, solo escala. Se calculan resolviendo \(\det(A-\lambda I)=0\) (polinomio característico) y después \((A-\lambda I)\mathbf v=0\).</p></div>
+<p>Si \(A\) tiene \(n\) autovectores linealmente independientes, es <strong>diagonalizable</strong>: \(A=PDP^{-1}\), con \(D\) diagonal de autovalores y \(P\) la matriz de autovectores. Entonces \(A^k=PD^kP^{-1}\), lo que simplifica potencias y sistemas dinámicos.</p>
+<p>En matrices simétricas reales, los autovalores son reales y los autovectores de autovalores distintos son ortogonales; además existe una base ortonormal de autovectores (<strong>teorema espectral</strong>).</p>
+<div class="example">
+<h4>Ejemplo 6.1 — Autovalores \(2\times2\)</h4>
+<p>\(A=\begin{pmatrix}3&1\\0&2\end{pmatrix}\). \(\det(A-\lambda I)=(3-\lambda)(2-\lambda)=0\Rightarrow\lambda=3,2\). Para \(\lambda=3\): \((A-3I)\mathbf v=0\Rightarrow \mathbf v=(1,0)\). Para \(\lambda=2\): \(\mathbf v=(1,-1)\). \(A=PDP^{-1}\) con \(D=\operatorname{diag}(3,2)\).</p>
+</div>
+<p><strong>Estabilidad:</strong> en un sistema discreto \(\mathbf x_{k+1}=A\mathbf x_k\), el origen es estable si todos los autovalores tienen módulo menor que 1. En un sistema continuo \(\dot{\mathbf x}=A\mathbf x\), si todas las partes reales son negativas.</p>
+
+<h2 id="ortogonalidad">7. Ortogonalidad, mínimos cuadrados y SVD</h2>
+<p>La proyección de \(\mathbf b\) sobre un subespacio con base ortonormal \(\{\mathbf q_i\}\) es \(\sum_i(\mathbf b\cdot\mathbf q_i)\mathbf q_i\). El método de <strong>Gram–Schmidt</strong> construye una base ortonormal a partir de una cualquiera.</p>
+<p>Si \(A\mathbf x=\mathbf b\) no tiene solución exacta (sistema sobredeterminado), la <strong>solución de mínimos cuadrados</strong> minimiza \(\|A\mathbf x-\mathbf b\|^2\) y satisface las ecuaciones normales</p>
+$$A^TA\,\mathbf x=A^T\mathbf b.$$
+<p>La <strong>descomposición en valores singulares</strong> (SVD) es \(A=U\Sigma V^T\), con \(U,V\) ortogonales y \(\Sigma\) diagonal de valores singulares \(\sigma_i\ge0\). Sirve para compresión, rango efectivo, pseudoinversa y análisis de canales MIMO.</p>
+<div class="example">
+<h4>Ejemplo 7.1 — Mínimos cuadrados</h4>
+<p>Ajustar una recta \(y=mx+c\) a los puntos \((0,1),(1,3),(2,4)\). El sistema es \(A\mathbf x=\mathbf b\) con \(A=\begin{pmatrix}1&0\\1&1\\1&2\end{pmatrix}\), \(\mathbf b=(1,3,4)^T\). Las ecuaciones normales dan \(3c+3m=8\), \(3c+5m=11\); resolviendo, \(m=1{,}5\), \(c=1{,}1667\). La recta es \(y=1{,}5x+1{,}1667\).</p>
+</div>
+<p><strong>Matrices complejas:</strong> la transpuesta se sustituye por la <strong>hermítica</strong> \(A^H=\overline{A^T}\). Una matriz es unitaria si \(A^HA=I\) y hermítica si \(A^H=A\). Si es hermítica, sus autovalores son reales y sus autovectores ortogonales; ambas aparecen en procesamiento de señales y en mecánica cuántica.</p>
+
+<h2 id="sim">8. Interactivo: una matriz como transformación</h2>
+<p>Mueve los cuatro coeficientes de \(A=\begin{pmatrix}a&b\\c&d\end{pmatrix}\). El cuadrado unidad discontinuo se transforma en el paralelogramo rojo. Observa cómo el determinante es el factor de área y cuándo la transformación colapsa el plano.</p>
+<div class="sim" id="sim-mat">
+  <div class="sim-title">Transformación lineal \(2\times2\)</div>
+  <div class="controls">
+    <label>a <input type="range" id="mat-a" min="-2" max="2" step="0.1" value="1"></label>
+    <label>b <input type="range" id="mat-b" min="-2" max="2" step="0.1" value="0.5"></label>
+    <label>c <input type="range" id="mat-c" min="-2" max="2" step="0.1" value="0"></label>
+    <label>d <input type="range" id="mat-d" min="-2" max="2" step="0.1" value="1.5"></label>
+  </div>
+  <canvas id="mat-canvas" aria-label="Transformación del cuadrado unitario por una matriz 2 por 2"></canvas>
+  <div class="readout" id="mat-out"></div>
+</div>
+
+<h2 id="telecom">9. Aplicaciones en Telecom</h2>
+<ul>
+  <li><strong>MIMO:</strong> el canal es una matriz \(H\); la capacidad y el diseño de precodificación dependen de sus valores singulares.</li>
+  <li><strong>Procesamiento de señales:</strong> filtros FIR como convolución matricial; bancos de filtros y transformadas como cambios de base.</li>
+  <li><strong>Control:</strong> espacio de estados \(\dot{\mathbf x}=A\mathbf x+B\mathbf u\), estabilidad por autovalores.</li>
+  <li><strong>Redes:</strong> matriz de adyacencia, caminos, centralidad y análisis espectral de grafos.</li>
+  <li><strong>Codificación:</strong> códigos lineales sobre \(\mathbb F_2\), matrices generadora y de paridad.</li>
+  <li><strong>Antenas:</strong> vectores de dirección (steering vectors) y conformación de haz.</li>
+</ul>
+
+<h2 id="ejemplos">10. Ejemplos resueltos</h2>
+<div class="example">
+<h4>Ejemplo 10.1 — Producto e inversa</h4>
+<p>\(A=\begin{pmatrix}1&2\\3&4\end{pmatrix}\). \(\det A=4-6=-2\). \(A^{-1}=\frac{1}{-2}\begin{pmatrix}4&-2\\-3&1\end{pmatrix}=\begin{pmatrix}-2&1\\1{,}5&-0{,}5\end{pmatrix}\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.2 — Rango</h4>
+<p>\(A=\begin{pmatrix}1&2&3\\2&4&6\\1&1&1\end{pmatrix}\). La segunda fila es \(2\) veces la primera; el rango es 2. El sistema \(A\mathbf x=0\) tiene \(3-2=1\) parámetro libre.</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.3 — Proyección</h4>
+<p>Proyectar \(\mathbf b=(1,2)\) sobre \(\mathbf a=(1,0)\): \(\operatorname{proj}_{\mathbf a}\mathbf b=\frac{\mathbf b\cdot\mathbf a}{\mathbf a\cdot\mathbf a}\mathbf a=1\cdot(1,0)=(1,0)\). La componente ortogonal es \((0,2)\).</p>
+</div>
+<div class="example">
+<h4>Ejemplo 10.4 — Diagonalización y potencia</h4>
+<p>Para \(A=\begin{pmatrix}2&0\\0&3\end{pmatrix}\), \(A^k=\begin{pmatrix}2^k&0\\0&3^k\end{pmatrix}\). Si \(A=PDP^{-1}\), \(A^k=PD^kP^{-1}\).</p>
+</div>
+
+<h2 id="ejercicios">11. Ejercicios propuestos</h2>
+<ol class="exercises">
+  <li>Calcula \(AB\) para \(A=\begin{pmatrix}1&2\\3&4\end{pmatrix}\), \(B=\begin{pmatrix}0&1\\1&0\end{pmatrix}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(AB=\begin{pmatrix}2&1\\4&3\end{pmatrix}\).</p></div></details></li>
+  <li>Resuelve \(x+y=3,\ 2x-y=0\).
+    <details class="sol"><summary>Respuesta</summary><div><p>De la segunda \(y=2x\); sustituyendo, \(3x=3\Rightarrow x=1,y=2\).</p></div></details></li>
+  <li>Calcula el determinante de \(\begin{pmatrix}2&1&0\\1&3&1\\0&1&2\end{pmatrix}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(2(6-1)-1(2-0)=10-2=8\).</p></div></details></li>
+  <li>Halla el rango de \(\begin{pmatrix}1&2&1\\2&4&2\\3&6&3\end{pmatrix}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Todas las filas son múltiplos de \((1,2,1)\); el rango es 1.</p></div></details></li>
+  <li>Calcula los autovalores de \(\begin{pmatrix}4&1\\2&3\end{pmatrix}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\det(A-\lambda I)=(4-\lambda)(3-\lambda)-2=\lambda^2-7\lambda+10=0\Rightarrow\lambda=5,2\).</p></div></details></li>
+  <li>Diagonaliza \(A=\begin{pmatrix}1&0\\0&-1\end{pmatrix}\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Ya es diagonal: autovalores \(1,-1\), autovectores \((1,0)\) y \((0,1)\).</p></div></details></li>
+  <li>Comprueba si \(\mathbf u=(1,2)\) y \(\mathbf v=(2,-1)\) son ortogonales.
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\mathbf u\cdot\mathbf v=2-2=0\). Sí lo son.</p></div></details></li>
+  <li>Proyecta \(\mathbf b=(3,4)\) sobre \(\mathbf a=(1,0)\) y sobre \(\mathbf a=(1,1)\).
+    <details class="sol"><summary>Respuesta</summary><div><p>Sobre \((1,0)\): \((3,0)\). Sobre \((1,1)\): \(\frac{7}{2}(1,1)=(3{,}5;3{,}5)\).</p></div></details></li>
+  <li>Resuelve por mínimos cuadrados el sistema \(x=1,\ x=2\) (una incógnita, dos ecuaciones).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(A=(1,1)^T\), \(A^TA=2\), \(A^T\mathbf b=3\); \(x=1{,}5\), la media de 1 y 2.</p></div></details></li>
+  <li>¿Qué significa que \(\det A=0\)?
+    <details class="sol"><summary>Respuesta</summary><div><p>Que \(A\) no es invertible, sus columnas son linealmente dependientes y la transformación reduce la dimensión (no tiene inversa).</p></div></details></li>
+  <li>Sea \(A\) ortogonal. Demuestra que \(\|A\mathbf x\|=\|\mathbf x\|\).
+    <details class="sol"><summary>Respuesta</summary><div><p>\(\|A\mathbf x\|^2=(A\mathbf x)^T(A\mathbf x)=\mathbf x^TA^TA\mathbf x=\mathbf x^T\mathbf x=\|\mathbf x\|^2\).</p></div></details></li>
+</ol>
+
+<h2 id="autoevaluacion">12. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q">
+    <p>1. Si \(A\) es \(3\times3\) con \(\det A=0\), entonces</p>
+    <div class="opts">
+      <button class="opt">\(A\) es invertible</button>
+      <button class="opt" data-ok>sus columnas son linealmente dependientes</button>
+      <button class="opt">el rango es 3</button>
+    </div>
+    <p class="why">Determinante nulo equivale a columnas dependientes y rango menor que el número de columnas; la matriz no tiene inversa.</p>
+  </div>
+  <div class="q">
+    <p>2. Los autovalores de una matriz simétrica real son</p>
+    <div class="opts">
+      <button class="opt" data-ok>reales</button>
+      <button class="opt">siempre complejos</button>
+      <button class="opt">siempre positivos</button>
+    </div>
+    <p class="why">El teorema espectral garantiza autovalores reales y una base ortonormal de autovectores; pueden ser negativos o nulos.</p>
+  </div>
+  <div class="q">
+    <p>3. La solución de mínimos cuadrados satisface</p>
+    <div class="opts">
+      <button class="opt">\(A\mathbf x=0\)</button>
+      <button class="opt" data-ok>\(A^TA\mathbf x=A^T\mathbf b\)</button>
+      <button class="opt">\(A\mathbf x=\mathbf b\) siempre</button>
+    </div>
+    <p class="why">Las ecuaciones normales proyectan \(\mathbf b\) sobre la imagen de \(A\); si el sistema es compatible, coinciden con la solución exacta.</p>
+  </div>
+</div>
+
+<h2 id="biblio">13. Dónde estudiarlo</h2>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Tema</th></tr></thead>
+  <tbody>
+    <tr><td>Lay, <em>Álgebra lineal y sus aplicaciones</em>, 5.ª ed.</td><td>1–7</td><td>Sistemas, matrices, espacios, autovalores, ortogonalidad, SVD</td><td>Curso completo</td></tr>
+    <tr><td>Strang, <em>Linear Algebra and Its Applications</em>, 4.ª ed.</td><td>1–8</td><td>Todo el curso</td><td>Enfoque geométrico y aplicaciones</td></tr>
+    <tr><td>OpenStax, <em>Linear Algebra</em></td><td>1–7</td><td>Matrices, sistemas, autovalores</td><td>Texto abierto</td></tr>
+    <tr><td>Golub y Van Loan, <em>Matrix Computations</em></td><td>1–8</td><td>Métodos numéricos</td><td>Para profundizar en SVD y estabilidad</td></tr>
+  </tbody>
+</table></div>
+<p><strong>Recursos abiertos:</strong> <a href="https://openstax.org/details/books/linear-algebra">OpenStax Linear Algebra</a> · <a href="https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/">MIT 18.06 Linear Algebra</a>.</p>
+
+<h2 id="faq">14. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Por qué \(AB\ne BA\)?</summary><div><p>Porque la composición de transformaciones no conmuta: primero rotar y luego reflejar no es lo mismo que primero reflejar y luego rotar. Solo matrices muy especiales (por ejemplo, múltiplos de la identidad o matrices que comparten una base de autovectores) conmutan.</p></div></details>
+  <details><summary>¿Qué es el rango en palabras?</summary><div><p>Es el número de direcciones independientes que produce la matriz. Si una matriz \(3\times3\) tiene rango 2, su imagen es un plano y "pierde" una dimensión; por eso no es invertible.</p></div></details>
+  <details><summary>¿Para qué sirve diagonalizar?</summary><div><p>Convierte una transformación en un simple escalado por autovalores. Eso simplifica potencias, sistemas dinámicos, ecuaciones diferenciales y el análisis de estabilidad. Si la matriz no es diagonalizable, se usa la forma de Jordan o la SVD.</p></div></details>
+  <details><summary>¿Qué relación hay entre SVD y autovalores?</summary><div><p>Los valores singulares son las raíces cuadradas de los autovalores de \(A^TA\) (o de \(AA^T\)). A diferencia de la diagonalización, la SVD existe para cualquier matriz, incluso rectangular, y es numéricamente muy estable.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> contenido propio basado en el temario estándar de álgebra lineal para ingeniería. Bibliografía por capítulo y epígrafe; recursos abiertos verificados.</p>
+</main>
+</div>
+<footer class="site wrap">Matemáticas para Telecom · Álgebra lineal · <a href="../">Volver al itinerario</a></footer>
+</body>
+</html>
