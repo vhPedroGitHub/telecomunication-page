@@ -136,6 +136,22 @@ y 11.1; después se añadió el dibujo del espectro bilateral (amplitud y fase) 
 
 ## Bitácora
 
+- **2026-10-22** — Tema II, ampliación didáctica (sin figuras nuevas; siguen 20): en 4.2 se añadió
+  «De los \(C_n\) a la amplitud y la fase» (`h4#cn-amplitud-fase`) con la receta de tres cuentas
+  (evaluar, separar real/imaginaria, módulo y `atan2`), tabla numérica de \(C_n=2\operatorname{sinc}(n/2)\)
+  y tabla de fase con retardo \(T_0/4\); la tabla de propiedades de 4.3 incorpora linealidad y una
+  columna «Ejemplo concreto» en las 8 propiedades, seguida de un ejemplo numérico sin volver a integrar
+  (linealidad, par/impar, media onda, desplazamiento y Parseval). En 5.2 se añadió `h4#tf-ejemplos` con
+  los 10 teoremas de la TF y un ejemplo por teorema, la caja «Cómo atacar un ejercicio con teoremas» y
+  el «Ejemplo 5.4 — Cuatro transformadas combinando teoremas». §6 (delta) se amplió con definición
+  límite/cribado, unidades, tabla de 10 operaciones con ejemplo numérico, ideas clave, errores típicos
+  y un «Ejemplo 6.1» (el antiguo espectro del muestreo pasó a 6.2). §7 (convolución) se amplió con
+  intuición de superposición/ecos, tabla de 10 propiedades con ejemplo, errores típicos y el
+  «Ejemplo 7.2 — Rectángulo por exponencial» con los tres tramos y comprobaciones de continuidad/área.
+  Corregidos los signos de \(C_{\pm1}\) y \(C_{\pm3}\) en el ejemplo de media onda y el ejemplo de la
+  tabla (tren 0/4 V: \(|C_n|=4/(\pi|n|)\)). Verificado en Chromium headless: consola sin errores,
+  0 nodos `.katex-error`, `scrollWidth` = 390 px a 390 px de ventana.
+
 - **2026-10-21** — Tema II, Ej. 4.1: añadida la figura `data-fig="espectro-p41"` con el espectro
   bilateral del tren de pulsos (A = 4 V, τ = 0,5 ms, T₀ = 1 ms): amplitud `|Cn| = 2|sinc(n/2)|`
   con las líneas en nf₀, la envolvente sinc, los ceros en los armónicos pares y las fases 0°/180°

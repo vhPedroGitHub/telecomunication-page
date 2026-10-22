@@ -396,19 +396,81 @@ $$\boxed{C_m=\frac{1}{T_0}\int_{T_0}x(t)\,e^{-j2\pi mf_0t}dt}$$
   <li><strong>El intervalo</strong>: la integral es sobre un período <em>entero</em>; si integras de \(-\tau/2\) a \(\tau/2\) sin más estás calculando la transformada de un pulso, no los \(C_n\) del tren.</li>
 </ul></div>
 
-<h3 id="series-prop">4.3 Propiedades de los \(C_n\)</h3>
-<div class="table-wrap"><table>
-  <thead><tr><th>Propiedad</th><th>Expresión</th><th>Para qué sirve</th></tr></thead>
+<h4 id="cn-amplitud-fase">De la fórmula de \(C_n\) a las líneas de amplitud y fase</h4>
+<p>Ya tienes \(C_n\) como fórmula. El paso que más se atasca es el último: <strong>convertir esa fórmula en números y en un dibujo</strong>. Recuerda que cada \(C_n\) es <em>un solo número complejo</em>, y que de él salen <em>dos</em> gráficos: la altura \(|C_n|\) va al espectro de amplitud y el ángulo \(\arg C_n\) va al de fase. Nunca se dibuja un valor negativo de altura: un signo menos es una fase de \(180^\circ\).</p>
+<div class="box idea"><span class="box-title">Las tres cuentas, en orden</span>
+<ol>
+  <li><strong>Evalúa</strong> la fórmula en el entero \(n\) que te interese (\(n=0,\pm1,\pm2,\dots\)). Si la fórmula tiene una sinc, calcula primero su argumento.</li>
+  <li><strong>Separa</strong> el resultado en parte real e imaginaria: \(C_n=a+jb\).</li>
+  <li><strong>Obtén</strong> \( |C_n|=\sqrt{a^2+b^2} \) y \( \arg C_n=\operatorname{atan2}(b,a) \), y pasa el ángulo a grados. Si \(C_n\) es real, no hace falta atan2: \(a\gt0\Rightarrow0^\circ\), \(a\lt0\Rightarrow180^\circ\).</li>
+</ol></div>
+<p>La función <em>atan2</em> es la que usan MATLAB, Python y las calculadoras: elige el cuadrante correcto mirando los signos de \(a\) y \(b\). Por eso no se escribe sin más \(\arctan(b/a)\): eso solo distingue bien el primero y el cuarto cuadrante.</p>
+<p>Ejemplo con la fórmula del tren de pulsos del Ejemplo 4.1, \(C_n=2\operatorname{sinc}(n/2)\), que es <strong>real</strong> porque la señal es par:</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>\(n\)</th><th>\(nf_0\) (kHz)</th><th>\(\operatorname{sinc}(n/2)\)</th><th>\(C_n=2\operatorname{sinc}(n/2)\)</th><th>\(|C_n|\) (V)</th><th>\(\arg C_n\)</th></tr></thead>
   <tbody>
-    <tr><td>Simetría hermítica (señal real)</td><td>\(C_{-n}=C_n^{*}\): \(|C_{-n}|=|C_n|\), \(\arg C_{-n}=-\arg C_n\)</td><td>Amplitud par, fase impar: basta calcular \(n\ge0\).</td></tr>
-    <tr><td>Valor medio (componente de DC)</td><td>\(C_0=\frac1{T_0}\int_{T_0}x\,dt=\langle x(t)\rangle\)</td><td>Sumar una constante solo cambia la línea en \(f=0\).</td></tr>
-    <tr><td>Señal par</td><td>\(x(-t)=x(t)\Rightarrow C_n\) reales</td><td>Fase 0° o 180°.</td></tr>
-    <tr><td>Señal impar</td><td>\(x(-t)=-x(t)\Rightarrow C_n\) imaginarios puros, \(C_0=0\)</td><td>Fase ±90°.</td></tr>
-    <tr><td>Simetría de media onda</td><td>\(x(t\pm T_0/2)=-x(t)\Rightarrow C_n=0\) para \(n\) par</td><td>Solo armónicos impares.</td></tr>
-    <tr><td>Desplazamiento en el tiempo</td><td>\(x(t-t_d)\to C_n e^{-j2\pi nf_0t_d}\)</td><td>Un retardo no cambia las amplitudes, solo añade fase lineal.</td></tr>
-    <tr><td>Teorema de Parseval (potencia)</td><td>\(P=\frac1{T_0}\int_{T_0}|x|^2dt=\sum_n|C_n|^2\)</td><td>La potencia se reparte entre las líneas.</td></tr>
+    <tr><td>0</td><td>0</td><td>1</td><td>2</td><td>2</td><td>0°</td></tr>
+    <tr><td>±1</td><td>±1</td><td>\(2/\pi\approx0{,}637\)</td><td>\(4/\pi\approx1{,}273\)</td><td>1,273</td><td>0°</td></tr>
+    <tr><td>±2</td><td>±2</td><td>0</td><td>0</td><td>0</td><td>indefinida</td></tr>
+    <tr><td>±3</td><td>±3</td><td>\(-2/(3\pi)\approx-0{,}212\)</td><td>\(-4/(3\pi)\approx-0{,}424\)</td><td>0,424</td><td>180°</td></tr>
+    <tr><td>±5</td><td>±5</td><td>\(2/(5\pi)\approx0{,}127\)</td><td>\(4/(5\pi)\approx0{,}255\)</td><td>0,255</td><td>0°</td></tr>
+    <tr><td>±7</td><td>±7</td><td>\(-2/(7\pi)\approx-0{,}091\)</td><td>\(-4/(7\pi)\approx-0{,}182\)</td><td>0,182</td><td>180°</td></tr>
   </tbody>
 </table></div>
+<p>Lee la tabla así: en \(f=0\) hay una línea de 2 V; en \(\pm1\) kHz, dos líneas de 1,273 V en fase 0; en \(\pm2\) kHz <em>no hay línea</em> (y por eso su fase no se dibuja); en \(\pm3\) kHz hay 0,424 V, pero con \(180^\circ\), etc. El espectro de amplitud es siempre \(\ge0\); el signo de la sinc se traslada al de fase.</p>
+
+<div class="box warn"><span class="box-title">Los tres errores que arruinan el dibujo</span>
+<ul>
+  <li><strong>Bajar la línea por debajo del eje</strong> cuando \(C_n\lt0\). En amplitud la altura es \(|C_n|\); el signo negativo se convierte en \(180^\circ\) en el gráfico de fase. Una línea «hacia abajo» en un espectro de amplitud no significa nada.</li>
+  <li><strong>Dar fase a un armónico nulo.</strong> Si \(C_n=0\), no hay componente: su fase no está definida y no se dibuja punto.</li>
+  <li><strong>Olvidar el signo al pasar a la forma módulo-ángulo.</strong> \(C_n=-0{,}424\) es \(0{,}424\,\angle180^\circ\), no \(0{,}424\,\angle0^\circ\). Y \(C_n=-j1{,}273\) es \(1{,}273\,\angle-90^\circ\), no \(\angle+90^\circ\).</li>
+</ul></div>
+
+<p>Si la señal está <strong>retrasada</strong>, la fórmula suele ser un producto de una amplitud real por una exponencial: \(C_n=|A_n|e^{j\varphi_n}\). Por ejemplo, el tren del Ejemplo 4.3 retrasado \(T'=T_0/4=0{,}25\) ms tiene \(C_n=2\operatorname{sinc}(n/2)\,e^{-j\pi n/2}\). La amplitud no cambia; la fase es la de la sinc (0° o 180°) <em>más</em> la de la exponencial, \(-90^\circ n\):</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>\(n\)</th><th>\(|C_n|\) (V)</th><th>Fase de la sinc</th><th>Fase del retardo</th><th>\(\arg C_n\) total</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>2</td><td>0°</td><td>0°</td><td>0°</td></tr>
+    <tr><td>1</td><td>1,273</td><td>0°</td><td>−90°</td><td>−90°</td></tr>
+    <tr><td>−1</td><td>1,273</td><td>0°</td><td>+90°</td><td>+90°</td></tr>
+    <tr><td>3</td><td>0,424</td><td>180°</td><td>−270° ≡ +90°</td><td>−90°</td></tr>
+    <tr><td>−3</td><td>0,424</td><td>180°</td><td>+270° ≡ −90°</td><td>+90°</td></tr>
+  </tbody>
+</table></div>
+<p>Comprobación rápida: el retardo no puede cambiar la potencia ni las alturas (solo gira las fases). Si al calcular un retardo te cambian los \(|C_n|\), hay un error de cuentas. Para comparar fases, suma o resta \(360^\circ\) hasta dejar el ángulo en \((-180^\circ,180^\circ]\); \(-270^\circ\) y \(+90^\circ\) son la misma fase.</p>
+
+<h3 id="series-prop">4.3 Propiedades de los \(C_n\)</h3>
+<p>Cada propiedad es una <strong>regla de atajo</strong>: permite predecir el espectro (o parte de él) sin repetir la integral. En la cuarta columna va un ejemplo numérico concreto; los desarrollo después de la tabla.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Propiedad</th><th>Expresión</th><th>Para qué sirve</th><th>Ejemplo concreto</th></tr></thead>
+  <tbody>
+    <tr><td>Linealidad</td><td>\(x(t)\leftrightarrow C_n,\ y(t)\leftrightarrow D_n\ \Rightarrow\ ax+by\leftrightarrow aC_n+bD_n\)</td><td>Sumar señales = sumar sus líneas.</td><td>\(3+2\cos(2\pi f_0t)\): \(C_0=3\), \(C_{\pm1}=1\).</td></tr>
+    <tr><td>Simetría hermítica (señal real)</td><td>\(C_{-n}=C_n^{*}\): \(|C_{-n}|=|C_n|\), \(\arg C_{-n}=-\arg C_n\)</td><td>Amplitud par, fase impar: basta calcular \(n\ge0\).</td><td>\(A\cos(2\pi f_0t+\varphi)\): \(C_1=\tfrac A2\angle\varphi\), \(C_{-1}=\tfrac A2\angle-\varphi\).</td></tr>
+    <tr><td>Valor medio (componente de DC)</td><td>\(C_0=\frac1{T_0}\int_{T_0}x\,dt=\langle x(t)\rangle\)</td><td>Sumar una constante solo cambia la línea en \(f=0\).</td><td>\(x=3+2\cos\): \(C_0=3\). Si \(x\to x+5\), \(C_0=8\).</td></tr>
+    <tr><td>Señal par</td><td>\(x(-t)=x(t)\Rightarrow C_n\) reales</td><td>Fase 0° o 180°.</td><td>Tren centrado: \(C_n=2\operatorname{sinc}(n/2)\), real.</td></tr>
+    <tr><td>Señal impar</td><td>\(x(-t)=-x(t)\Rightarrow C_n\) imaginarios puros, \(C_0=0\)</td><td>Fase ±90°.</td><td>\(A\sin(2\pi f_0t)\): \(C_1=-j\tfrac A2\), \(C_{-1}=+j\tfrac A2\).</td></tr>
+    <tr><td>Simetría de media onda</td><td>\(x(t\pm T_0/2)=-x(t)\Rightarrow C_n=0\) para \(n\) par</td><td>Solo armónicos impares.</td><td>Tren 0/4 V sin DC: \(|C_n|=4/(\pi|n|)\) para \(n\) impar; \(C_n=0\) para \(n\) par.</td></tr>
+    <tr><td>Desplazamiento en el tiempo</td><td>\(x(t-t_d)\to C_n e^{-j2\pi nf_0t_d}\)</td><td>Un retardo no cambia las amplitudes, solo añade fase lineal.</td><td>Retardo \(T_0/4\): \(|C_n|\) iguales, \(\arg C_n\) baja \(90^\circ n\).</td></tr>
+    <tr><td>Teorema de Parseval (potencia)</td><td>\(P=\frac1{T_0}\int_{T_0}|x|^2dt=\sum_n|C_n|^2\)</td><td>La potencia se reparte entre las líneas.</td><td>Ej. 4.1: \(P=8\) W \(=C_0^2+2\sum_{n\ \text{impar}}|C_n|^2\).</td></tr>
+  </tbody>
+</table></div>
+<div class="box idea"><span class="box-title">Cómo usar la tabla sin equivocarte</span>
+<p>Primero identifica la <strong>forma</strong> de la señal: ¿tiene DC?, ¿es par o impar?, ¿se repite invertida a medio período?, ¿está retrasada respecto de una versión que ya conoces? Cada «sí» elimina líneas o fija fases antes de calcular nada. La integral solo se hace para las amplitudes que quedan.</p></div>
+
+<div class="example">
+<h4>Las propiedades de los \(C_n\) con números (sin volver a integrar)</h4>
+<p><strong>1. Linealidad.</strong> Sea \(x(t)=3+2\cos(2\pi t)+0{,}5\cos(4\pi t)\), con \(T_0=1\) s. Cada coseno aporta dos líneas de altura mitad y la constante una línea en DC:</p>
+$$C_0=3,\qquad C_{\pm1}=\tfrac22=1,\qquad C_{\pm2}=\tfrac{0{,}5}{2}=0{,}25,\qquad \text{resto}=0$$
+<p>Si sumas otra señal, sumas sus coeficientes línea a línea; no hay que integrar de nuevo.</p>
+
+<p><strong>2. Par e impar.</strong> Para \(x(t)=2\cos(2\pi t)\), \(C_{\pm1}=1\) (real, fase 0°). Para \(y(t)=2\sin(2\pi t)=2\cos(2\pi t-90^\circ)\), \(C_1=1\angle-90^\circ=-j\) y \(C_{-1}=1\angle+90^\circ=+j\): mismos módulos, fases opuestas. Eso es exactamente la simetría hermítica \(C_{-n}=C_n^*\).</p>
+
+<p><strong>3. Media onda.</strong> Al tren 0/4 V del Ejemplo 4.1 le restamos su valor medio 2 V. Los \(C_n\) con \(n\ne0\) no cambian; \(C_0\) pasa de 2 a 0. Como \(C_n=2\operatorname{sinc}(n/2)\), los pares siguen nulos y los impares valen \(C_{\pm1}=4/\pi\), \(C_{\pm3}=-4/(3\pi)\), etc. (pares en \(n\)). La señal tiene simetría de media onda: \(x(t+T_0/2)=-x(t)\), y por eso <strong>solo quedan armónicos impares</strong>.</p>
+
+<p><strong>4. Desplazamiento.</strong> El tren centrado tiene \(C_n=2\operatorname{sinc}(n/2)\). Si lo retrasas \(T_0/4=0{,}25\) ms, multiplicas por \(e^{-j2\pi n(1/4)}=e^{-j\pi n/2}\). La línea de 1 kHz (\(n=1\)) conserva sus 1,273 V pero pasa de 0° a \(-90^\circ\); la de \(-1\) kHz pasa a \(+90^\circ\). Ninguna altura cambia: un retardo solo gira el espectro de fase.</p>
+
+<p><strong>5. Parseval.</strong> Para el mismo tren, \(P=A^2\tau/T_0=16\cdot0{,}5=8\) W. En frecuencia: \(2^2+2[(4/\pi)^2+(4/3\pi)^2+(4/5\pi)^2+\dots]=4+4=8\) W. Si te sale distinto, o falta el factor 2 de las líneas negativas o se olvidó alguna componente.</p>
+</div>
 
 <h3 id="series-tren">4.4 El caso más importante: el tren de pulsos rectangulares</h3>
 <p>Define primero dos funciones que aparecerán sin descanso:</p>
@@ -940,6 +1002,26 @@ $$X(f)=\mathcal F\{x(t)\}=\int_{-\infty}^{\infty}x(t)\,e^{-j2\pi ft}\,dt\qquad\L
   </tbody>
 </table></div>
 
+<h4 id="tf-ejemplos">Un ejemplo concreto por cada teorema</h4>
+<p>Los teoremas se entienden cuando se ven aplicados. En todos los ejemplos \(x(t)\leftrightarrow X(f)\) es el pulso base \(\Pi(t)\leftrightarrow\operatorname{sinc}(f)\) (ancho 1, altura 1, área 1):</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Teorema</th><th>Señal concreta</th><th>Transformada</th><th>Qué se observa</th></tr></thead>
+  <tbody>
+    <tr><td>Linealidad</td><td>\(2\Pi(t/2)+3\delta(t-1)\)</td><td>\(4\operatorname{sinc}(2f)+3e^{-j2\pi f}\)</td><td>La constante 2 multiplica la transformada del pulso; el impulso aporta una exponencial compleja. No hay términos cruzados.</td></tr>
+    <tr><td>Desplazamiento en tiempo</td><td>\(\Pi(t-1)\)</td><td>\(\operatorname{sinc}(f)\,e^{-j2\pi f}\)</td><td>Mismo \(|X(f)|=|\operatorname{sinc}f|\); la fase \(-2\pi f\) es una recta (módulo \(180^\circ\)).</td></tr>
+    <tr><td>Modulación</td><td>\(\Pi(t)\cos(2\pi\,5t)\)</td><td>\(\tfrac12[\operatorname{sinc}(f-5)+\operatorname{sinc}(f+5)]\)</td><td>El lóbulo de \(\pm1/\tau\) se copia alrededor de \(\pm5\) Hz, con altura mitad.</td></tr>
+    <tr><td>Cambio de escala</td><td>\(\Pi(2t)\)</td><td>\(\tfrac12\operatorname{sinc}(f/2)\)</td><td>El pulso conserva la altura pero dura la mitad (área 0,5); su espectro es el doble de ancho y la mitad de alto. Primer cero: \(f=2\) en vez de \(f=1\).</td></tr>
+    <tr><td>Dualidad</td><td>\(2\operatorname{sinc}(2t)\)</td><td>\(\Pi(f/2)\)</td><td>Lo que era pulso en tiempo pasa a sinc en frecuencia y viceversa (con \(W=1\)).</td></tr>
+    <tr><td>Derivada</td><td>\(\Lambda(t)\) y \(d\Lambda/dt\)</td><td>\(\operatorname{sinc}^2(f)\) y \(j2\pi f\operatorname{sinc}^2(f)\)</td><td>La derivada multiplica por \(j2\pi f\): acentúa las altas frecuencias y convierte el triángulo en dos rectángulos (Ej. 5.3).</td></tr>
+    <tr><td>Integración</td><td>\(u(t)\)</td><td>\(\dfrac{1}{j2\pi f}+\tfrac12\delta(f)\)</td><td>El término \(1/(j2\pi f)\) integra las componentes; el impulso en 0 es el valor medio (la DC) del escalón.</td></tr>
+    <tr><td>Convolución</td><td>\(\Pi(t)*\Pi(t)=\Lambda(t)\)</td><td>\(\operatorname{sinc}(f)\cdot\operatorname{sinc}(f)=\operatorname{sinc}^2(f)\)</td><td>Convolucionar en tiempo = multiplicar en frecuencia (Ej. 7.1).</td></tr>
+    <tr><td>Multiplicación</td><td>\(2\operatorname{sinc}(2t)\cos(2\pi\,10t)\)</td><td>\(\tfrac12[\Pi(\tfrac{f-10}{2})+\Pi(\tfrac{f+10}{2})]\)</td><td>Multiplicar en tiempo = convolucionar en frecuencia; el rectángulo se replica en \(\pm10\).</td></tr>
+    <tr><td>Rayleigh</td><td>\(x(t)=2\Pi(t)\)</td><td>\(X(f)=2\operatorname{sinc}(f)\)</td><td>\(E_{\text{tiempo}}=4\cdot1=4\) J y \(E_{\text{frecuencia}}=\int4\operatorname{sinc}^2(f)\,df=4\) J.</td></tr>
+  </tbody>
+</table></div>
+<div class="box idea"><span class="box-title">Cómo atacar un ejercicio con teoremas</span>
+<p>Escribe la señal como <strong>operaciones sobre un par conocido</strong>: sumas, desplazamientos, escalados, productos por cosenos, derivadas. Transforma cada operación con la tabla y combina. Si al final no sabes si el resultado es razonable, comprueba tres cosas: \(X(0)\) debe ser el área de \(x(t)\); \(|X(f)|\) debe ser par si \(x\) es real; y el ancho de banda debe crecer cuando la señal se comprime en tiempo.</p></div>
+
 <div class="example">
 <h4>Ejemplo 5.2 — Pulso de radiofrecuencia (Resumen de TF, Ejemplos 1 y 2)</h4>
 <p>Halle el espectro de \(x(t)=\Pi(t/T_1)\cos(2\pi f_1t)\) (un "trozo" de coseno de duración \(T_1\)).</p>
@@ -1021,6 +1103,25 @@ $$\frac{dx}{dt}=\frac{A}{\tau}\Pi\!\left(\frac{t+\tau/2}{\tau}\right)-\frac{A}{\
 <div class="step"><span class="n">3</span><div><p>Dividimos por \(j2\pi f\) (teorema de la derivada al revés):</p>$$X(f)=\frac{2jA\operatorname{sinc}(f\tau)\sin(\pi f\tau)}{j2\pi f}=A\tau\operatorname{sinc}(f\tau)\frac{\sin\pi f\tau}{\pi f\tau}=A\tau\operatorname{sinc}^2(f\tau)$$<p>Sin una sola integral. Observa que el triángulo (sin saltos) tiene un espectro que decae como \(1/f^2\), más rápido que el rectángulo (\(1/f\)): <strong>cuanto más suave la señal, más compacto su espectro</strong>.</p></div></div>
 </div>
 
+<div class="example">
+<h4>Ejemplo 5.4 — Cuatro transformadas combinando teoremas</h4>
+<p><strong>(a) Desplazamiento, escala y linealidad.</strong> Sea \(x(t)=3\Pi\!\left(\frac{t-2}{4}\right)-2\Pi\!\left(\frac{t}{2}\right)\). El primer pulso tiene altura 3, duración 4 y centro en \(t_d=2\); el segundo, altura 2 y duración 2, centrado en 0:</p>
+$$X(f)=3\cdot4\operatorname{sinc}(4f)e^{-j2\pi f\cdot2}-2\cdot2\operatorname{sinc}(2f)=12\operatorname{sinc}(4f)e^{-j4\pi f}-4\operatorname{sinc}(2f)$$
+<p>Comprobación en \(f=0\): \(X(0)=12-4=8\), que es el área total (\(3\cdot4-2\cdot2=8\)). La exponencial solo aparece en el pulso desplazado; el centrado tiene fase 0 o 180° según el signo de la sinc.</p>
+
+<p><strong>(b) Modulación.</strong> Para \(y(t)=\Pi(t/2)\cos(2\pi\,100t)\), con \(Y_0(f)=2\operatorname{sinc}(2f)\):</p>
+$$Y(f)=\tfrac12[Y_0(f-100)+Y_0(f+100)]=\operatorname{sinc}[2(f-100)]+\operatorname{sinc}[2(f+100)]$$
+<p>El espectro es el del pulso, copiado en \(\pm100\) Hz. No hace falta integrar el coseno truncado.</p>
+
+<p><strong>(c) Escala.</strong> Compara \(z(t)=\Pi(t)\) y \(z(2t)\). La segunda dura la mitad y vale el doble en el intervalo donde existe. Sus transformadas son \(Z(f)=\operatorname{sinc}(f)\) y \(\tfrac12Z(f/2)=\tfrac12\operatorname{sinc}(f/2)\): el primer cero pasa de \(f=1\) a \(f=2\) y la altura en \(f=0\) baja de 1 a 0,5. El área en frecuencia, \(\int|X|df\), se conserva; lo que se comprime en tiempo se expande en frecuencia.</p>
+
+<p><strong>(d) Derivada e integración.</strong> El triángulo \(A\Lambda(t/\tau)\) del Ejemplo 5.3 tiene \(X(f)=A\tau\operatorname{sinc}^2(f\tau)\). Su derivada debe transformarse en \(j2\pi fX(f)\):</p>
+$$\mathcal F\left\{\frac{d}{dt}\left[A\Lambda\!\left(\frac t\tau\right)\right]\right\}=j2\pi f\,A\tau\operatorname{sinc}^2(f\tau)$$
+<p>Y efectivamente, derivando el triángulo salen dos rectángulos de altura \(\pm A/\tau\): al transformarlos con desplazamiento se obtiene \(2jA\operatorname{sinc}(f\tau)\sin(\pi f\tau)\), que es lo mismo porque \(\sin(\pi f\tau)=\pi f\tau\operatorname{sinc}(f\tau)\). La derivada <em>sube</em> el exponente de \(f\) (de \(1/f^2\) a \(1/f\)); integrar lo baja. Por eso las señales suaves tienen espectros más estrechos.</p>
+
+<p><strong>(e) Rayleigh.</strong> Para el pulso \(x(t)=A\Pi(t/\tau)\): \(E=\int|A|^2dt=A^2\tau\) y \(\int|X|^2df=A^2\tau^2\int\operatorname{sinc}^2(f\tau)df=A^2\tau\). Las dos cuentas coinciden, como debe ser.</p>
+</div>
+
 <div class="sim" id="sim-tf">
   <div class="sim-title">Explorador de la transformada de Fourier</div>
   <p class="meta">Un pulso de ancho τ, retardado \(t_d\) y, opcionalmente, multiplicado por un coseno de frecuencia \(f_c\). Comprueba los teoremas: el retardo no altera \(|X(f)|\) pero gira la fase; la modulación traslada el espectro a \(\pm f_c\); estrechar el pulso ensancha el espectro.</p>
@@ -1038,10 +1139,47 @@ $$\frac{dx}{dt}=\frac{A}{\tau}\Pi\!\left(\frac{t+\tau/2}{\tau}\right)-\frac{A}{\
 <h2 id="impulsos">6. Impulsos y transformadas en el límite</h2>
 <p>Problema que plantea la Actividad 3: ¿cuál es el espectro de una <strong>constante</strong>? No es periódica en sentido útil ni de energía (\(E=\infty\)), así que la integral de Fourier no converge. La salida es el <strong>impulso de Dirac</strong>.</p>
 <h3 id="impulsos-def">6.1 El impulso unitario</h3>
-<p>Imagina un pulso rectangular de ancho \(a\) y altura \(1/a\) (área 1). Si \(a\to0\) se hace infinitamente alto y estrecho pero conserva área 1: eso es \(\delta(t)\). No es una función ordinaria; se define por lo que hace dentro de una integral:</p>
-$$\delta(t)=\lim_{a\to0}\tfrac1a\Pi(t/a),\qquad \int_{-\infty}^{\infty}\delta(t)\,dt=1,\qquad \int_{-\infty}^{\infty}x(t)\,\delta(t-t_0)\,dt=x(t_0)\ \ (\text{cribado})$$
-<p>Operaciones útiles: \(x(t)\delta(t-t_0)=x(t_0)\delta(t-t_0)\) · \(x(t)*\delta(t-t_0)=x(t-t_0)\) (convolucionar con un impulso <em>traslada</em>) · \(\delta(\alpha t)=\delta(t)/|\alpha|\) · \(u(t)=\int_{-\infty}^t\delta\), es decir \(\delta=du/dt\).</p>
-<p>Se dibuja como una flecha cuya <strong>altura indica el área (peso)</strong>, no el valor.</p>
+<p>Imagina un pulso rectangular de ancho \(a\) y altura \(1/a\): su área es siempre 1, aunque \(a\) cambie. Si \(a\to0\), el pulso se hace altísimo y estrechísimo pero conserva el área. El objeto límite es el <strong>impulso unitario de Dirac</strong> \(\delta(t)\):</p>
+$$\delta(t)=\lim_{a\to0}\frac1a\Pi\!\left(\frac ta\right),\qquad \int_{-\infty}^{\infty}\delta(t)\,dt=1$$
+<p>No es una función ordinaria: <strong>no tiene un valor puntual útil</strong>. No se pregunta «cuánto vale \(\delta(0)\)», sino «qué hace al multiplicarse por otra función e integrarse». Su definición operativa es la propiedad de <strong>cribado</strong> (o muestreo):</p>
+<div class="eq key">$$\int_{-\infty}^{\infty}x(t)\,\delta(t-t_0)\,dt=x(t_0)$$<div class="eq-label">El impulso en \(t_0\) «extrae» el valor de \(x\) en \(t_0\)</div></div>
+<p>De ahí salen todas las demás reglas. Si \(t\) se mide en segundos, \(\delta(t)\) tiene unidades de \(1/\text{s}\) (su integral, el área, es adimensional). Se dibuja como una <strong>flecha</strong> cuya altura representa el <strong>área o peso</strong>, no el valor de la función.</p>
+
+<div class="table-wrap"><table>
+  <thead><tr><th>Operación</th><th>Regla</th><th>Ejemplo numérico</th></tr></thead>
+  <tbody>
+    <tr><td>Área</td><td>\(\int\delta(t)\,dt=1\)</td><td>Un impulso de peso 3 tiene \(\int3\delta(t)dt=3\).</td></tr>
+    <tr><td>Cribado</td><td>\(\int x(t)\delta(t-t_0)dt=x(t_0)\)</td><td>\(\int(3t^2+1)\delta(t-2)dt=3\cdot4+1=13\).</td></tr>
+    <tr><td>Producto</td><td>\(x(t)\delta(t-t_0)=x(t_0)\delta(t-t_0)\)</td><td>\(t^2\delta(t-1)=1\cdot\delta(t-1)\).</td></tr>
+    <tr><td>Paridad</td><td>\(\delta(-t)=\delta(t)\)</td><td>\(\int x(t)\delta(-t)dt=x(0)\).</td></tr>
+    <tr><td>Escala</td><td>\(\delta(at)=\dfrac{1}{|a|}\delta(t)\)</td><td>\(\delta(2t)=\tfrac12\delta(t)\); \(\delta(2t-0{,}5)=\tfrac12\delta(t-0{,}25)\).</td></tr>
+    <tr><td>Convolución</td><td>\(x(t)*\delta(t-t_0)=x(t-t_0)\)</td><td>\(\Pi(t)*\delta(t-2)=\Pi(t-2)\): solo traslada.</td></tr>
+    <tr><td>Derivada</td><td>\(\int x(t)\delta'(t-t_0)dt=-x'(t_0)\)</td><td>\(\int t^2\delta'(t-1)dt=-2\).</td></tr>
+    <tr><td>Escalón</td><td>\(u(t)=\int_{-\infty}^t\delta(\lambda)d\lambda\), \(\delta(t)=\dfrac{du}{dt}\)</td><td>La derivada de \(2u(t-1)\) es \(2\delta(t-1)\).</td></tr>
+    <tr><td>Transformada</td><td>\(\mathcal F\{\delta(t)\}=1\), \(\mathcal F\{1\}=\delta(f)\)</td><td>Un impulso tiene todas las frecuencias por igual; una constante, solo \(f=0\).</td></tr>
+    <tr><td>Línea espectral</td><td>\(A\cos(2\pi f_0t)\leftrightarrow\tfrac A2\delta(f-f_0)+\tfrac A2\delta(f+f_0)\)</td><td>\(3\cos(2\pi10t)\leftrightarrow\tfrac32\delta(f-10)+\tfrac32\delta(f+10)\).</td></tr>
+  </tbody>
+</table></div>
+
+<p><strong>Las dos ideas que hay que llevarse.</strong> (1) El impulso es la <em>identidad de la convolución</em>: convolucionar con \(\delta(t-t_0)\) no deforma nada, solo traslada. (2) En frecuencia, un impulso es una <em>línea espectral</em>: por eso la TF de una señal periódica es \(\sum_nC_n\delta(f-nf_0)\), y por eso el espectro de línea y el espectro continuo son el mismo objeto matemático visto con distinto nivel de detalle.</p>
+
+<div class="box warn"><span class="box-title">Errores típicos con la delta</span>
+<ul>
+  <li><strong>Evaluar \(\delta(0)\).</strong> No se usa el valor puntual; solo importa dentro de una integral o como peso de una línea. Escribir \(\delta(0)=\infty\) no ayuda a calcular nada.</li>
+  <li><strong>Olvidar el valor absoluto en \(\delta(at)\).</strong> Es \(1/|a|\), no \(1/a\): \(\delta(-2t)=\tfrac12\delta(t)\), no \(-\tfrac12\delta(t)\).</li>
+  <li><strong>Multiplicar dos deltas en el mismo punto.</strong> \(\delta(t)^2\) no está definido; en cambio, \(\delta(t-t_1)\delta(t-t_2)=0\) si \(t_1\ne t_2\).</li>
+  <li><strong>Confundir \(\delta(t)\) con \(\delta(f)\).</strong> Cambia el argumento (y las unidades): \(\delta(t)\) está en \(1/\text{s}\), \(\delta(f)\) en s. La regla \(\mathcal F\{1\}=\delta(f)\) no es \(\mathcal F\{1\}=\delta(t)\).</li>
+  <li><strong>Dibujar la delta con «altura» igual a su valor.</strong> La flecha marca el <em>área</em>; dos deltas de pesos 1 y 3 se dibujan con flechas de alturas 1 y 3 aunque ambas sean «infinitas».</li>
+</ul></div>
+
+<div class="example">
+<h4>Ejemplo 6.1 — Manejo del impulso en cuentas concretas</h4>
+<p><strong>(a) Cribado directo.</strong> \(\displaystyle\int_{-\infty}^{\infty}(3t^2+1)\,\delta(t-2)\,dt=3(2)^2+1=13\). El impulso «selecciona» \(t=2\); el resto de la integral no se calcula.</p>
+<p><strong>(b) Impulso fuera del intervalo.</strong> \(\displaystyle\int_{0}^{5}e^{-t}\delta(t+1)\,dt=0\), porque \(\delta(t+1)\) está en \(t=-1\), fuera de \([0,5]\). Dentro de la integral, la delta solo actúa si su punto cae en el intervalo.</p>
+<p><strong>(c) Escala antes de cribar.</strong> \(\displaystyle\int_{-\infty}^{\infty}\cos(2\pi t)\,\delta(2t-0{,}5)\,dt\). Primero \(\delta(2t-0{,}5)=\delta(2(t-0{,}25))=\tfrac12\delta(t-0{,}25)\); después \(\tfrac12\cos(2\pi\cdot0{,}25)=\tfrac12\cos(\pi/2)=0\).</p>
+<p><strong>(d) Convolución como eco.</strong> Si \(x(t)=\Pi(t)\) y \(h(t)=\delta(t)+0{,}5\delta(t-1)\), entonces \(y=x*h=x(t)+0{,}5x(t-1)\): la salida es el pulso original más una copia atenuada 1 s después. Los impulsos de \(h\) son los «ecos» del sistema.</p>
+<p><strong>(e) De la serie a la TF.</strong> La señal \(3+2\cos(2\pi10t)\) tiene \(C_0=3\), \(C_{\pm1}=1\). Su transformada es \(3\delta(f)+\delta(f-10)+\delta(f+10)\): las mismas líneas, ahora como impulsos de pesos 3, 1 y 1.</p>
+</div>
 
 <h3 id="impulsos-tl">6.2 Transformadas en el límite</h3>
 <div class="step"><span class="n">1</span><div><p>\(\mathcal F\{\delta(t)\}=\int\delta(t)e^{-j2\pi ft}dt=1\): un impulso contiene <strong>todas las frecuencias con igual amplitud</strong>.</p></div></div>
@@ -1050,7 +1188,7 @@ $$\delta(t)=\lim_{a\to0}\tfrac1a\Pi(t/a),\qquad \int_{-\infty}^{\infty}\delta(t)
 <div class="step"><span class="n">4</span><div><p>Cualquier señal periódica: \(X(f)=\sum_nC_n\,\delta(f-nf_0)\). Así <strong>una sola herramienta</strong> (la TF con impulsos) sirve para señales periódicas, de energía y mixtas, y el espectro es <em>integrable</em> (conclusión de la Actividad 3).</p></div></div>
 
 <div class="example">
-<h4>Ejemplo 6.1 — Espectro de una señal muestreada (CP 7)</h4>
+<h4>Ejemplo 6.2 — Espectro de una señal muestreada (CP 7)</h4>
 <p>Sea \(y(t)=x(t)\,z(t)\), donde \(z(t)\) es un tren de pulsos (o impulsos) de período \(T_s=1/f_s\). Halle \(Y(f)\).</p>
 <div class="step"><span class="n">1</span><div><p>\(z(t)\) es periódica: \(z(t)=\sum_nC_n^{(z)}e^{j2\pi nf_st}\), una suma de cosenos de frecuencias \(nf_s\).</p></div></div>
 <div class="step"><span class="n">2</span><div><p>Multiplicar \(x(t)\) por cada exponencial la traslada en frecuencia (teorema de modulación):</p>
@@ -1069,7 +1207,32 @@ $$Y(f)=\sum_{n=-\infty}^{\infty}C_n^{(z)}\,X(f-nf_s)$$</div></div>
   <li>Multiplica punto a punto y calcula el <strong>área</strong> del producto: ese número es \(v*w\) en el instante \(t\).</li>
   <li>Repite para varios \(t\), identificando los intervalos donde cambia la forma del solapamiento.</li>
 </ol>
-<p>Propiedades: conmutativa, asociativa, distributiva; la duración del resultado es la suma de duraciones; el área del resultado es el producto de áreas; \(x*\delta=x\).</p>
+<p>El reflejo es la parte que más confunde: \(w(t-\lambda)\) es \(w\) <em>vista al revés</em> y desplazada. Si te cuesta, usa la conmutatividad y refleja la señal más sencilla; el resultado es el mismo. El área que calculas en cada \(t\) es la <strong>superposición ponderada</strong> de todas las copias retardadas de \(w\).</p>
+<div class="box idea"><span class="box-title">Qué significa convolucionar (sin dibujar)</span>
+<p>Imagina que \(v(t)\) se descompone en una suma de impulsos: uno de peso \(v(\lambda)d\lambda\) en cada instante \(\lambda\). Un sistema LTI responde a cada impulso con una copia de \(h\) desplazada a \(t=\lambda\) y escalada por ese peso. La salida es la suma de <em>todas</em> esas copias: exactamente la integral de convolución. Por eso convolucionar es «pintar» la forma de una señal con el pincel de la otra: suaviza, ensancha y mezcla.</p></div>
+<div class="table-wrap"><table>
+  <thead><tr><th>Propiedad</th><th>Expresión</th><th>Ejemplo concreto</th></tr></thead>
+  <tbody>
+    <tr><td>Conmutativa</td><td>\(v*w=w*v\)</td><td>Da igual reflejar \(v\) que \(w\): \( \Pi*\Lambda=\Lambda*\Pi\).</td></tr>
+    <tr><td>Asociativa</td><td>\((v*w)*h=v*(w*h)\)</td><td>Dos filtros en cascada se pueden combinar en uno: \(h_1*h_2\).</td></tr>
+    <tr><td>Distributiva</td><td>\(v*(w_1+w_2)=v*w_1+v*w_2\)</td><td>\( \Pi*(\Pi+\delta)=\Pi*\Pi+\Pi*\delta\).</td></tr>
+    <tr><td>Identidad</td><td>\(v*\delta=v\)</td><td>Un sistema con \(h=\delta\) no cambia la señal.</td></tr>
+    <tr><td>Desplazamiento</td><td>\(v*\delta(t-t_0)=v(t-t_0)\)</td><td>\( \Pi(t)*\delta(t-2)=\Pi(t-2)\): solo retrasa.</td></tr>
+    <tr><td>Duración</td><td>\(\Delta(v*w)=\Delta v+\Delta w\)</td><td>Dos pulsos de 1 ms dan un triángulo de 2 ms.</td></tr>
+    <tr><td>Área</td><td>\(\int(v*w)dt=\left(\int v\,dt\right)\left(\int w\,dt\right)\)</td><td>\(\Pi\) (área 1) \(*\Pi\) (área 1) \(=\Lambda\) (área 1).</td></tr>
+    <tr><td>Derivada</td><td>\(\dfrac{d}{dt}(v*w)=\dfrac{dv}{dt}*w=v*\dfrac{dw}{dt}\)</td><td>La derivada del triángulo son dos rectángulos (Ej. 5.3).</td></tr>
+    <tr><td>Fourier</td><td>\(\mathcal F\{v*w\}=V(f)\,W(f)\)</td><td>\(\Pi*\Pi\leftrightarrow\operatorname{sinc}(f)\cdot\operatorname{sinc}(f)=\operatorname{sinc}^2(f)\).</td></tr>
+    <tr><td>Suavizado</td><td>Convolucionar con un pulso ancho promedia y ensancha</td><td>Una rampa convolucionada con \( \Pi(t/T)\) se convierte en una rampa con esquinas redondeadas.</td></tr>
+  </tbody>
+</table></div>
+<div class="box warn"><span class="box-title">Errores típicos al convolucionar</span>
+<ul>
+  <li><strong>Multiplicar punto a punto.</strong> \(v(t)w(t)\) no es \(v*w\): la convolución integra solapamientos, no valores en el mismo instante.</li>
+  <li><strong>Olvidar los límites por tramos.</strong> El integrando cambia de expresión cuando el borde de \(w(t-\lambda)\) cruza un borde de \(v(\lambda)\). Esos cruces definen los intervalos del resultado.</li>
+  <li><strong>Reflejar mal.</strong> Es \(w(t-\lambda)=w(-(\lambda-t))\): primero se refleja \(w(\lambda)\) y después se desplaza. No es \(w(\lambda-t)\).</li>
+  <li><strong>Sumar duraciones siempre.</strong> La regla «las duraciones se suman» vale para señales de duración finita. \(e^{-t}u(t)*e^{-t}u(t)\) dura infinito (aunque decae).</li>
+  <li><strong>Confundir convolución con correlación.</strong> La correlación compara señales sin reflejar; la convolución refleja una de ellas. En sistemas LTI siempre es convolución.</li>
+</ul></div>
 <div class="example">
 <h4>Ejemplo 7.1 — Rectángulo por rectángulo</h4>
 <p>\(\Pi(t/T)*\Pi(t/T)\). Para \(|t|\lt T\) los pulsos se solapan en un intervalo de longitud \(T-|t|\) con producto 1, así que el área es \(T-|t|\); fuera, 0. Resultado: \(T\,\Lambda(t/T)\), un triángulo de base \(2T\) y altura \(T\). Comprobación en frecuencia: \([T\operatorname{sinc}(fT)]^2=T\cdot T\operatorname{sinc}^2(fT)\) ✔ (par del triángulo).</p>
@@ -1122,6 +1285,27 @@ $$Y(f)=\sum_{n=-\infty}^{\infty}C_n^{(z)}\,X(f-nf_s)$$</div></div>
 
 
 </div>
+
+<div class="example">
+<h4>Ejemplo 7.2 — Rectángulo por exponencial (con los límites bien puestos)</h4>
+<p>Sean \(v(t)=\Pi(t/T)\) (pulso de \(-T/2\) a \(T/2\)) y \(w(t)=e^{-t}u(t)\) (exponencial que empieza en 0). La convolución es</p>
+$$(v*w)(t)=\int_{-T/2}^{T/2}e^{-(t-\lambda)}u(t-\lambda)\,d\lambda$$
+<p>El escalón \(u(t-\lambda)\) vale 1 solo si \(t-\lambda\gt0\), es decir, si \(\lambda\lt t\). Ese es el único detalle que hay que vigilar: el límite superior efectivo es \(\min(t,T/2)\). Aparecen tres tramos:</p>
+<div class="step"><span class="n">1</span><div><p><strong>\(t\lt-T/2\)</strong>: ningún \(\lambda\in[-T/2,T/2]\) cumple \(\lambda\lt t\), así que el integrando es cero y \((v*w)(t)=0\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>\(-T/2\le t\lt T/2\)</strong>: el pulso ya empezó pero la exponencial todavía no llegó al borde derecho; se integra de \(-T/2\) a \(t\):</p>
+$$\int_{-T/2}^{t}e^{-(t-\lambda)}d\lambda=\left[e^{\lambda-t}\right]_{-T/2}^{t}=1-e^{-(t+T/2)}$$
+</div></div>
+<div class="step"><span class="n">3</span><div><p><strong>\(t\ge T/2\)</strong>: la exponencial ya cubre todo el pulso; se integra de \(-T/2\) a \(T/2\):</p>
+$$\int_{-T/2}^{T/2}e^{-(t-\lambda)}d\lambda=e^{-t}\left(e^{T/2}-e^{-T/2}\right)=2e^{-t}\sinh(T/2)$$
+</div></div>
+<p>Reuniendo los tres tramos:</p>
+$$(v*w)(t)=\begin{cases}0,&t\lt-T/2\\[2pt] 1-e^{-(t+T/2)},&-T/2\le t\lt T/2\\[2pt] 2e^{-t}\sinh(T/2),&t\ge T/2\end{cases}$$
+<p><strong>Comprobaciones.</strong> En \(t=-T/2\) vale 0; en \(t=T/2\) los dos últimos tramos coinciden: \(1-e^{-T}=2e^{-T/2}\sinh(T/2)\); y cuando \(t\to\infty\) decae a 0. El área total debe ser la del pulso (\(T\)) por la de la exponencial (1): integrando los tramos sale \(T\). El resultado no es simétrico porque \(w\) es causal (solo existe para \(t\ge0\)): sube, alcanza \(1-e^{-T}\) y luego decae.</p>
+<p><strong>Caso hermano:</strong> \(e^{-t}u(t)*e^{-t}u(t)\). Aquí el solapamiento es de \(0\) a \(t\):</p>
+$$\int_0^t e^{-\lambda}e^{-(t-\lambda)}d\lambda=e^{-t}\int_0^t d\lambda=t\,e^{-t},\qquad t\ge0$$
+<p>El factor \(t\) es la <em>longitud del solapamiento</em>; fuera de \(t\ge0\) el resultado es 0. En frecuencia: \(1/(1+j2\pi f)^2\), que es el cuadrado de la transformada de cada exponencial. Este ejemplo muestra que la regla «las duraciones se suman» no se aplica a señales de duración infinita.</p>
+</div>
+
 <div class="sim" id="sim-conv">
   <div class="sim-title">Convolución paso a paso</div>
   <p class="meta">Arrastra \(t\): la señal \(w(t-\lambda)\) (naranja) se desliza sobre \(v(\lambda)\) (azul); el área sombreada del producto es el valor de \(v*w\) en ese \(t\) (punto sobre la curva verde).</p>
