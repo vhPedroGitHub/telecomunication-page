@@ -65,6 +65,128 @@
     C.onRedraw(draw);
   })();
 
+  // ------------------------------------------- Suma de hasta cinco fasores
+  (function () {
+    if (!$("sim-fasores5")) return;
+    const COLORS = ["--s1", "--s2", "--s3", "--s4", "--s5"];
+    const WINDOW = 4;
+    const pz = new Plot($("f5-c1"), {
+      xmin: -2.35, xmax: 2.35, ymin: -2.35, ymax: 2.35, aspect: 1,
+      pad: [10, 10, 10, 10], grid: false, xstep: 1, ystep: 1,
+      xfmt: function () { return ""; }, yfmt: function () { return ""; }
+    });
+    const pt = new Plot($("f5-c2"), {
+      xmin: -WINDOW, xmax: 0, ymin: -3, ymax: 3, aspect: 1,
+      xlabel: "t (s)", ylabel: "x(t)"
+    });
+    let t = WINDOW;
+
+    function arrow(ctx, x0, y0, x1, y1, col, w) {
+      const X0 = pz.X(x0), Y0 = pz.Y(y0), X1 = pz.X(x1), Y1 = pz.Y(y1);
+      const a = Math.atan2(Y1 - Y0, X1 - X0), head = 8;
+      ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = w || 2.2;
+      ctx.beginPath(); ctx.moveTo(X0, Y0); ctx.lineTo(X1, Y1); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(X1, Y1);
+      ctx.lineTo(X1 - head * Math.cos(a - 0.4), Y1 - head * Math.sin(a - 0.4));
+      ctx.lineTo(X1 - head * Math.cos(a + 0.4), Y1 - head * Math.sin(a + 0.4));
+      ctx.closePath(); ctx.fill();
+    }
+
+    function draw() {
+      const comps = [];
+      for (let i = 1; i <= 5; i++) {
+        if (!$("f5-on-" + i).checked) continue;
+        const A = num("f5-A-" + i), f = num("f5-f-" + i), phd = num("f5-p-" + i);
+        if (A <= 0) continue;
+        comps.push({ i: i, A: A, f: f, ph: phd * Math.PI / 180, phd: phd, col: COLORS[i - 1] });
+      }
+      const sumA = comps.reduce(function (s, c) { return s + c.A; }, 0);
+      const ymax = Math.max(1.2, sumA * 1.08);
+      const fn = $("f5-fn").value;
+      const shift = fn === "sin" ? -Math.PI / 2 : 0;
+      const wave = function (c, x) { return c.A * Math.cos(2 * Math.PI * c.f * x + c.ph + shift); };
+
+      // ---- plano complejo
+      pz.clear();
+      const ctx = pz.ctx;
+      ctx.save();
+      ctx.strokeStyle = C.cssVar("--border"); ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
+      [1, 2].forEach(function (r) {
+        ctx.beginPath(); ctx.arc(pz.X(0), pz.Y(0), Math.abs(pz.X(r) - pz.X(0)), 0, 2 * Math.PI); ctx.stroke();
+      });
+      ctx.setLineDash([]);
+      ctx.fillStyle = C.cssVar("--muted"); ctx.font = "11px sans-serif";
+      ctx.textAlign = "left"; ctx.textBaseline = "bottom";
+      ctx.fillText("Re", pz.X(2.12), pz.Y(0) - 4);
+      ctx.textAlign = "left"; ctx.textBaseline = "top";
+      ctx.fillText("Im", pz.X(0) + 5, pz.Y(2.12));
+      comps.forEach(function (c) {
+        const th = 2 * Math.PI * c.f * t + c.ph + shift;
+        const x = c.A * Math.cos(th), y = c.A * Math.sin(th);
+        const col = C.cssVar(c.col);
+        // proyección sobre el eje real: el valor instantáneo del coseno
+        ctx.globalAlpha = 0.3; ctx.strokeStyle = col; ctx.lineWidth = 1; ctx.setLineDash([2, 3]);
+        ctx.beginPath(); ctx.moveTo(pz.X(x), pz.Y(y)); ctx.lineTo(pz.X(x), pz.Y(0)); ctx.stroke();
+        ctx.setLineDash([]); ctx.globalAlpha = 1;
+        ctx.fillStyle = col;
+        ctx.beginPath(); ctx.arc(pz.X(x), pz.Y(0), 2.5, 0, 2 * Math.PI); ctx.fill();
+        arrow(ctx, 0, 0, x, y, col, 2.2);
+        ctx.font = "600 11px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.fillText(String(c.i), pz.X(x * 0.82), pz.Y(y * 0.82));
+      });
+      ctx.restore();
+
+      // ---- senoides individuales y suma
+      pt.set({ xmin: t - WINDOW, xmax: t, ymin: -ymax, ymax: ymax });
+      pt.clear();
+      comps.forEach(function (c) {
+        pt.fn(function (x) { return wave(c, x); }, c.col, 1.4, null, 600);
+      });
+      pt.fn(function (x) {
+        let s = 0;
+        comps.forEach(function (c) { s += wave(c, x); });
+        return s;
+      }, "--text", 2.8, null, 1200);
+      pt.vline(t, "--muted");
+      comps.forEach(function (c) {
+        pt.points([t], [wave(c, t)], c.col, 3);
+      });
+      let total = 0;
+      comps.forEach(function (c) { total += wave(c, t); });
+      pt.points([t], [total], "--text", 4);
+
+      // ---- lectura
+      const terms = comps.map(function (c) {
+        let s = M.fmt(c.A) + "·" + fn + "(2π·" + M.fmt(c.f) + "·t";
+        if (Math.abs(c.phd) > 1e-9) s += (c.phd > 0 ? " + " : " − ") + M.fmt(Math.abs(c.phd)) + "°";
+        return s + ")";
+      });
+      const n = comps.length;
+      const estado = n === 0 ? "Sin fasores activos" : n === 1 ? "1 fasor activo" : n + " fasores activos";
+      $("f5-out").textContent = (terms.length ? "x(t) = " + terms.join(" + ") : "x(t) = 0") +
+        "\n" + estado + " · ventana móvil de " + WINDOW + " s · cada flecha: amplitud Aᵢ, frecuencia fᵢ y desfase φᵢ";
+    }
+
+    for (let i = 1; i <= 5; i++) {
+      $("f5-on-" + i).addEventListener("change", function () {
+        this.closest(".f5-row").classList.toggle("is-off", !this.checked);
+        draw();
+      });
+    }
+    const ids = [];
+    for (let i = 1; i <= 5; i++) ids.push("f5-A-" + i, "f5-f-" + i, "f5-p-" + i);
+    ids.push("f5-fn");
+    on(ids, draw);
+
+    const an = animator($("sim-fasores5"), function (dt) { t += dt * 0.6; draw(); });
+    $("f5-play").addEventListener("click", function () {
+      this.textContent = an.toggle() ? "⏸ Pausa" : "▶ Reanudar";
+    });
+    $("f5-reset").addEventListener("click", function () { t = WINDOW; draw(); });
+    C.onRedraw(draw);
+  })();
+
   // ---------------------------------------------------- Series de Fourier
   (function () {
     if (!$("sim-fs")) return;

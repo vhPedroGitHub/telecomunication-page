@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tema 0 · Introducción y repaso — FC I</title>
+  <meta name="description" content="Tema especial de Fundamentos de las Comunicaciones I: qué es comunicar, mapa del curso y repaso detallado de matemática, señales, probabilidad, circuitos y lógica binaria que se aplican en los Temas I, II y III.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="../../assets/css/base.css">
+  <link rel="stylesheet" href="../../assets/css/course.css">
+  <script src="../../assets/js/theme.js"></script>
+  <script defer src="../../assets/js/course.js"></script>
+  <script defer src="../js/tema0.js"></script>
+  <style>body { --accent: var(--c-fc1); }</style>
+</head>
+<body>
+<button class="theme-toggle" type="button" aria-label="Cambiar tema claro/oscuro">◐ Tema</button>
+<header class="course-top">
+  <div class="wrap">
+    <a class="home" href="../../">← Portal</a>
+    <span class="title">Fundamentos de las Comunicaciones I</span>
+    <nav class="tabs" aria-label="Secciones de la asignatura">
+      <a href="../">Inicio</a>
+      <a href="tema0-introduccion-y-repaso.html" aria-current="page">Tema 0</a>
+      <a href="tema1-teoria-informacion.html">Tema I</a>
+      <a href="tema2-senales-y-sistemas.html">Tema II</a>
+      <a href="tema3-banda-base.html">Tema III</a>
+      <a href="../#software">Software</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Índice del tema"><h2>En esta página</h2><ol data-auto></ol></nav>
+
+<main class="content">
+<p class="meta">Tema especial · Actividad 1 (Introducción) · Curso 2026</p>
+<h1>Introducción y repaso: lo que hay que dominar antes de empezar</h1>
+<p class="lead">Este tema no es una parte más del programa: es la <strong>puerta de entrada</strong>. Primero responde a la pregunta <em>qué problema resuelve un sistema de comunicación</em> y dónde encaja cada tema del curso. Después repasa, con calma y con ejemplos, las herramientas de matemática, señales, probabilidad, circuitos y lógica binaria que los profesores dan por sabidas y que vas a usar <strong>todos los días</strong> en las Actividades, las clases prácticas, los laboratorios y las pruebas parciales.</p>
+
+<div class="box idea"><span class="box-title">Cómo usar esta página</span>
+<p>No hace falta leerla de una vez. Úsala así: (1) haz el <a href="#autodiagnostico">autodiagnóstico</a> de la sección 8; (2) por cada casilla que no puedas marcar, ve a la sección correspondiente y resuelve los ejemplos; (3) vuelve a intentarlo. Si dominas esta página, el Tema II se estudia mucho más rápido y el Tema III deja de ser una colección de fórmulas.</p></div>
+
+<div class="objectives">
+  <strong>Objetivos del tema</strong>
+  <ul>
+    <li>Explicar qué es un sistema de comunicación, qué magnitudes se manipulan y qué preguntas responde la asignatura.</li>
+    <li>Situar los Temas I, II y III en un mapa de dependencias y saber qué prerrequisito necesita cada uno.</li>
+    <li>Repasar números complejos, trigonometría, logaritmos, integrales, series, impulso y unidades, con la aplicación concreta que tendrán.</li>
+    <li>Recordar el lenguaje de las señales: sinusoide, período, fase, valor medio, valor eficaz, potencia, energía, espectro y ancho de banda.</li>
+    <li>Repasar probabilidad, variable aleatoria, gaussiana, función \(Q\), varianza y entropía, que son la base del ruido y de la probabilidad de error.</li>
+    <li>Repasar impedancia, circuitos RC, respuesta en frecuencia y la idea de sistema LTI.</li>
+    <li>Manejar bits, niveles, XOR, paridad, muestreo y cuantización como preparación del Tema III.</li>
+    <li>Disponer de un plan de repaso y de un autodiagnóstico para llegar al curso sin lagunas.</li>
+  </ul>
+</div>
+
+<div class="box prereq">
+  <span class="box-title">esta página es el repaso</span>
+  <p>Las demás páginas del curso empiezan con un recuadro «Antes de empezar» que remite a una ficha de <a href="../../repaso/">repaso</a>. Aquí reunimos esos prerrequisitos en un solo lugar y los conectamos con el curso. Las fichas cortas siguen disponibles para consulta rápida: <a href="../../repaso/matematica.html">matemática</a>, <a href="../../repaso/probabilidad.html">probabilidad</a>, <a href="../../repaso/circuitos.html">circuitos</a>, <a href="../../repaso/electronica-digital.html">electrónica digital</a> y <a href="../../repaso/fisica-em.html">física electromagnética</a>.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="que-es">1. Qué es comunicar: el problema que resuelve la asignatura</h2>
+<p>Comunicar es <strong>transportar información</strong> de un punto a otro. La información puede ser voz, música, una foto, un vídeo, la lectura de un sensor o los bits de un programa. Para moverla hay que convertirla en una <strong>señal</strong>: una magnitud física —tensión, corriente, campo electromagnético, luz— que varía con el tiempo. Esa señal recorre un <strong>canal</strong> y en el camino se atenúa, se distorsiona y se le suma <strong>ruido</strong>. El receptor tiene que reconstruir el mensaje con la menor cantidad de errores posible.</p>
+
+<svg class="diagram" data-fig="sistema" viewBox="0 0 760 250" role="img" aria-label="Diagrama de bloques de un sistema de comunicación: fuente, transmisor, canal con ruido, receptor y destino">
+  <defs><marker id="arr0" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="accf"/></marker></defs>
+  <rect x="18" y="92" width="100" height="60" rx="8" class="box-s"/>
+  <text x="68" y="118" text-anchor="middle" font-weight="600">Fuente</text>
+  <text x="68" y="137" text-anchor="middle" class="muted" font-size="11">voz, dato, imagen</text>
+
+  <rect x="158" y="92" width="118" height="60" rx="8" class="box-s"/>
+  <text x="217" y="112" text-anchor="middle" font-weight="600">Transmisor</text>
+  <text x="217" y="130" text-anchor="middle" class="muted" font-size="11">adapta y codifica</text>
+  <text x="217" y="144" text-anchor="middle" class="muted" font-size="11">la señal</text>
+
+  <rect x="318" y="92" width="118" height="60" rx="8" class="box-s"/>
+  <text x="377" y="118" text-anchor="middle" font-weight="600">Canal</text>
+  <text x="377" y="137" text-anchor="middle" class="muted" font-size="11">cable, fibra, aire</text>
+
+  <rect x="478" y="92" width="118" height="60" rx="8" class="box-s"/>
+  <text x="537" y="112" text-anchor="middle" font-weight="600">Receptor</text>
+  <text x="537" y="130" text-anchor="middle" class="muted" font-size="11">filtra, decide</text>
+  <text x="537" y="144" text-anchor="middle" class="muted" font-size="11">y decodifica</text>
+
+  <rect x="638" y="92" width="104" height="60" rx="8" class="box-s"/>
+  <text x="690" y="118" text-anchor="middle" font-weight="600">Destino</text>
+  <text x="690" y="137" text-anchor="middle" class="muted" font-size="11">usuario</text>
+
+  <line x1="118" y1="122" x2="154" y2="122" class="stroke" marker-end="url(#arr0)"/>
+  <line x1="276" y1="122" x2="314" y2="122" class="stroke" marker-end="url(#arr0)"/>
+  <line x1="436" y1="122" x2="474" y2="122" class="stroke" marker-end="url(#arr0)"/>
+  <line x1="596" y1="122" x2="634" y2="122" class="stroke" marker-end="url(#arr0)"/>
+
+  <rect x="330" y="18" width="94" height="42" rx="8" class="box-s"/>
+  <text x="377" y="36" text-anchor="middle" font-weight="600">Ruido</text>
+  <text x="377" y="51" text-anchor="middle" class="muted" font-size="11">fuentes no deseadas</text>
+  <line x1="377" y1="60" x2="377" y2="88" class="acc" marker-end="url(#arr0)"/>
+
+  <text x="68" y="180" text-anchor="middle" class="muted" font-size="11">mensaje</text>
+  <text x="217" y="180" text-anchor="middle" class="muted" font-size="11">señal</text>
+  <text x="377" y="180" text-anchor="middle" class="muted" font-size="11">señal + ruido</text>
+  <text x="537" y="180" text-anchor="middle" class="muted" font-size="11">señal estimada</text>
+  <text x="690" y="180" text-anchor="middle" class="muted" font-size="11">mensaje</text>
+
+  <text x="377" y="222" text-anchor="middle" font-weight="600">lo que la asignatura modela, mide y optimiza</text>
+  <text x="377" y="240" text-anchor="middle" class="muted" font-size="12">información · espectro · potencia · ruido · errores</text>
+</svg>
+<p class="meta">Figura 1. Cadena básica de comunicación. En FC I el canal es un medio de <em>banda base</em> (cable, par trenzado, fibra) y no se estudian todavía las antenas ni las modulaciones; eso corresponde a Fundamentos de las Comunicaciones II.</p>
+
+<h3 id="preguntas">1.1 Las cinco preguntas de todo sistema</h3>
+<p>Todo el curso se puede resumir en cinco preguntas. Cada una tiene su herramienta y su tema:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Pregunta</th><th>Herramienta</th><th>Tema</th><th>Ejemplo de respuesta</th></tr></thead>
+  <tbody>
+    <tr><td>¿Cuánta información lleva el mensaje?</td><td>Entropía, cantidad de información</td><td>I</td><td>Una moneda trucada lleva menos de 1 bit</td></tr>
+    <tr><td>¿Cómo represento la información con bits?</td><td>Codificación de fuente y de canal</td><td>I · III</td><td>Huffman, PCM, Hamming</td></tr>
+    <tr><td>¿Qué le hace el canal a la señal?</td><td>Series y transformada de Fourier, sistemas LTI</td><td>II</td><td>Un cable atenúa más las frecuencias altas</td></tr>
+    <tr><td>¿Cuánto ruido hay y cómo se combate?</td><td>Señales aleatorias, densidades espectrales</td><td>II</td><td>Ruido térmico \(N_0B\)</td></tr>
+    <tr><td>¿Con qué probabilidad me equivoco?</td><td>Función \(Q\), umbral y filtro óptimos</td><td>III</td><td>\(P_e=Q(d/2\sigma)\)</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="analogico-digital">1.2 Analógico y digital; banda base y banda pasante</h3>
+<p>Dos clasificaciones que conviene no mezclar:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Clasificación</th><th>Qué significa</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Analógico</strong></td><td>La señal puede tomar cualquier valor dentro de un rango continuo.</td><td>La tensión de un micrófono</td></tr>
+    <tr><td><strong>Digital</strong></td><td>La información se representa con un conjunto finito de símbolos (bits).</td><td>Un fichero de audio, los bits de un UART</td></tr>
+    <tr><td><strong>Banda base</strong></td><td>El espectro de la señal empieza en 0 Hz (o cerca de 0).</td><td>PCM por un par trenzado, Ethernet</td></tr>
+    <tr><td><strong>Banda pasante</strong></td><td>El espectro está centrado en una frecuencia portadora \(f_c\gg B\).</td><td>Radio FM, Wi-Fi, telefonía móvil</td></tr>
+  </tbody>
+</table></div>
+<p>Fundamentos I caracteriza sistemas digitales en <strong>banda base</strong>. Eso no significa que no haya frecuencias: una señal digital tiene un espectro ancho, pero centrado en 0. La modulación —trasladar ese espectro a una portadora— es el objeto de Fundamentos II.</p>
+
+<div class="example"><h4>Ejemplo 1.1 — Un mensaje de voz, de principio a fin</h4>
+<p>Una conversación telefónica se filtra entre 300 y 3400 Hz. Para digitalizarla se muestrea a 8 kHz (sección 7.3), se cuantiza a 8 bits y se obtiene un caudal de</p>
+$$R_b = 8000\ \text{muestras/s}\times 8\ \text{bits/muestra}=64\ \text{kbit/s}.$$
+<p>Esos bits se convierten en pulsos (código de línea, Tema III), se transmiten por un par trenzado, se atenúan y se les suma ruido (Tema II), y en el receptor se decide qué bit llegó (Tema III). La teoría de la información (Tema I) dice cuántos bits por segundo son realmente necesarios y cuánta redundancia conviene añadir para detectar errores. Cada bloque de la Figura 1 aparece, al menos una vez, en el curso.</p></div>
+
+<div class="box idea"><span class="box-title">Idea clave</span>
+<p><strong>La información no es la señal.</strong> Una sinusoide perfecta, de la que se conoce amplitud, frecuencia y fase, no transporta información nueva: el receptor ya sabe cómo va a seguir. La información nace de la <em>incertidumbre</em>: de no saber qué símbolo viene. Esa es la idea que desarrolla el Tema I.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="mapa">2. El mapa del curso: qué necesitas para cada tema</h2>
+<p>El curso 2026 empieza por el <strong>Tema II</strong>, sigue con el <strong>Tema I</strong> y termina con el <strong>Tema III</strong>. No es un capricho: el Tema III (transmisión en banda base) se apoya en el espectro, los filtros y el ruido del Tema II, y en la codificación del Tema I. El Tema 0 que estás leyendo es la base de los tres.</p>
+
+<svg class="diagram" data-fig="mapa" viewBox="0 0 760 330" role="img" aria-label="Mapa de dependencias: el Tema 0 alimenta los Temas I y II; ambos alimentan el Tema III">
+  <defs><marker id="arr1" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="accf"/></marker></defs>
+  <rect x="18" y="130" width="150" height="72" rx="10" class="box-s"/>
+  <text x="93" y="156" text-anchor="middle" font-weight="600">Tema 0</text>
+  <text x="93" y="174" text-anchor="middle" class="muted" font-size="11">introducción y base</text>
+  <text x="93" y="190" text-anchor="middle" class="muted" font-size="11">matemática · señales · bits</text>
+
+  <rect x="225" y="30" width="190" height="80" rx="10" class="box-s"/>
+  <text x="320" y="56" text-anchor="middle" font-weight="600">Tema I · Información</text>
+  <text x="320" y="74" text-anchor="middle" class="muted" font-size="11">entropía · codificación</text>
+  <text x="320" y="90" text-anchor="middle" class="muted" font-size="11">capacidad · Hamming</text>
+
+  <rect x="225" y="215" width="190" height="80" rx="10" class="box-s"/>
+  <text x="320" y="241" text-anchor="middle" font-weight="600">Tema II · Señales</text>
+  <text x="320" y="259" text-anchor="middle" class="muted" font-size="11">Fourier · LTI · ruido</text>
+  <text x="320" y="275" text-anchor="middle" class="muted" font-size="11">potencia · espectro</text>
+
+  <rect x="500" y="118" width="220" height="94" rx="10" class="box-s"/>
+  <text x="610" y="145" text-anchor="middle" font-weight="600">Tema III · Banda base</text>
+  <text x="610" y="163" text-anchor="middle" class="muted" font-size="11">muestreo · PCM · ISI</text>
+  <text x="610" y="179" text-anchor="middle" class="muted" font-size="11">códigos de línea · \(P_e\)</text>
+  <text x="610" y="195" text-anchor="middle" class="muted" font-size="11">umbral y filtro óptimos</text>
+
+  <line x1="168" y1="150" x2="221" y2="82" class="acc" marker-end="url(#arr1)"/>
+  <line x1="168" y1="182" x2="221" y2="248" class="acc" marker-end="url(#arr1)"/>
+  <line x1="415" y1="75" x2="496" y2="132" class="acc" marker-end="url(#arr1)"/>
+  <line x1="415" y1="250" x2="496" y2="196" class="acc" marker-end="url(#arr1)"/>
+
+  <text x="188" y="100" text-anchor="middle" class="muted" font-size="11">probabilidad</text>
+  <text x="188" y="262" text-anchor="middle" class="muted" font-size="11">matemática</text>
+  <text x="452" y="92" text-anchor="middle" class="muted" font-size="11">codificación</text>
+  <text x="452" y="238" text-anchor="middle" class="muted" font-size="11">espectro y ruido</text>
+</svg>
+<p class="meta">Figura 2. Mapa de dependencias. El Tema I puede estudiarse en paralelo al II, pero el III necesita los dos.</p>
+
+<div class="table-wrap"><table>
+  <thead><tr><th>Tema</th><th>Idea central</th><th>Prerrequisitos que más pesan</th><th>Dónde se evalúa</th></tr></thead>
+  <tbody>
+    <tr><td><strong>I · Teoría de la información</strong></td><td>Medir la información y codificarla de forma eficiente y segura.</td><td>Probabilidad, logaritmos base 2, esperanza, aritmética módulo 2, matrices binarias.</td><td>PP1, CP 1–4, laboratorio simulado de codificación.</td></tr>
+    <tr><td><strong>II · Señales y sistemas</strong></td><td>Describir la señal en tiempo y frecuencia y predecir el efecto del canal.</td><td>Complejos, Euler, trigonometría, integrales, series, impulso, circuitos RC, funciones \(Q\).</td><td>PP2, CP 5–11, Laboratorio Simulado 2, Trabajo Práctico.</td></tr>
+    <tr><td><strong>III · Banda base</strong></td><td>Convertir bits en pulsos, transmitirlos y decidirlos con la menor \(P_e\).</td><td>Todo lo anterior: espectro, LTI, ruido, probabilidad, codificación.</td><td>PP3, CP 12–18, laboratorio de ISI y ruido.</td></tr>
+  </tbody>
+</table></div>
+
+<div class="box warn"><span class="box-title">Aviso</span>
+<p>El error más caro del curso es intentar hacer el Tema III sin el Tema II. La ISI, el coseno alzado, el filtro adaptado y la probabilidad de error son <em>consecuencias</em> de la convolución, del espectro y del ruido. Si algo de eso no está claro, vuelve a la sección correspondiente de esta página antes de seguir.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="matematica">3. Matemática: las siete herramientas que más se usan</h2>
+<p>No hay que repasar un curso entero de cálculo. Hay un puñado de herramientas que aparecen una y otra vez. Para cada una veremos <em>qué es</em>, <em>para qué se usa en el curso</em> y <em>cuál es el error típico</em>.</p>
+
+<h3 id="complejos">3.1 Números complejos, fasores y fórmula de Euler</h3>
+<p>Un número complejo \(z=a+jb\) se representa como un punto del plano. En ingeniería se usa \(j\) en lugar de \(i\) porque \(i\) es la corriente. Sus dos formas son:</p>
+<div class="eq key">$$z=a+jb=|z|e^{j\theta}=|z|\angle\theta,\qquad |z|=\sqrt{a^2+b^2},\qquad \theta=\operatorname{atan2}(b,a).$$<div class="eq-label">Forma binómica y polar</div></div>
+<p>La <strong>fórmula de Euler</strong> es la que conecta la exponencial con el seno y el coseno:</p>
+$$e^{j\theta}=\cos\theta+j\sin\theta,\qquad \cos\theta=\frac{e^{j\theta}+e^{-j\theta}}{2},\qquad \sin\theta=\frac{e^{j\theta}-e^{-j\theta}}{2j}.$$
+<p>De ahí sale el <strong>fasor</strong>: un número complejo que guarda la amplitud y la fase de una sinusoide. Si \(x(t)=A\cos(\omega t+\varphi)\), su fasor es \(\mathbf X=Ae^{j\varphi}=A\angle\varphi\). La sinusoide se recupera multiplicando por \(e^{j\omega t}\) y tomando la parte real:</p>
+$$x(t)=\operatorname{Re}\{\mathbf X e^{j\omega t}\}=\operatorname{Re}\{Ae^{j\varphi}e^{j\omega t}\}=A\cos(\omega t+\varphi).$$
+<p>El fasor <em>no</em> incluye la frecuencia: es una foto de amplitud y fase. Por eso sirve para comparar señales de la misma frecuencia (un divisor de tensión, un filtro, una línea de transmisión).</p>
+
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Operación</th><th>Forma binómica</th><th>Forma polar</th><th>Qué hace</th></tr></thead>
+  <tbody>
+    <tr><td>Suma</td><td>\((a+c)+j(b+d)\)</td><td>—</td><td>Se suman las partes reales e imaginarias.</td></tr>
+    <tr><td>Producto</td><td>Fórmula distributiva</td><td>\(|z_1||z_2|\angle(\theta_1+\theta_2)\)</td><td>Multiplica módulos y suma ángulos.</td></tr>
+    <tr><td>Cociente</td><td>Multiplicar por el conjugado</td><td>\(\frac{|z_1|}{|z_2|}\angle(\theta_1-\theta_2)\)</td><td>Divide módulos y resta ángulos.</td></tr>
+    <tr><td>Conjugado</td><td>\(z^*=a-jb\)</td><td>\(|z|\angle(-\theta)\)</td><td>Cambia el signo de la fase; \(zz^*=|z|^2\).</td></tr>
+    <tr><td>Potencia</td><td>—</td><td>\(|z|^n\angle(n\theta)\)</td><td>Útil para potencias de fasores.</td></tr>
+  </tbody>
+</table></div>
+
+<div class="example"><h4>Ejemplo 3.1 — Operaciones y cuidado con el cuadrante</h4>
+<p>Sean \(z_1=3+j4\) y \(z_2=1-j2\).</p>
+<div class="step"><span class="n">1</span><div><p><strong>Módulos y fases.</strong> \(|z_1|=\sqrt{9+16}=5\), \(\theta_1=\operatorname{atan2}(4,3)=53{,}13^\circ\). \(|z_2|=\sqrt{1+4}=\sqrt5=2{,}236\), \(\theta_2=\operatorname{atan2}(-2,1)=-63{,}43^\circ\).</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Suma.</strong> \(z_1+z_2=(3+1)+j(4-2)=4+j2\).</p></div></div>
+<div class="step"><span class="n">3</span><div><p><strong>Producto.</strong> \((3+j4)(1-j2)=3-j6+j4-8j^2=11-j2\). En polar: \(5\cdot\sqrt5\angle(53{,}13^\circ-63{,}43^\circ)=11{,}18\angle-10{,}30^\circ\).</p></div></div>
+<div class="step"><span class="n">4</span><div><p><strong>Cociente.</strong> Multiplicando por el conjugado: \(\frac{3+j4}{1-j2}\cdot\frac{1+j2}{1+j2}=\frac{3+j6+j4+8j^2}{1+4}=\frac{-5+j10}{5}=-1+j2\). En polar: \(\frac{5}{\sqrt5}\angle(53{,}13^\circ+63{,}43^\circ)=\sqrt5\angle116{,}57^\circ\).</p></div></div>
+<p><strong>Lección:</strong> una calculadora que solo hace \(\arctan(b/a)\) da \(-53{,}13^\circ\) para \(-1+j2\), que está en el segundo cuadrante; el ángulo correcto es \(116{,}57^\circ\). Usa siempre \(\operatorname{atan2}\) o dibuja el punto.</p></div>
+
+<div class="sim" id="sim-fasor0">
+  <div class="sim-title">Del fasor a la sinusoide</div>
+  <p class="meta">Mueve la amplitud, la frecuencia y la fase. A la izquierda, el fasor en el plano complejo; a la derecha, la proyección real en el tiempo.</p>
+  <div class="controls">
+    <label>A (V) <input type="range" id="f0-A" min="1" max="10" step="0.5" value="6" data-out="f0-Ao"><output id="f0-Ao"></output></label>
+    <label>f (Hz) <input type="range" id="f0-f" min="0.5" max="5" step="0.5" value="1" data-out="f0-fo"><output id="f0-fo"></output></label>
+    <label>φ (°) <input type="range" id="f0-p" min="-180" max="180" step="5" value="30" data-out="f0-po"><output id="f0-po"></output></label>
+  </div>
+  <div class="two"><canvas id="f0-c1" aria-label="Fasor en el plano complejo"></canvas><canvas id="f0-c2" aria-label="Sinusoide en el tiempo"></canvas></div>
+  <div class="readout" id="f0-out"></div>
+</div>
+
+<div class="box warn"><span class="box-title">Errores típicos</span>
+<ul>
+  <li>Confundir \(j\) con \(i\): en electricidad \(i\) es corriente, por eso se usa \(j\).</li>
+  <li>Usar grados y radianes en la misma fórmula. En \(e^{j\theta}\), \(\theta\) va en radianes; en \(\cos(\omega t+\varphi)\), \(\omega t\) va en radianes y \(\varphi\) puede ir en grados si eres consistente.</li>
+  <li>Creer que \(|z|^2=z^2\). Lo correcto es \(|z|^2=z\,z^*=a^2+b^2\).</li>
+  <li>Olvidar el cuadrante al calcular la fase. Dibuja siempre el número.</li>
+</ul></div>
+<p>Repaso corto: <a href="../../repaso/matematica.html#complejos">números complejos y Euler</a> · <a href="../../repaso/circuitos.html#fasores">fasores e impedancia</a>.</p>
+
+<h3 id="trig">3.2 Trigonometría: las identidades que crean el espectro</h3>
+<p>Cuatro familias de identidades explican casi todo el Tema II:</p>
+<div class="eq key">$$\cos a\cos b=\tfrac12[\cos(a-b)+\cos(a+b)],\qquad \sin a\sin b=\tfrac12[\cos(a-b)-\cos(a+b)],$$
+$$\sin a\cos b=\tfrac12[\sin(a+b)+\sin(a-b)],\qquad \cos^2a=\tfrac12(1+\cos2a),\quad \sin^2a=\tfrac12(1-\cos2a).$$<div class="eq-label">Producto→suma y reducción de potencia</div></div>
+<p>La primera es la más importante: <strong>multiplicar dos cosenos produce las frecuencias suma y diferencia</strong>. Eso es la modulación, y también la razón de que un amplificador no lineal genere armónicos. La reducción de potencia sirve para calcular valores medios y potencias.</p>
+
+<div class="example"><h4>Ejemplo 3.2 — Una multiplicación que se convierte en dos líneas espectrales</h4>
+<p>Sea \(x(t)=2\cos(2\pi\,1000t)\cos(2\pi\,100t)\). Con \(a=2\pi1000t\) y \(b=2\pi100t\):</p>
+$$x(t)=\cos(2\pi\,900t)+\cos(2\pi\,1100t).$$
+<p>En el tiempo parece una señal "modulada"; en frecuencia son dos cosenos, uno en 900 Hz y otro en 1100 Hz. Si además hubiera una fase, aparecería un término \(\cos(a\pm b)\) con esa fase. Este es el puente entre la trigonometría y el espectro de líneas del Tema II.</p></div>
+
+<p>También usarás los desfases: \(\cos(\theta\pm180^\circ)=-\cos\theta\), \(\sin\theta=\cos(\theta-90^\circ)\) y \(\cos(\theta-90^\circ)=\sin\theta\). Sirven para escribir cualquier sinusoide como un coseno de amplitud positiva, que es la convención al dibujar espectros.</p>
+<p>Repaso corto: <a href="../../repaso/matematica.html#trig">identidades trigonométricas</a>.</p>
+
+<h3 id="db">3.3 Logaritmos y decibelios</h3>
+<p>El logaritmo responde a la pregunta «¿a qué exponente hay que elevar la base para obtener este número?». Las bases que usamos son 2 (información y bits) y 10 (potencia y dB). Las leyes son:</p>
+$$\log_b(xy)=\log_bx+\log_by,\qquad \log_b\!\left(\frac xy\right)=\log_bx-\log_by,\qquad \log_b(x^r)=r\log_bx,\qquad \log_2x=\frac{\ln x}{\ln2}.$$
+<p>El <strong>decibelio</strong> es una escala logarítmica de relación de potencias (o de tensiones con la misma impedancia):</p>
+<div class="eq key">$$G_{\text{dB}}=10\log_{10}\frac{P_2}{P_1}=20\log_{10}\frac{V_2}{V_1},\qquad P_{\text{dBm}}=10\log_{10}\frac{P}{1\ \text{mW}}.$$<div class="eq-label">dB y dBm</div></div>
+<p>En dB las ganancias en cascada se <strong>suman</strong>; las pérdidas son negativas. \(0\ \text{dBm}=1\ \text{mW}\), \(30\ \text{dBm}=1\ \text{W}\). Una relación de potencias de 2 es \(+3{,}01\ \text{dB}\); de 10 es \(+10\ \text{dB}\); de 100 es \(+20\ \text{dB}\).</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Relación de potencia</th><th>0,001</th><th>0,01</th><th>0,1</th><th>0,5</th><th>1</th><th>2</th><th>4</th><th>10</th><th>100</th><th>1000</th></tr></thead>
+  <tbody><tr><td><strong>dB</strong></td><td>−30</td><td>−20</td><td>−10</td><td>−3,01</td><td>0</td><td>+3,01</td><td>+6,02</td><td>+10</td><td>+20</td><td>+30</td></tr></tbody>
+</table></div>
+
+<div class="sim" id="sim-db0">
+  <div class="sim-title">Conversor de dB</div>
+  <p class="meta">Mueve la ganancia en dB y observa la relación de potencias y de tensiones. Si la entrada es 0 dBm, la salida en mW coincide con la relación de potencias.</p>
+  <div class="controls">
+    <label>Ganancia (dB) <input type="range" id="db0-db" min="-40" max="40" step="0.5" value="10" data-out="db0-dbo"><output id="db0-dbo"></output></label>
+  </div>
+  <div class="readout" id="db0-out"></div>
+</div>
+
+<div class="example"><h4>Ejemplo 3.3 — Un enlace con pérdidas y ganancias</h4>
+<p>Un transmisor entrega \(100\ \text{mW}=20\ \text{dBm}\). El cable pierde \(3\ \text{dB}\) y el amplificador gana \(20\ \text{dB}\). En dB:</p>
+$$P_{\text{salida}}=20\ \text{dBm}-3\ \text{dB}+20\ \text{dB}=37\ \text{dBm}.$$
+<p>Para volver a mW: \(P=10^{37/10}\ \text{mW}=10^{3{,}7}\ \text{mW}\approx5012\ \text{mW}=5{,}01\ \text{W}\). Observa que no se puede sumar \(100\ \text{mW}-3+20\): los dB no son vatios. Primero se pasa todo a dBm, se suma, y al final se vuelve a la unidad lineal.</p></div>
+
+<div class="box warn"><span class="box-title">Errores típicos</span>
+<ul>
+  <li>Usar \(10\log\) para tensiones. Para tensiones es \(20\log\) si la impedancia es la misma; si no, hay que incluir las impedancias.</li>
+  <li>Sumar dBm con dBm. \(10\ \text{dBm}+10\ \text{dBm}\) no es \(20\ \text{dBm}\): son 10 mW + 10 mW = 20 mW = 13,01 dBm.</li>
+  <li>Creer que un número negativo en dB significa potencia negativa. Significa potencia menor que la referencia.</li>
+  <li>Olvidar que \(G_{\text{dB}}\) es una <em>relación</em>; para una potencia absoluta se usa dBm, dBW, etc.</li>
+</ul></div>
+<p>Repaso corto: <a href="../../repaso/matematica.html#logaritmos">logaritmos y decibelios</a>.</p>
+
+<h3 id="integrales">3.4 Integrales, ortogonalidad y valores medios</h3>
+<p>Tres integrales aparecen en todas las conferencias de Fourier:</p>
+<div class="eq key">$$\int e^{at}dt=\frac{e^{at}}{a},\qquad \int_{-T/2}^{T/2}e^{-j2\pi ft}dt=\frac{\sin\pi fT}{\pi f}=T\operatorname{sinc}(fT),$$
+$$\int_{T_0}e^{j2\pi(n-m)t/T_0}dt=\begin{cases}T_0,&n=m\\0,&n\ne m\end{cases}$$<div class="eq-label">Integrales de ortogonalidad</div></div>
+<p>La última es la <strong>ortogonalidad</strong> de las exponenciales: dos armónicos distintos, integrados en un período, dan cero. Gracias a eso los coeficientes de Fourier «aíslan» una frecuencia y no se mezclan con las demás. El valor medio y el valor eficaz también son integrales:</p>
+$$\overline{x}=\frac1{T_0}\int_{T_0}x(t)dt,\qquad X_{\text{ef}}=\sqrt{\frac1{T_0}\int_{T_0}x^2(t)dt},\qquad P=\overline{x^2}=X_{\text{ef}}^2\ \text{(normalizada, }1\,\Omega\text{)}.$$
+<div class="example"><h4>Ejemplo 3.4 — Media, potencia y ortogonalidad de un coseno</h4>
+<p>Para \(x(t)=A\cos(2\pi f_0t)\), integrando en un período \(T_0=1/f_0\):</p>
+$$\overline{x}=\frac{A}{T_0}\int_0^{T_0}\cos(2\pi f_0t)dt=0,\qquad \overline{x^2}=\frac{A^2}{T_0}\int_0^{T_0}\cos^2(2\pi f_0t)dt=\frac{A^2}{2}.$$
+<p>Por tanto \(P=A^2/2\) y \(X_{\text{ef}}=A/\sqrt2\). Para \(A=6\ \text{V}\): \(P=18\ \text{W}\) (sobre \(1\,\Omega\)) y \(X_{\text{ef}}=4{,}24\ \text{V}\). La integral del coseno es cero porque hay tantas áreas positivas como negativas; la del coseno al cuadrado no, porque \(\cos^2\) es siempre positivo y su media es \(1/2\).</p></div>
+<p>Repaso corto: <a href="../../repaso/matematica.html#integrales">integrales útiles</a>.</p>
+
+<h3 id="series">3.5 Series y aproximaciones</h3>
+<p>Las series geométricas y de Taylor aparecen en la DFT, en los filtros y en los cálculos de «pequeña señal»:</p>
+$$\sum_{n=0}^{N-1}r^n=\frac{1-r^N}{1-r},\qquad \sum_{n=0}^{\infty}r^n=\frac{1}{1-r}\ (|r|\lt1),\qquad e^x=\sum_{n=0}^{\infty}\frac{x^n}{n!},\qquad \ln(1+x)\approx x.$$
+<p>Si \(|x|\ll1\): \((1+x)^\alpha\approx1+\alpha x\), \(e^x\approx1+x\), \(\sin x\approx x\), \(\cos x\approx1-x^2/2\). Son aproximaciones de primer o segundo orden; el error se controla con el término siguiente. En el curso se usan para demostrar que un filtro es «plano» en su banda de paso o que un sistema no lineal genera distorsión de segundo orden.</p>
+<div class="example"><h4>Ejemplo 3.5 — La respuesta de un filtro a baja frecuencia</h4>
+<p>Para un RC paso bajo, \(H(f)=1/(1+jf/f_c)\). Si \(f\ll f_c\), sea \(x=f/f_c\ll1\):</p>
+$$H(f)\approx1-jx,\qquad |H(f)|\approx\sqrt{1+x^2}\approx1,\qquad \angle H(f)\approx-x\ \text{rad}.$$
+<p>Es decir: muy por debajo de la frecuencia de corte el filtro casi no atenúa y apenas desfasa. La aproximación falla cuando \(f\) se acerca a \(f_c\).</p></div>
+
+<h3 id="impulso">3.6 Impulso, escalón y derivada</h3>
+<p>El <strong>escalón unitario</strong> \(u(t)\) vale 0 para \(t\lt0\) y 1 para \(t\gt0\). El <strong>impulso unitario</strong> \(\delta(t)\) es el límite de un pulso de área 1 cuya anchura tiende a 0. No es una función con un «valor» en 0: es una distribución definida por lo que hace al integrarse:</p>
+<div class="eq key">$$\int_{-\infty}^{\infty}\delta(t)dt=1,\qquad \int_{-\infty}^{\infty}x(t)\delta(t-t_0)dt=x(t_0),\qquad \frac{du}{dt}=\delta(t),\qquad \int_{-\infty}^{t}\delta(\lambda)d\lambda=u(t).$$<div class="eq-label">Propiedades del impulso</div></div>
+<p>La segunda propiedad se llama <strong>cribado</strong>: el impulso «extrae» el valor de la función en \(t_0\). También se usa \(\delta(at)=\delta(t)/|a|\), que explica por qué al comprimir un pulso su espectro se ensancha. La convolución con un impulso desplaza: \(x(t)*\delta(t-t_0)=x(t-t_0)\).</p>
+<div class="example"><h4>Ejemplo 3.6 — Cribado y escalado</h4>
+<p>\(\displaystyle\int_{-\infty}^{\infty}(3t+1)\delta(t-2)dt=3\cdot2+1=7\). En cambio, \(\delta(2t)=\tfrac12\delta(t)\): el área se conserva aunque el impulso esté «comprimido». Y la derivada del escalón es el impulso: si \(x(t)=u(t)-u(t-1)\) es un pulso rectangular, \(x'(t)=\delta(t)-\delta(t-1)\), dos impulsos de signos opuestos en los bordes.</p></div>
+<p>Repaso corto: <a href="../../repaso/matematica.html#impulso">impulso y escalón</a> · explicación completa en <a href="tema2-senales-y-sistemas.html#impulsos">Tema II §6</a>.</p>
+
+<h3 id="unidades">3.7 Unidades, prefijos y órdenes de magnitud</h3>
+<p>La mitad de los errores en las pruebas son de unidades, no de concepto. Fija estas conversiones:</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Magnitud</th><th>Unidad</th><th>Prefijos</th><th>Ejemplo</th></tr></thead>
+  <tbody>
+    <tr><td>Tiempo</td><td>s</td><td>ms \(10^{-3}\), µs \(10^{-6}\), ns \(10^{-9}\)</td><td>\(0{,}5\ \text{ms}=500\ \mu\text{s}\)</td></tr>
+    <tr><td>Frecuencia</td><td>Hz</td><td>kHz \(10^3\), MHz \(10^6\), GHz \(10^9\)</td><td>\(2{,}4\ \text{kHz}=2400\ \text{Hz}\)</td></tr>
+    <tr><td>Potencia</td><td>W</td><td>mW \(10^{-3}\), µW \(10^{-6}\)</td><td>\(0{,}2\ \text{W}=200\ \text{mW}=23{,}01\ \text{dBm}\)</td></tr>
+    <tr><td>Tensión</td><td>V</td><td>mV \(10^{-3}\), µV \(10^{-6}\)</td><td>\(1\ \text{mV}=10^{-3}\ \text{V}\)</td></tr>
+    <tr><td>Temperatura</td><td>K</td><td>—</td><td>\(T=290\ \text{K}\) (ruido térmico)</td></tr>
+  </tbody>
+</table></div>
+<p>Dos constantes que conviene recordar: la constante de Boltzmann \(k=1{,}38\cdot10^{-23}\ \text{J/K}\) y, a \(T=290\ \text{K}\), \(kT\approx4{,}0\cdot10^{-21}\ \text{J}=4{,}0\cdot10^{-21}\ \text{W/Hz}\), es decir, \(-174\ \text{dBm/Hz}\). Ese número aparece en todos los cálculos de ruido del Tema II y del Tema III.</p>
+<div class="box idea"><span class="box-title">Regla práctica</span>
+<p>Antes de calcular, escribe las unidades al lado de cada número y comprueba que el resultado tiene la unidad esperada. Si aparece «Hz·s» debe dar adimensional; si aparece «W/Hz · Hz» debe dar W. Un resultado con unidades imposibles es un resultado mal.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="senales">4. El lenguaje de las señales</h2>
+<p>El Tema II empieza suponiendo que ya sabes describir una señal. Aquí está lo mínimo, con la interpretación física que usaremos después.</p>
+
+<h3 id="senal-def">4.1 Qué es una señal y qué la distingue de la información</h3>
+<p>Una <strong>señal</strong> es una magnitud que varía con una variable independiente (normalmente el tiempo): \(x(t)\). Puede ser una tensión, una corriente, un campo eléctrico o la salida de un sensor. Se clasifica de varias formas:</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Criterio</th><th>Clases</th><th>Qué implica en el curso</th></tr></thead>
+  <tbody>
+    <tr><td>¿Se conoce su valor?</td><td>Determinística / aleatoria</td><td>Fourier / densidades espectrales y ruido</td></tr>
+    <tr><td>¿Se repite?</td><td>Periódica / no periódica</td><td>Serie / transformada de Fourier</td></tr>
+    <tr><td>¿Cómo varía?</td><td>Continua / discreta</td><td>Señales analógicas / muestreadas (Tema III)</td></tr>
+    <tr><td>¿Cuánto dura?</td><td>De energía / de potencia</td><td>Densidad espectral de energía / de potencia</td></tr>
+  </tbody>
+</table></div>
+<p>Una señal determinística se puede predecir; una aleatoria solo se describe con promedios. El ruido es aleatorio; la voz es, en buena parte, aleatoria. La información está ligada a la <strong>incertidumbre</strong>: si el receptor ya sabe qué va a llegar, no hay información nueva. Una sinusoide pura conocida es un caso extremo: es una señal perfecta pero informativamente vacía.</p>
+
+<h3 id="sinusoide">4.2 La sinusoide: los cinco parámetros</h3>
+<p>La señal más importante del curso es la sinusoide:</p>
+<div class="eq key">$$x(t)=A\cos(\omega t+\varphi)=A\cos\!\left(2\pi ft+\varphi\right),\qquad \omega=2\pi f,\qquad T=\frac1f,\qquad f=\frac1T.$$<div class="eq-label">Sinusoide y sus parámetros</div></div>
+<ul>
+  <li><strong>\(A\)</strong>: amplitud de pico (V). No es el valor eficaz.</li>
+  <li><strong>\(f\)</strong>: frecuencia (Hz), número de ciclos por segundo.</li>
+  <li><strong>\(T=1/f\)</strong>: período (s), duración de un ciclo.</li>
+  <li><strong>\(\omega=2\pi f\)</strong>: frecuencia angular (rad/s). No es lo mismo que \(f\).</li>
+  <li><strong>\(\varphi\)</strong>: fase inicial (rad o grados). Un desfase positivo <em>adelanta</em> la señal; uno negativo la <em>atrasa</em>.</li>
+</ul>
+
+<svg class="diagram" data-fig="sinusoide" viewBox="0 0 760 270" role="img" aria-label="Sinusoide con amplitud A, período T y fase inicial">
+  <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="accf"/></marker></defs>
+  <line x1="40" y1="140" x2="730" y2="140" class="stroke" marker-end="url(#arr2)"/>
+  <line x1="40" y1="245" x2="40" y2="35" class="stroke" marker-end="url(#arr2)"/>
+  <text x="724" y="158" class="muted">t</text>
+  <text x="20" y="42" class="muted">x</text>
+  <polyline points="40.0,60.0 42.8,60.2 45.7,60.7 48.5,61.6 51.3,62.8 54.2,64.3 57.0,66.2 59.8,68.4 62.7,70.9 65.5,73.7 68.3,76.8 71.2,80.1 74.0,83.8 76.8,87.6 79.7,91.7 82.5,96.0 85.3,100.5 88.2,105.2 91.0,110.0 93.8,115.0 96.7,120.0 99.5,125.2 102.3,130.4 105.2,135.7 108.0,140.9 110.8,146.2 113.7,151.4 116.5,156.6 119.3,161.8 122.2,166.8 125.0,171.7 127.8,176.5 130.7,181.1 133.5,185.5 136.3,189.7 139.2,193.8 142.0,197.5 144.8,201.1 147.7,204.4 150.5,207.3 153.3,210.0 156.2,212.4 159.0,214.5 161.8,216.3 164.7,217.7 167.5,218.8 170.3,219.5 173.2,219.9 176.0,220.0 178.8,219.7 181.7,219.0 184.5,218.1 187.3,216.7 190.2,215.1 193.0,213.1 195.8,210.8 198.7,208.2 201.5,205.3 204.3,202.1 207.2,198.6 210.0,194.9 212.8,190.9 215.7,186.8 218.5,182.4 221.3,177.8 224.2,173.1 227.0,168.2 229.8,163.2 232.7,158.1 235.5,153.0 238.3,147.7 241.2,142.5 244.0,137.2 246.8,131.9 249.7,126.7 252.5,121.6 255.3,116.5 258.2,111.5 261.0,106.6 263.8,101.9 266.7,97.3 269.5,93.0 272.3,88.8 275.2,84.9 278.0,81.2 280.8,77.7 283.7,74.6 286.5,71.7 289.3,69.1 292.2,66.8 295.0,64.8 297.8,63.2 300.7,61.9 303.5,60.9 306.3,60.3 309.2,60.0 312.0,60.1 314.8,60.5 317.7,61.3 320.5,62.4 323.3,63.8 326.2,65.6 329.0,67.7 331.8,70.1 334.7,72.8 337.5,75.8 340.3,79.1 343.2,82.7 346.0,86.5 348.8,90.5 351.7,94.8 354.5,99.2 357.3,103.8 360.2,108.6 363.0,113.5 365.8,118.5 368.7,123.7 371.5,128.9 374.3,134.1 377.2,139.4 380.0,144.7 382.8,149.9 385.7,155.1 388.5,160.3 391.3,165.3 394.2,170.3 397.0,175.1 399.8,179.7 402.7,184.2 405.5,188.5 408.3,192.6 411.2,196.5 414.0,200.1 416.8,203.4 419.7,206.5 422.5,209.3 425.3,211.8 428.2,213.9 431.0,215.8 433.8,217.3 436.7,218.5 439.5,219.3 442.3,219.8 445.2,220.0 448.0,219.8 450.8,219.3 453.7,218.4 456.5,217.2 459.3,215.6 462.2,213.7 465.0,211.5 467.8,209.0 470.7,206.1 473.5,203.0 476.3,199.7 479.2,196.0 482.0,192.1 484.8,188.0 487.7,183.7 490.5,179.2 493.3,174.5 496.2,169.7 499.0,164.7 501.8,159.7 504.7,154.5 507.5,149.3 510.3,144.0 513.2,138.8 516.0,133.5 518.8,128.3 521.7,123.1 524.5,117.9 527.3,112.9 530.2,108.0 533.0,103.3 535.8,98.7 538.7,94.2 541.5,90.0 544.3,86.0 547.2,82.2 550.0,78.7 552.8,75.5 555.7,72.5 558.5,69.8 561.3,67.4 564.2,65.4 567.0,63.6 569.8,62.2 572.7,61.2 575.5,60.4 578.3,60.1 581.2,60.0 584.0,60.3 586.8,61.0 589.7,62.0 592.5,63.4 595.3,65.0 598.2,67.0 601.0,69.4 603.8,72.0 606.7,74.9 609.5,78.1 612.3,81.6 615.2,85.3 618.0,89.3 620.8,93.5 623.7,97.9 626.5,102.4 629.3,107.2 632.2,112.1 635.0,117.1 637.8,122.2 640.7,127.3 643.5,132.6 646.3,137.8 649.2,143.1 652.0,148.4 654.8,153.6 657.7,158.8 660.5,163.8 663.3,168.8 666.2,173.7 669.0,178.4 671.8,182.9 674.7,187.3 677.5,191.4 680.3,195.3 683.2,199.0 686.0,202.5 688.8,205.6 691.7,208.5 694.5,211.1 697.3,213.3 700.2,215.3 703.0,216.9 705.8,218.2 708.7,219.1 711.5,219.7 714.3,220.0 717.2,219.9 720.0,219.5" class="acc"/>
+  <line x1="40" y1="60" x2="40" y2="140" class="stroke" stroke-dasharray="3 3"/>
+  <text x="48" y="58" class="acc" font-size="12">A</text>
+  <line x1="40" y1="232" x2="310" y2="232" class="stroke"/>
+  <line x1="40" y1="228" x2="40" y2="236" class="stroke"/>
+  <line x1="310" y1="228" x2="310" y2="236" class="stroke"/>
+  <text x="175" y="250" text-anchor="middle" class="muted">un período T</text>
+  <line x1="40" y1="140" x2="175" y2="140" class="stroke" stroke-dasharray="3 3"/>
+  <text x="70" y="155" class="muted" font-size="11">t = 0</text>
+  <text x="52" y="200" class="muted" font-size="11">−A</text>
+  <circle cx="40" cy="60" r="3" class="accf"/>
+  <text x="110" y="45" class="muted" font-size="11">máximo = A</text>
+</svg>
+<p class="meta">Figura 3. Sinusoide \(x(t)=A\cos(2\pi t/T)\), con \(A\) y \(T\) marcados. La fase inicial desplaza la curva a izquierda o derecha.</p>
+
+<div class="example"><h4>Ejemplo 4.1 — Leer una sinusoide</h4>
+<p>Sea \(x(t)=6\cos(2\pi\,1000t+30^\circ)\ \text{V}\). Entonces:</p>
+<ul>
+  <li>\(A=6\ \text{V}\) (pico); tensión pico a pico \(=12\ \text{V}\).</li>
+  <li>\(f=1000\ \text{Hz}=1\ \text{kHz}\); \(T=1\ \text{ms}\); \(\omega=2\pi\cdot1000=6283{,}19\ \text{rad/s}\).</li>
+  <li>Fase inicial \(\varphi=+30^\circ\). Un desfase positivo adelanta la señal: el máximo ocurre \(30/360=1/12\) de período <em>antes</em> de \(t=0\), es decir, \(83{,}3\ \mu\text{s}\) antes.</li>
+  <li>Valor medio \(=0\); valor eficaz \(A/\sqrt2=4{,}24\ \text{V}\); potencia normalizada \(A^2/2=18\ \text{W}\).</li>
+</ul></div>
+
+<h3 id="potencia">4.3 Media, valor eficaz, potencia y energía</h3>
+<p>Para una señal periódica de período \(T_0\):</p>
+<div class="eq key">$$\overline{x}=\frac1{T_0}\int_{T_0}x(t)dt,\qquad X_{\text{ef}}=\sqrt{\frac1{T_0}\int_{T_0}x^2(t)dt},\qquad P=\overline{x^2}=X_{\text{ef}}^2.$$<div class="eq-label">Media, valor eficaz y potencia media (normalizada)</div></div>
+<p>La potencia se mide en vatios si se divide por la resistencia real; en comunicaciones se trabaja casi siempre con la <strong>potencia normalizada</strong> sobre \(1\,\Omega\), que numéricamente es el valor medio del cuadrado. La energía es la integral de la potencia durante toda la señal: \(E=\int_{-\infty}^{\infty}x^2(t)dt\). Una señal de energía tiene potencia media cero; una de potencia tiene energía infinita. El curso estudia ambas, pero las señales reales de un enlace suelen ser de potencia (duran mucho) o pulsos de energía (duran poco).</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Señal</th><th>Valor medio</th><th>Valor eficaz</th><th>Potencia normalizada</th></tr></thead>
+  <tbody>
+    <tr><td>\(A\cos(\omega t+\varphi)\)</td><td>0</td><td>\(A/\sqrt2\)</td><td>\(A^2/2\)</td></tr>
+    <tr><td>Constante \(A\)</td><td>\(A\)</td><td>\(A\)</td><td>\(A^2\)</td></tr>
+    <tr><td>Tren de pulsos 0/\(A\) con ciclo de trabajo \(d\)</td><td>\(dA\)</td><td>\(A\sqrt d\)</td><td>\(dA^2\)</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="espectro-preview">4.4 El espectro: la otra forma de mirar la señal</h3>
+<p>El <strong>espectro</strong> es la distribución de la señal en frecuencia: qué componentes senoidales contiene y con qué amplitud y fase. Es la misma señal descrita con otra coordenada. Un osciloscopio muestra \(x(t)\); un analizador de espectro muestra las líneas o la curva \(X(f)\). La transformación de Fourier pasa de una a otra sin perder información.</p>
+<p>Para una señal periódica el espectro es <strong>de líneas</strong>: componentes en \(f_0,2f_0,3f_0,\dots\) con coeficientes \(C_n\). Para una señal no periódica es <strong>continuo</strong>: una función \(X(f)\). El curso dedica el Tema II entero a construir estas dos herramientas y a usarlas para explicar filtros, modulación, muestreo y ruido.</p>
+<p>Un coseno \(A\cos(2\pi f_0t+\varphi)\) tiene, en el espectro bilateral, dos líneas de altura \(A/2\) en \(+f_0\) y \(-f_0\), con fases \(+\varphi\) y \(-\varphi\). La frecuencia negativa no se mide con un frecuencímetro: es la contabilidad de Euler. Lo verás en detalle en <a href="tema2-senales-y-sistemas.html#fasores">Tema II §3</a>.</p>
+
+<h3 id="banda">4.5 Ancho de banda y el teorema que viene</h3>
+<p>El <strong>ancho de banda</strong> es el rango de frecuencias que una señal ocupa o que un sistema deja pasar. No hay una definición única: puede ser el primer lóbulo del espectro, el rango que contiene el 90 % o el 99 % de la potencia, o el ancho equivalente de ruido. En el curso se precisa según el contexto.</p>
+<p>Dos ideas que se usan continuamente:</p>
+<ul>
+  <li>Un pulso de duración \(\tau\) tiene su primer cero espectral en \(1/\tau\). Cuanto más estrecho el pulso, más ancho su espectro. Es la versión cualitativa del principio de incertidumbre tiempo-frecuencia.</li>
+  <li>Para muestrear una señal de banda limitada \(B\) sin aliasing hace falta una frecuencia de muestreo \(f_s\gt2B\) (teorema de Nyquist-Shannon). Lo demostrarás en el Tema III con el espectro de la señal muestreada.</li>
+</ul>
+<div class="box idea"><span class="box-title">Idea clave</span>
+<p>Todo el Tema II es un cambio de dominio: convolución en tiempo ↔ multiplicación en frecuencia; retardo en tiempo ↔ fase lineal en frecuencia; muestreo en tiempo ↔ repetición en frecuencia. Si entiendes esa dualidad, las fórmulas dejan de ser una lista y se vuelven una sola idea.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="probabilidad">5. Probabilidad: el lenguaje del ruido y de los errores</h2>
+<p>El ruido es impredecible, pero sus <em>promedios</em> son muy regulares. Por eso se describe con probabilidad y estadística. Las mismas herramientas sirven para la entropía (Tema I), el ruido (Tema II) y la probabilidad de error (Tema III).</p>
+
+<h3 id="prob-basica">5.1 Eventos, independencia y probabilidad total</h3>
+<p>Para dos eventos \(A\) y \(B\):</p>
+$$P(A\cup B)=P(A)+P(B)-P(A\cap B),\qquad P(A|B)=\frac{P(A\cap B)}{P(B)},\qquad P(A\cap B)=P(A)P(B)\ \text{si son independientes}.$$
+<p>La <strong>probabilidad total</strong> descompone un evento según las causas que lo producen:</p>
+<div class="eq key">$$P(A)=\sum_iP(A|B_i)P(B_i).$$<div class="eq-label">Probabilidad total</div></div>
+<p>Es exactamente la fórmula de la probabilidad de error de un sistema binario: \(P_e=P(0)P(e|0)+P(1)P(e|1)\). Si los bits son equiprobables, \(P_e=\tfrac12[P(e|0)+P(e|1)]\).</p>
+<div class="example"><h4>Ejemplo 5.1 — Probabilidad de error total</h4>
+<p>Un canal envía 0 el 60 % de las veces y 1 el 40 %. La probabilidad de error dado 0 es 0,01 y dado 1 es 0,02. Entonces</p>
+$$P_e=0{,}6\cdot0{,}01+0{,}4\cdot0{,}02=0{,}006+0{,}008=0{,}014.$$
+<p>Es decir, 1,4 % de los bits llegan mal. Observa que no basta con promediar 0,01 y 0,02: hay que ponderar por la probabilidad de cada símbolo.</p></div>
+
+<h3 id="va">5.2 Variable aleatoria, media y varianza</h3>
+<p>Una <strong>variable aleatoria</strong> \(X\) asigna un número a cada resultado. Se describe con su función de distribución \(F_X(x)=P(X\le x)\) y, si es continua, con su densidad \(p_X(x)\). La media y la varianza son:</p>
+<div class="eq key">$$m_X=E[X]=\int x\,p_X(x)dx,\qquad \sigma_X^2=E[(X-m_X)^2]=E[X^2]-m_X^2.$$<div class="eq-label">Media y varianza</div></div>
+<p>Lectura eléctrica: si \(X\) es una tensión ergódica, \(m_X\) es el nivel de continua, \(E[X^2]\) es la potencia total, \(\sigma_X^2\) es la potencia de alterna y \(\sqrt{E[X^2]}\) es el valor eficaz. La desviación típica \(\sigma_X\) tiene las mismas unidades que \(X\); la varianza tiene unidades al cuadrado.</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>Propiedad</th><th>Fórmula</th><th>Consecuencia</th></tr></thead>
+  <tbody>
+    <tr><td>Linealidad de la media</td><td>\(E[aX+b]=aE[X]+b\)</td><td>Un offset cambia la media, no la varianza.</td></tr>
+    <tr><td>Varianza con escala</td><td>\(\operatorname{var}(aX+b)=a^2\sigma_X^2\)</td><td>Duplicar la amplitud cuadruplica la potencia de alterna.</td></tr>
+    <tr><td>Suma independiente</td><td>\(\sigma_{X+Y}^2=\sigma_X^2+\sigma_Y^2\)</td><td>Las potencias de ruidos independientes se suman.</td></tr>
+  </tbody>
+</table></div>
+<div class="example"><h4>Ejemplo 5.2 — Sumar ruidos</h4>
+<p>Dos fuentes de ruido independientes tienen \(\sigma_1=3\ \mu\text{V}\) y \(\sigma_2=4\ \mu\text{V}\). La desviación típica total no es \(3+4=7\ \mu\text{V}\), sino</p>
+$$\sigma_{\text{tot}}=\sqrt{3^2+4^2}=\sqrt{25}=5\ \mu\text{V}.$$
+<p>La potencia total es \(9+16=25\ \mu\text{V}^2\). En dB, si una fuente tiene \(-40\ \text{dBm}\) y otra \(-40\ \text{dBm}\), la suma es \(-37\ \text{dBm}\), no \(-80\ \text{dBm}\).</p></div>
+
+<h3 id="gauss">5.3 Gaussiana, función \(Q\) y probabilidad de error</h3>
+<p>El ruido térmico y muchas perturbaciones se modelan como una variable aleatoria gaussiana:</p>
+<div class="eq key">$$p_X(x)=\frac{1}{\sqrt{2\pi}\,\sigma}e^{-(x-m)^2/(2\sigma^2)},\qquad P(X\gt a)=Q\!\left(\frac{a-m}{\sigma}\right),$$
+$$Q(z)=\frac1{\sqrt{2\pi}}\int_z^\infty e^{-\lambda^2/2}d\lambda,\qquad Q(-z)=1-Q(z),\qquad Q(z)=\tfrac12\operatorname{erfc}\!\left(\frac{z}{\sqrt2}\right).$$<div class="eq-label">Gaussiana y función Q</div></div>
+<p>\(Q(z)\) es el área de la cola derecha de una normal estándar: la probabilidad de que el ruido supere \(z\) desviaciones típicas. No confundir con la función de distribución \(\Phi(z)=1-Q(z)\), que es el área de la cola izquierda.</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>\(z\)</th><th>0</th><th>0,5</th><th>1</th><th>1,5</th><th>2</th><th>2,5</th><th>3</th><th>3,09</th><th>4</th><th>5</th><th>6</th></tr></thead>
+  <tbody><tr><td>\(Q(z)\)</td><td>0,500</td><td>0,309</td><td>0,159</td><td>0,0668</td><td>0,0228</td><td>6,21·10⁻³</td><td>1,35·10⁻³</td><td>10⁻³</td><td>3,17·10⁻⁵</td><td>2,87·10⁻⁷</td><td>9,87·10⁻¹⁰</td></tr></tbody>
+</table></div>
+
+<div class="sim" id="sim-q0">
+  <div class="sim-title">Calculadora visual de \(Q(z)\)</div>
+  <p class="meta">La zona sombreada es la probabilidad de que una gaussiana estándar supere \(z\). Esa es exactamente la forma de una probabilidad de error.</p>
+  <div class="controls">
+    <label>z <input type="range" id="f0q-z" min="0" max="5" step="0.01" value="2" data-out="f0q-zo"><output id="f0q-zo"></output></label>
+  </div>
+  <canvas id="f0q-c" aria-label="Campana de Gauss con la cola sombreada"></canvas>
+  <div class="readout" id="f0q-out"></div>
+</div>
+
+<div class="example"><h4>Ejemplo 5.3 — Del ruido a la probabilidad de error</h4>
+<p>Un sistema binario envía \(-A\) y \(+A\) con igual probabilidad. El ruido es gaussiano, de media 0 y desviación típica \(\sigma\). El receptor decide por el signo de la señal recibida (umbral 0). Se equivoca si el ruido supera \(A\) en magnitud:</p>
+$$P_e=Q\!\left(\frac{A}{\sigma}\right).$$
+<p>Si \(A=1{,}5\ \text{V}\) y \(\sigma=1\ \text{V}\), \(P_e=Q(1{,}5)\approx0{,}0668\): uno de cada 15 bits, aproximadamente. Si se duplica la amplitud o se reduce el ruido a la mitad, \(z\) pasa a 3 y \(P_e\approx1{,}35\cdot10^{-3}\). La probabilidad de error cae muy rápido porque \(Q\) es una cola exponencial.</p></div>
+
+<div class="box warn"><span class="box-title">Errores típicos</span>
+<ul>
+  <li>Confundir \(\sigma\) (desviación típica) con \(\sigma^2\) (varianza). La fórmula de \(Q\) usa \(\sigma\), no \(\sigma^2\).</li>
+  <li>Usar \(Q\) cuando el problema pide \(\Phi\) o al revés. \(Q(z)\) es la cola derecha; la tabla de Walpole suele dar \(\Phi(z)=P(Z\le z)\).</li>
+  <li>Sumar desviaciones típicas de ruidos independientes en lugar de varianzas.</li>
+  <li>Olvidar que \(Q(0)=0{,}5\): con umbral en la media y ruido simétrico, la mitad de las decisiones son erróneas si no hay separación entre símbolos.</li>
+</ul></div>
+<p>Repaso corto: <a href="../../repaso/probabilidad.html">probabilidad</a>.</p>
+
+<h3 id="entropia-preview">5.4 Información, sorpresa y entropía</h3>
+<p>La cantidad de información de un suceso de probabilidad \(p\) se mide en bits:</p>
+<div class="eq key">$$I(p)=\log_2\frac1p=-\log_2p\ \text{bits},\qquad H(X)=-\sum_kp_k\log_2p_k.$$<div class="eq-label">Información y entropía</div></div>
+<p>Un suceso seguro (\(p=1\)) no informa: \(I=0\). Un suceso con probabilidad \(1/2\) informa exactamente 1 bit. La <strong>entropía</strong> \(H\) es el promedio de información de una fuente; mide su incertidumbre y, por tanto, el número mínimo de bits por símbolo que hace falta para representarla. Es el punto de partida del Tema I.</p>
+
+<div class="sim" id="sim-info0">
+  <div class="sim-title">Información de un suceso y entropía binaria</div>
+  <p class="meta">Mueve la probabilidad \(p\). A la izquierda se muestra \(I(p)\); la curva es la entropía de una fuente binaria \(H_b(p)\).</p>
+  <div class="controls">
+    <label>p <input type="range" id="f0i-p" min="0.01" max="0.99" step="0.01" value="0.5" data-out="f0i-po"><output id="f0i-po"></output></label>
+  </div>
+  <canvas id="f0i-c" aria-label="Entropía binaria en función de p"></canvas>
+  <div class="readout" id="f0i-out"></div>
+</div>
+
+<div class="example"><h4>Ejemplo 5.4 — Bits de una fuente binaria</h4>
+<p>Para una fuente binaria con \(P(1)=p\) y \(P(0)=1-p\):</p>
+$$H_b(p)=-p\log_2p-(1-p)\log_2(1-p).$$
+<p>Si \(p=0{,}5\), \(H_b=1\) bit: hace falta 1 bit por símbolo. Si \(p=0{,}9\), \(H_b\approx0{,}469\) bits: la fuente es predecible y se puede comprimir por debajo de 1 bit por símbolo. Si \(p=1\), \(H_b=0\): no hay información. Es la justificación matemática de la compresión de datos y del código de Huffman.</p></div>
+
+<h3 id="ruido-preview">5.5 Señal, ruido y relación señal/ruido</h3>
+<p>La <strong>relación señal/ruido</strong> (SNR) compara la potencia útil con la potencia de ruido:</p>
+<div class="eq key">$$\text{SNR}=\frac{P_s}{P_n},\qquad \text{SNR}_{\text{dB}}=10\log_{10}\frac{P_s}{P_n}=P_{s,\text{dBm}}-P_{n,\text{dBm}}.$$<div class="eq-label">Relación señal/ruido</div></div>
+<p>Es la magnitud que decide si un enlace funciona. Un SNR de 20 dB significa que la señal es 100 veces más potente que el ruido. En el Tema II verás de dónde sale el ruido térmico; en el Tema III verás cómo el SNR se convierte en probabilidad de error.</p>
+<div class="example"><h4>Ejemplo 5.5 — Un SNR en dB</h4>
+<p>Si la señal recibida es \(2\ \mu\text{W}\) y el ruido \(0{,}5\ \mu\text{W}\), entonces \(\text{SNR}=2/0{,}5=4\), es decir, \(10\log_{10}4=6{,}02\ \text{dB}\). Si en cambio se expresa en dBm: \(2\ \mu\text{W}=-27\ \text{dBm}\) y \(0{,}5\ \mu\text{W}=-33\ \text{dBm}\); la diferencia es \(6\ \text{dB}\). Restar dBm da dB, y eso es correcto.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="circuitos">6. Circuitos y sistemas: cómo responde el canal</h2>
+<p>El canal y los filtros del receptor son circuitos. Para el curso basta con la respuesta en régimen sinusoidal (fasores e impedancias) y la respuesta en frecuencia de un circuito RC.</p>
+
+<h3 id="impedancia">6.1 Fasores, impedancia y divisores</h3>
+<p>En régimen sinusoidal permanente, derivar equivale a multiplicar por \(j\omega\) e integrar a dividir por \(j\omega\). De ahí las impedancias:</p>
+<div class="eq key">$$Z_R=R,\qquad Z_L=j\omega L,\qquad Z_C=\frac{1}{j\omega C}=-\frac{j}{\omega C}.$$<div class="eq-label">Impedancias</div></div>
+<p>Con impedancias valen las mismas reglas que en continua: Kirchhoff, divisores de tensión, Thévenin. Por ejemplo, un divisor con \(Z_1\) en serie y \(Z_2\) en paralelo da</p>
+$$H(j\omega)=\frac{V_o}{V_i}=\frac{Z_2}{Z_1+Z_2}.$$
+<p>Un condensador se comporta como un circuito abierto a baja frecuencia y como un cortocircuito a alta; una bobina, al revés. Esa es la intuición de todos los filtros.</p>
+
+<h3 id="rc">6.2 El RC: respuesta temporal y en frecuencia</h3>
+<p>El circuito RC paso bajo (R en serie, C a la salida) es el filtro más importante del curso. Su constante de tiempo y su función de transferencia son:</p>
+<div class="eq key">$$\tau=RC,\qquad H(f)=\frac{1}{1+j\,f/f_c},\qquad f_c=\frac{1}{2\pi RC},$$
+$$|H(f)|=\frac{1}{\sqrt{1+(f/f_c)^2}},\qquad \angle H(f)=-\arctan\!\left(\frac{f}{f_c}\right).$$<div class="eq-label">RC paso bajo</div></div>
+<p>En \(f=f_c\): \(|H|=1/\sqrt2=0{,}707\), es decir, \(-3{,}01\ \text{dB}\), y la fase es \(-45^\circ\). Por encima de \(f_c\) el módulo cae \(20\ \text{dB}\) por década. En el tiempo, ante un escalón \(V\), el condensador carga como \(v_C(t)=V(1-e^{-t/\tau})u(t)\); en \(5\tau\) alcanza el 99,3 % del valor final.</p>
+
+<div class="sim" id="sim-rc0">
+  <div class="sim-title">Respuesta en frecuencia de un RC</div>
+  <p class="meta">Cambia R y C y observa cómo se desplaza la frecuencia de corte. Arriba, el módulo en dB; abajo, la fase.</p>
+  <div class="controls">
+    <label>R (kΩ) <input type="range" id="f0r-r" min="0.1" max="10" step="0.1" value="1.6" data-out="f0r-ro"><output id="f0r-ro"></output></label>
+    <label>C (nF) <input type="range" id="f0r-c" min="1" max="1000" step="1" value="100" data-out="f0r-co"><output id="f0r-co"></output></label>
+  </div>
+  <div class="two"><canvas id="f0r-c1" aria-label="Módulo de la respuesta en dB"></canvas><canvas id="f0r-c2" aria-label="Fase de la respuesta"></canvas></div>
+  <div class="readout" id="f0r-out"></div>
+</div>
+
+<div class="example"><h4>Ejemplo 6.1 — Un filtro RC concreto</h4>
+<p>Con \(R=1{,}6\ \text{k}\Omega\) y \(C=100\ \text{nF}\):</p>
+$$\tau=1600\cdot100\cdot10^{-9}=1{,}6\cdot10^{-4}\ \text{s}=160\ \mu\text{s},\qquad f_c=\frac{1}{2\pi\cdot1{,}6\cdot10^{-4}}\approx994{,}7\ \text{Hz}.$$
+<p>A \(1\ \text{kHz}\) el filtro está prácticamente en su corte: atenúa \(3\ \text{dB}\) y desfasa \(-45^\circ\). A \(10\ \text{kHz}\) (\(f/f_c\approx10\)) atenúa unos \(20\ \text{dB}\) y desfasa casi \(-84^\circ\). A \(100\ \text{Hz}\) casi no atenúa.</p></div>
+
+<h3 id="lti">6.3 La idea de sistema LTI</h3>
+<p>Un sistema es <strong>lineal</strong> si \(\mathcal S\{a x_1+b x_2\}=a\mathcal S\{x_1\}+b\mathcal S\{x_2\}\) (superposición) y es <strong>invariante en el tiempo</strong> si un retardo en la entrada produce el mismo retardo en la salida. Un sistema LTI queda completamente descrito por su <strong>respuesta impulsiva</strong> \(h(t)\): la salida es la convolución</p>
+$$y(t)=x(t)*h(t)=\int_{-\infty}^{\infty}x(\lambda)h(t-\lambda)d\lambda.$$
+<p>En frecuencia, la convolución se convierte en multiplicación: \(Y(f)=X(f)H(f)\). Ahí está la potencia de la transformada de Fourier: el efecto del canal se estudia multiplicando espectros. Un filtro ideal deja pasar \(|H(f)|=1\) con fase lineal en su banda y corta fuera. La distorsión lineal aparece cuando \(|H(f)|\) no es constante o la fase no es lineal dentro de la banda de la señal; la distorsión no lineal (armónicos, intermodulación) aparece cuando el sistema no es lineal.</p>
+<p>Esto se desarrolla en <a href="tema2-senales-y-sistemas.html#lti">Tema II §9</a>. Aquí solo necesitas la intuición: <em>un sistema LTI no crea frecuencias nuevas; solo cambia la amplitud y la fase de las que ya había</em>.</p>
+
+<h3 id="ruido-termico">6.4 Ruido térmico: el precio de la resistencia</h3>
+<p>Cualquier resistencia a temperatura \(T\) genera ruido por agitación térmica de los electrones. Su densidad espectral de potencia disponible es \(kT/2\) bilateral (o \(kT\) unilateral), y la potencia disponible en un ancho de banda \(B\) es \(N=kTB\). A \(290\ \text{K}\), \(kT\approx-174\ \text{dBm/Hz}\). Por eso los receptores se caracterizan por su figura de ruido y por eso las primeras etapas de un receptor deben tener baja pérdida y bajo ruido.</p>
+<div class="box warn"><span class="box-title">Errores típicos</span>
+<ul>
+  <li>Usar \(f_c=1/(RC)\) en lugar de \(1/(2\pi RC)\). El \(2\pi\) no es opcional.</li>
+  <li>Confundir \(-3\ \text{dB}\) con «la mitad»: es \(1/\sqrt2=0{,}707\) en tensión y \(1/2\) en potencia.</li>
+  <li>Creer que un filtro RC «elimina» totalmente las frecuencias altas: las atenúa 20 dB por década, no las borra.</li>
+  <li>Olvidar que la fase también distorsiona. Un filtro puede atenuar poco y aun así deformar un pulso por su fase no lineal.</li>
+</ul></div>
+<p>Repaso corto: <a href="../../repaso/circuitos.html">circuitos</a>.</p>
+
+<!-- ============================================================ -->
+<h2 id="bits">7. Bits, lógica y códigos: el idioma de lo digital</h2>
+<p>En un sistema digital la información se representa con bits. Antes del Tema III conviene tener claras cuatro ideas: bit, nivel, velocidad y redundancia.</p>
+
+<h3 id="bit">7.1 Bit, niveles y velocidad</h3>
+<p>Un <strong>bit</strong> es una unidad de información con dos valores posibles, 0 y 1. Con \(n\) bits se pueden representar \(M=2^n\) símbolos o niveles distintos. Si cada símbolo dura \(T_s\), la velocidad de símbolos es \(R_s=1/T_s\) (baudios) y la velocidad de bits es</p>
+<div class="eq key">$$M=2^n,\qquad R_b=R_s\log_2M=nR_s.$$<div class="eq-label">Bits, niveles y velocidad</div></div>
+<p>No confundir <strong>bit</strong> (unidad de información) con <strong>baudio</strong> (símbolo transmitido). En un sistema binario coinciden; en uno multinivel, un símbolo puede llevar varios bits.</p>
+<div class="example"><h4>Ejemplo 7.1 — De niveles a bits</h4>
+<p>Un sistema con 8 niveles (\(M=8\)) necesita \(n=\log_28=3\) bits por símbolo. Si transmite 1000 símbolos por segundo, \(R_b=3\cdot1000=3000\ \text{bit/s}\). Con 256 niveles, \(n=8\) bits por símbolo; a la misma velocidad de símbolos, el caudal se multiplica por 8, pero la separación entre niveles se reduce y el sistema es más sensible al ruido.</p></div>
+
+<h3 id="xor">7.2 XOR, paridad y distancia de Hamming</h3>
+<p>La aritmética de bits es <strong>módulo 2</strong>: la suma es el O exclusivo (XOR), \(1\oplus1=0\), y restar es lo mismo que sumar. La tabla es:</p>
+<div class="table-wrap"><table class="compact">
+  <thead><tr><th>\(a\)</th><th>\(b\)</th><th>\(a\oplus b\)</th></tr></thead>
+  <tbody><tr><td>0</td><td>0</td><td>0</td></tr><tr><td>0</td><td>1</td><td>1</td></tr><tr><td>1</td><td>0</td><td>1</td></tr><tr><td>1</td><td>1</td><td>0</td></tr></tbody>
+</table></div>
+<p>El <strong>bit de paridad</strong> se elige para que el número de unos sea par (paridad par) o impar (paridad impar). La <strong>distancia de Hamming</strong> entre dos palabras es el número de posiciones en que difieren, es decir, el peso (número de unos) de su XOR. Si la distancia mínima de un código es \(d_{\min}\), se pueden detectar hasta \(d_{\min}-1\) errores y corregir hasta \(\lfloor(d_{\min}-1)/2\rfloor\).</p>
+<div class="example"><h4>Ejemplo 7.2 — Paridad y distancia</h4>
+<p>Para los datos \(1011\), el XOR de los bits es \(1\oplus0\oplus1\oplus1=1\). Con paridad par se añade un 1 y se transmite \(10111\) (cuatro unos, par). Si se recibe \(10011\), el XOR es \(1\oplus0\oplus0\oplus1\oplus1=1\): la paridad falla y se detecta un error. La distancia entre \(1011\) y \(1001\) es 1 (difieren en el tercer bit). Un código con \(d_{\min}=3\) puede corregir un error; es la idea de Hamming (7,4), que verás en el Tema I.</p></div>
+
+<h3 id="adc-preview">7.3 Muestreo y cuantización: lo que viene en el Tema III</h3>
+<p>Para convertir una señal analógica en bits se hacen dos operaciones:</p>
+<ul>
+  <li><strong>Muestreo</strong>: tomar el valor de la señal cada \(T_s\) segundos. Si la señal está limitada a la banda \(B\), basta \(f_s=1/T_s\gt2B\) para poder reconstruirla (teorema de Nyquist-Shannon). Si se muestrea más despacio, las réplicas del espectro se solapan y aparece <strong>aliasing</strong>.</li>
+  <li><strong>Cuantización</strong>: redondear cada muestra a uno de \(M=2^n\) niveles. El error de cuantización es inevitable; su potencia relativa a una sinusoide de fondo de escala es, para un cuantificador uniforme de \(n\) bits,</li>
+</ul>
+<div class="eq key">$$\text{SNR}_q\approx6{,}02\,n+1{,}76\ \text{dB}.$$<div class="eq-label">SNR de cuantización (sinusoide a fondo de escala)</div></div>
+<p>Es la fórmula que usan los fabricantes de ADC y la que explica por qué un CD (16 bits) tiene \(\text{SNR}_q\approx98\ \text{dB}\).</p>
+<div class="sim" id="sim-niv0">
+  <div class="sim-title">Bits, niveles y SNR de cuantización</div>
+  <div class="controls">
+    <label>bits \(n\) <input type="range" id="niv0-n" min="1" max="16" step="1" value="8" data-out="niv0-no"><output id="niv0-no"></output></label>
+  </div>
+  <div class="readout" id="niv0-out"></div>
+</div>
+<div class="example"><h4>Ejemplo 7.3 — Un ADC de 8 bits</h4>
+<p>Con \(n=8\), \(M=2^8=256\) niveles y \(\text{SNR}_q\approx6{,}02\cdot8+1{,}76=49{,}9\ \text{dB}\). Con \(n=12\), \(M=4096\) y \(\text{SNR}_q\approx74{,}0\ \text{dB}\). Cada bit adicional mejora el SNR en unos \(6\ \text{dB}\), es decir, reduce el error de cuantización a la mitad. La contrapartida es que el caudal \(R_b=nf_s\) aumenta.</p></div>
+
+<!-- ============================================================ -->
+<h2 id="autodiagnostico">8. Autodiagnóstico y plan de repaso</h2>
+<p>Marca mentalmente cada casilla. Si no puedes explicar el concepto <em>y</em> hacer el cálculo en menos de dos minutos, vuelve a la sección indicada.</p>
+<div class="table-wrap"><table>
+  <thead><tr><th>Debo ser capaz de…</th><th>Sección</th><th>¿Listo?</th></tr></thead>
+  <tbody>
+    <tr><td>Pasar de binómica a polar, multiplicar, dividir y elegir el cuadrante correcto.</td><td><a href="#complejos">3.1</a></td><td>☐</td></tr>
+    <tr><td>Escribir \(A\cos(\omega t+\varphi)\) como suma de dos exponenciales complejas.</td><td><a href="#complejos">3.1</a>, <a href="#trig">3.2</a></td><td>☐</td></tr>
+    <tr><td>Convertir potencias y tensiones a dB, y sumar ganancias en cascada.</td><td><a href="#db">3.3</a></td><td>☐</td></tr>
+    <tr><td>Integrar un coseno y un coseno al cuadrado en un período; explicar la ortogonalidad.</td><td><a href="#integrales">3.4</a></td><td>☐</td></tr>
+    <tr><td>Usar el cribado del impulso y relacionar escalón y derivada.</td><td><a href="#impulso">3.6</a></td><td>☐</td></tr>
+    <tr><td>Calcular media, valor eficaz y potencia de una sinusoide.</td><td><a href="#potencia">4.3</a></td><td>☐</td></tr>
+    <tr><td>Explicar qué es el espectro y qué significa una frecuencia negativa.</td><td><a href="#espectro-preview">4.4</a></td><td>☐</td></tr>
+    <tr><td>Usar la probabilidad total, la media, la varianza y la gaussiana.</td><td><a href="#prob-basica">5.1</a>, <a href="#va">5.2</a></td><td>☐</td></tr>
+    <tr><td>Calcular \(Q(z)\) y convertir un problema de ruido en una probabilidad de error.</td><td><a href="#gauss">5.3</a></td><td>☐</td></tr>
+    <tr><td>Calcular la entropía de una fuente binaria y explicar qué mide.</td><td><a href="#entropia-preview">5.4</a></td><td>☐</td></tr>
+    <tr><td>Obtener la impedancia de R, L y C; usar un divisor de tensión con fasores.</td><td><a href="#impedancia">6.1</a></td><td>☐</td></tr>
+    <tr><td>Calcular \(\tau\), \(f_c\), \(|H|\) y \(\angle H\) de un RC; dibujar su Bode.</td><td><a href="#rc">6.2</a></td><td>☐</td></tr>
+    <tr><td>Explicar qué es un sistema LTI y por qué la convolución se vuelve producto en frecuencia.</td><td><a href="#lti">6.3</a></td><td>☐</td></tr>
+    <tr><td>Pasar de bits a niveles y de niveles a bits; calcular \(R_b\).</td><td><a href="#bit">7.1</a></td><td>☐</td></tr>
+    <tr><td>Calcular paridad, XOR y distancia de Hamming.</td><td><a href="#xor">7.2</a></td><td>☐</td></tr>
+    <tr><td>Explicar muestreo, aliasing y SNR de cuantización.</td><td><a href="#adc-preview">7.3</a></td><td>☐</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="plan-repaso">8.1 Plan de repaso en seis sesiones</h3>
+<div class="table-wrap"><table>
+  <thead><tr><th>Sesión</th><th>Tiempo</th><th>Qué estudiar</th><th>Qué resolver</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>1,5 h</td><td><a href="#complejos">3.1</a> y <a href="#trig">3.2</a></td><td>Ejercicios 1–4</td></tr>
+    <tr><td>2</td><td>1,5 h</td><td><a href="#db">3.3</a>, <a href="#integrales">3.4</a>, <a href="#series">3.5</a></td><td>Ejercicios 5–8</td></tr>
+    <tr><td>3</td><td>1,5 h</td><td><a href="#impulso">3.6</a>, <a href="#unidades">3.7</a>, <a href="#senales">4</a></td><td>Ejercicios 9–12</td></tr>
+    <tr><td>4</td><td>2 h</td><td><a href="#probabilidad">5</a></td><td>Ejercicios 13–16</td></tr>
+    <tr><td>5</td><td>2 h</td><td><a href="#circuitos">6</a></td><td>Ejercicios 17–19</td></tr>
+    <tr><td>6</td><td>1,5 h</td><td><a href="#bits">7</a> y repaso del autodiagnóstico</td><td>Ejercicios 20–22 y autoevaluación</td></tr>
+  </tbody>
+</table></div>
+
+<h3 id="metodo">8.2 Cómo resolver un problema de comunicaciones</h3>
+<div class="step"><span class="n">1</span><div><p><strong>Dibuja.</strong> Haz un esquema de la señal, del circuito o del espectro. La mitad de los errores desaparecen al dibujar.</p></div></div>
+<div class="step"><span class="n">2</span><div><p><strong>Escribe los datos con unidades</strong> y pasa todo al SI (o a un sistema coherente: ms con kHz, µs con MHz).</p></div></div>
+<div class="step"><span class="n">3</span><div><p><strong>Decide el dominio.</strong> ¿El problema es más fácil en tiempo o en frecuencia? ¿Hay convolución que se vuelve producto?</p></div></div>
+<div class="step"><span class="n">4</span><div><p><strong>Haz el cálculo simbólico primero</strong> y sustituye al final. Así detectas errores de fórmula y puedes comprobar órdenes de magnitud.</p></div></div>
+<div class="step"><span class="n">5</span><div><p><strong>Comprueba.</strong> Unidades, signo, orden de magnitud, simetría, casos límite. Si puedes, verifica con el paquete <code>fc1</code> o con una gráfica.</p></div></div>
+
+<h3 id="errores">8.3 Los diez errores que más cuestan puntos</h3>
+<ol>
+  <li>Confundir \(f\) (Hz) con \(\omega\) (rad/s).</li>
+  <li>Usar \(10\log\) para tensiones o \(20\log\) para potencias.</li>
+  <li>Olvidar el \(2\pi\) en \(f_c=1/(2\pi RC)\).</li>
+  <li>Sumar dBm con dBm, o sumar desviaciones típicas en lugar de varianzas.</li>
+  <li>Calcular la fase con \(\arctan(b/a)\) sin mirar el cuadrante.</li>
+  <li>Confundir amplitud de pico con valor eficaz (\(A\) frente a \(A/\sqrt2\)).</li>
+  <li>Creer que un coseno tiene valor medio \(A\) o potencia \(A^2\).</li>
+  <li>Usar \(\delta(t)\) como si tuviera un valor en 0 en lugar de un área.</li>
+  <li>Confundir la frecuencia de muestreo \(f_s\) con la frecuencia de la señal, o el baudio con el bit.</li>
+  <li>Dar un resultado sin unidades o con unidades imposibles.</li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="ejercicios">9. Ejercicios propuestos</h2>
+<p>Resuelve primero en papel y luego abre la solución. Los ejercicios están ordenados como el plan de repaso.</p>
+<ol class="exercises">
+  <li><p>Escribe \(z=2-j2\sqrt3\) en forma polar y calcula \(z^2\).</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(|z|=\sqrt{4+12}=4\); \(\theta=\operatorname{atan2}(-2\sqrt3,2)=-60^\circ\). Entonces \(z=4\angle-60^\circ\) y \(z^2=16\angle-120^\circ=-8-j8\sqrt3\).</p></div></details></li>
+
+  <li><p>Simplifica \(\dfrac{1+j}{1-j}\) y da el resultado en forma binómica y polar.</p>
+  <details class="sol"><summary>Solución</summary><div><p>Multiplicando por el conjugado: \(\frac{(1+j)^2}{1+1}=\frac{1+2j+j^2}{2}=\frac{2j}{2}=j\). En polar, \(1\angle90^\circ\).</p></div></details></li>
+
+  <li><p>Escribe \(8\cos(2\pi500t-45^\circ)\) como suma de dos exponenciales complejas.</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(4e^{j(2\pi500t-45^\circ)}+4e^{-j(2\pi500t-45^\circ)}=4e^{-j\pi/4}e^{j2\pi500t}+4e^{j\pi/4}e^{-j2\pi500t}\). Las dos amplitudes son 4 y las fases \(\mp45^\circ\).</p></div></details></li>
+
+  <li><p>Demuestra que \(\cos(3t)+\cos(5t)=2\cos(4t)\cos(t)\).</p>
+  <details class="sol"><summary>Solución</summary><div><p>Usando \(\cos a+\cos b=2\cos\frac{a+b}{2}\cos\frac{a-b}{2}\) con \(a=5t\), \(b=3t\): \(2\cos(4t)\cos(t)\). Es el fenómeno de batido: una envolvente lenta \(\cos t\) modula una portadora \(\cos4t\).</p></div></details></li>
+
+  <li><p>Convierte \(0{,}2\ \text{W}\) y \(2\ \text{mW}\) a dBm y calcula su relación en dB.</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(0{,}2\ \text{W}=200\ \text{mW}\): \(10\log_{10}200=23{,}01\ \text{dBm}\). \(2\ \text{mW}\): \(10\log_{10}2=3{,}01\ \text{dBm}\). Diferencia: \(20\ \text{dB}\), que corresponde a \(200/2=100\) veces.</p></div></details></li>
+
+  <li><p>Una señal de \(0\ \text{dBm}\) pasa por un atenuador de \(6\ \text{dB}\) y luego por un amplificador de \(15\ \text{dB}\). ¿Potencia final en dBm y en mW?</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(0-6+15=9\ \text{dBm}\). \(P=10^{9/10}\ \text{mW}=10^{0{,}9}\ \text{mW}\approx7{,}94\ \text{mW}\).</p></div></details></li>
+
+  <li><p>Calcula \(\int_{-T/2}^{T/2}\cos(2\pi t/T)dt\) y \(\int_{-T/2}^{T/2}\cos^2(2\pi t/T)dt\).</p>
+  <details class="sol"><summary>Solución</summary><div><p>La primera es 0 (un ciclo completo, áreas positivas y negativas). La segunda es \(T/2\), porque \(\cos^2=(1+\cos(4\pi t/T))/2\) y el término coseno integrado en dos ciclos da 0.</p></div></details></li>
+
+  <li><p>Calcula \(\int_{-\infty}^{\infty}(t^2+1)\delta(t-3)dt\) y simplifica \(\delta(4t)\).</p>
+  <details class="sol"><summary>Solución</summary><div><p>Por cribado: \(3^2+1=10\). Y \(\delta(4t)=\delta(t)/4\), porque \(\delta(at)=\delta(t)/|a|\).</p></div></details></li>
+
+  <li><p>Para \(x(t)=10\cos(2\pi\,2000t+90^\circ)\ \text{V}\), indica \(A\), \(f\), \(T\), \(\omega\), valor medio, valor eficaz y potencia normalizada.</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(A=10\ \text{V}\), \(f=2\ \text{kHz}\), \(T=0{,}5\ \text{ms}\), \(\omega=2\pi\cdot2000=12566\ \text{rad/s}\). Media 0; \(X_{\text{ef}}=10/\sqrt2=7{,}07\ \text{V}\); \(P=10^2/2=50\ \text{W}\) (sobre \(1\,\Omega\)).</p></div></details></li>
+
+  <li><p>Una señal de \(3\ \text{V}\) de pico y \(1\ \text{kHz}\) pasa por un RC con \(R=1\ \text{k}\Omega\) y \(C=159\ \text{nF}\). ¿Qué amplitud y fase tiene a la salida a \(1\ \text{kHz}\)?</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(\tau=10^3\cdot159\cdot10^{-9}=1{,}59\cdot10^{-4}\ \text{s}\); \(f_c\approx1000\ \text{Hz}\). A \(f=f_c\), \(|H|=1/\sqrt2=0{,}707\) y \(\angle H=-45^\circ\). La salida es \(2{,}12\ \text{V}\) de pico, atrasada \(45^\circ\).</p></div></details></li>
+
+  <li><p>Dos ruidos independientes tienen potencias \(P_1=1\ \mu\text{W}\) y \(P_2=3\ \mu\text{W}\). ¿Cuál es la potencia total y el aumento en dB respecto al primero?</p>
+  <details class="sol"><summary>Solución</summary><div><p>Las potencias se suman: \(P_{\text{tot}}=4\ \mu\text{W}\). El aumento es \(10\log_{10}4=6{,}02\ \text{dB}\). Las desviaciones típicas serían \(\sqrt1\) y \(\sqrt3\), pero no se suman directamente.</p></div></details></li>
+
+  <li><p>Un receptor recibe \(10\ \mu\text{W}\) de señal y \(0{,}5\ \mu\text{W}\) de ruido. Calcula el SNR en lineal y en dB.</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(\text{SNR}=10/0{,}5=20\); en dB, \(10\log_{10}20=13{,}01\ \text{dB}\). En dBm: \(-20\ \text{dBm}\) y \(-33{,}01\ \text{dBm}\); la diferencia es \(13{,}01\ \text{dB}\).</p></div></details></li>
+
+  <li><p>El ruido de un canal es gaussiano, de media 0 y \(\sigma=0{,}5\ \text{V}\). El umbral de decisión está a \(1\ \text{V}\) por encima de la media. ¿Cuál es la probabilidad de que el ruido supere el umbral?</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(z=(1-0)/0{,}5=2\); \(P=Q(2)=0{,}0228\), es decir, 2,28 %.</p></div></details></li>
+
+  <li><p>En un sistema binario simétrico, la distancia entre las dos señales es \(d=4\ \text{V}\) y el ruido tiene \(\sigma=1\ \text{V}\). ¿Cuál es \(P_e\)?</p>
+  <details class="sol"><summary>Solución</summary><div><p>Con umbral en el punto medio, \(P_e=Q(d/(2\sigma))=Q(4/2)=Q(2)=0{,}0228\).</p></div></details></li>
+
+  <li><p>Una fuente binaria emite 1 con probabilidad \(0{,}8\). Calcula su entropía y la información de recibir un 1.</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(H_b(0{,}8)=-0{,}8\log_20{,}8-0{,}2\log_20{,}2\approx0{,}722\ \text{bits}\). La información de un 1 es \(-\log_20{,}8\approx0{,}322\ \text{bits}\); la de un 0 es \(-\log_20{,}2\approx2{,}322\ \text{bits}\). El promedio ponderado da 0,722.</p></div></details></li>
+
+  <li><p>Un código de paridad par recibe \(11010\). ¿Detecta error? ¿Puede corregirlo?</p>
+  <details class="sol"><summary>Solución</summary><div><p>El número de unos es 3 (impar), así que la paridad falla y se detecta un error. La paridad sola no dice qué bit falló, así que no puede corregirlo; para corregir hacen falta más bits de redundancia (por ejemplo, Hamming).</p></div></details></li>
+
+  <li><p>Un ADC de 12 bits trabaja con una sinusoide a fondo de escala. Estima su SNR de cuantización y el número de niveles.</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(M=2^{12}=4096\) niveles; \(\text{SNR}_q\approx6{,}02\cdot12+1{,}76=74{,}0\ \text{dB}\).</p></div></details></li>
+
+  <li><p>Una señal de voz se limita a \(3{,}4\ \text{kHz}\). ¿Cuál es la frecuencia de muestreo mínima? ¿Por qué el teléfono usa 8 kHz?</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(f_s\gt2B=6{,}8\ \text{kHz}\). Se eligen 8 kHz para dejar margen para el filtro antialiasing, que no es ideal y necesita una banda de transición; además, 8 kHz es una frecuencia cómoda para la jerarquía digital telefónica.</p></div></details></li>
+
+  <li><p>En un enlace, la señal llega con \(-70\ \text{dBm}\) y el ruido con \(-100\ \text{dBm}\). ¿SNR en dB? Si el ruido se reduce en \(3\ \text{dB}\), ¿cuánto mejora?</p>
+  <details class="sol"><summary>Solución</summary><div><p>\(\text{SNR}=-70-(-100)=30\ \text{dB}\). Si el ruido baja 3 dB, el SNR sube a \(33\ \text{dB}\): una mejora de 3 dB, es decir, el doble en potencia.</p></div></details></li>
+
+  <li><p>Explica con una frase por qué una sinusoide pura conocida no transporta información y por qué el ruido sí es un problema aunque sea impredecible.</p>
+  <details class="sol"><summary>Solución</summary><div><p>Porque la información mide incertidumbre: si el receptor conoce exactamente la sinusoide (amplitud, frecuencia y fase), no aprende nada nuevo. El ruido es un problema porque se suma a la señal y hace que la decisión del receptor sea incierta; esa incertidumbre se cuantifica con probabilidad (gaussiana, \(Q\)) y se combate con más potencia, más banda o codificación.</p></div></details></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="quiz">10. Autoevaluación</h2>
+<div class="quiz">
+  <div class="q"><p>1. El módulo de \(z=3-j4\) es…</p><div class="opts">
+    <button class="opt" type="button">7</button>
+    <button class="opt" type="button" data-ok>5</button>
+    <button class="opt" type="button">25</button></div>
+    <p class="why">\(|z|=\sqrt{3^2+(-4)^2}=5\). El 25 es \(|z|^2\).</p></div>
+  <div class="q"><p>2. El producto \(\cos(2\pi100t)\cos(2\pi10t)\) contiene frecuencias…</p><div class="opts">
+    <button class="opt" type="button">100 Hz y 10 Hz</button>
+    <button class="opt" type="button" data-ok>90 Hz y 110 Hz</button>
+    <button class="opt" type="button">1000 Hz y 100 Hz</button></div>
+    <p class="why">Producto→suma: \((100-10)\) y \((100+10)\) Hz.</p></div>
+  <div class="q"><p>3. Una ganancia de \(20\ \text{dB}\) en potencia equivale a…</p><div class="opts">
+    <button class="opt" type="button">2 veces</button>
+    <button class="opt" type="button">20 veces</button>
+    <button class="opt" type="button" data-ok>100 veces</button></div>
+    <p class="why">\(10^{20/10}=100\). Para tensión serían 10 veces (\(20\log10=20\)).</p></div>
+  <div class="q"><p>4. La integral de \(\cos(2\pi f_0t)\) en un número entero de períodos es…</p><div class="opts">
+    <button class="opt" type="button" data-ok>0</button>
+    <button class="opt" type="button">\(T_0/2\)</button>
+    <button class="opt" type="button">\(2\pi\)</button></div>
+    <p class="why">Las áreas positivas y negativas se cancelan. La del \(\cos^2\) sí es \(T_0/2\).</p></div>
+  <div class="q"><p>5. Una sinusoide de amplitud \(1\ \text{V}\) tiene potencia normalizada…</p><div class="opts">
+    <button class="opt" type="button">1 W</button>
+    <button class="opt" type="button" data-ok>0,5 W</button>
+    <button class="opt" type="button">0,707 W</button></div>
+    <p class="why">\(P=A^2/2=1/2\ \text{W}\). El valor eficaz es \(0{,}707\ \text{V}\), pero la potencia es \(0{,}5\ \text{W}\).</p></div>
+  <div class="q"><p>6. \(Q(0)\) vale…</p><div class="opts">
+    <button class="opt" type="button">0</button>
+    <button class="opt" type="button" data-ok>0,5</button>
+    <button class="opt" type="button">1</button></div>
+    <p class="why">La mitad del área de la gaussiana está a la derecha de la media.</p></div>
+  <div class="q"><p>7. Al sumar dos ruidos independientes…</p><div class="opts">
+    <button class="opt" type="button">se suman las desviaciones típicas</button>
+    <button class="opt" type="button" data-ok>se suman las varianzas</button>
+    <button class="opt" type="button">se suman las medias</button></div>
+    <p class="why">\(\sigma_{1+2}^2=\sigma_1^2+\sigma_2^2\). Las medias se suman, pero no es lo que determina la dispersión.</p></div>
+  <div class="q"><p>8. En la frecuencia de corte de un RC paso bajo…</p><div class="opts">
+    <button class="opt" type="button">\(|H|=1\) y \(\angle H=0^\circ\)</button>
+    <button class="opt" type="button" data-ok>\(|H|=0{,}707\) y \(\angle H=-45^\circ\)</button>
+    <button class="opt" type="button">\(|H|=0\) y \(\angle H=-90^\circ\)</button></div>
+    <p class="why">Es la definición de \(-3\ \text{dB}\): \(1/\sqrt2\) y \(-45^\circ\).</p></div>
+  <div class="q"><p>9. Con 8 niveles de señal, cada símbolo transporta…</p><div class="opts">
+    <button class="opt" type="button">8 bits</button>
+    <button class="opt" type="button" data-ok>3 bits</button>
+    <button class="opt" type="button">2 bits</button></div>
+    <p class="why">\(\log_2 8=3\). Ocho niveles no son ocho bits.</p></div>
+  <div class="q"><p>10. \(\delta(t)\) se caracteriza por…</p><div class="opts">
+    <button class="opt" type="button">valer 1 en \(t=0\)</button>
+    <button class="opt" type="button" data-ok>tener área 1 y duración nula</button>
+    <button class="opt" type="button">ser siempre negativo</button></div>
+    <p class="why">Su «valor» no está definido; lo que importa es su área y su propiedad de cribado.</p></div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="glosario">11. Glosario mínimo</h2>
+<div class="table-wrap"><table>
+  <thead><tr><th>Término</th><th>Qué es</th><th>Sección</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Señal</strong></td><td>Magnitud física que varía con el tiempo y representa información.</td><td><a href="#senal-def">4.1</a></td></tr>
+    <tr><td><strong>Información</strong></td><td>Medida de la incertidumbre que se reduce al recibir un mensaje; se mide en bits.</td><td><a href="#entropia-preview">5.4</a></td></tr>
+    <tr><td><strong>Sistema de comunicación</strong></td><td>Conjunto fuente–transmisor–canal–receptor–destino.</td><td><a href="#que-es">1</a></td></tr>
+    <tr><td><strong>Banda base</strong></td><td>Señal cuyo espectro empieza en 0 Hz.</td><td><a href="#analogico-digital">1.2</a></td></tr>
+    <tr><td><strong>Banda pasante</strong></td><td>Señal centrada en una portadora \(f_c\gg B\).</td><td><a href="#analogico-digital">1.2</a></td></tr>
+    <tr><td><strong>Fasor</strong></td><td>Complejo \(Ae^{j\varphi}\) que representa amplitud y fase de una sinusoide.</td><td><a href="#complejos">3.1</a></td></tr>
+    <tr><td><strong>Espectro</strong></td><td>Distribución de la señal en frecuencia.</td><td><a href="#espectro-preview">4.4</a></td></tr>
+    <tr><td><strong>Ancho de banda</strong></td><td>Rango de frecuencias que ocupa una señal o deja pasar un sistema.</td><td><a href="#banda">4.5</a></td></tr>
+    <tr><td><strong>Valor eficaz (RMS)</strong></td><td>Raíz del valor medio del cuadrado; \(A/\sqrt2\) para una sinusoide.</td><td><a href="#potencia">4.3</a></td></tr>
+    <tr><td><strong>Potencia media</strong></td><td>Valor medio de \(x^2(t)\); normalizada si se supone \(1\,\Omega\).</td><td><a href="#potencia">4.3</a></td></tr>
+    <tr><td><strong>dB y dBm</strong></td><td>Escala logarítmica de relación de potencias / potencia absoluta referida a 1 mW.</td><td><a href="#db">3.3</a></td></tr>
+    <tr><td><strong>Impulso unitario</strong></td><td>Distribución de área 1 y duración nula; criba funciones.</td><td><a href="#impulso">3.6</a></td></tr>
+    <tr><td><strong>Variable aleatoria</strong></td><td>Número asignado a cada resultado de un experimento aleatorio.</td><td><a href="#va">5.2</a></td></tr>
+    <tr><td><strong>Varianza y desviación típica</strong></td><td>Dispersión cuadrática media y su raíz; unidades al cuadrado y lineales.</td><td><a href="#va">5.2</a></td></tr>
+    <tr><td><strong>Gaussiana</strong></td><td>Distribución en campana, descrita por media y desviación típica.</td><td><a href="#gauss">5.3</a></td></tr>
+    <tr><td><strong>Función \(Q\)</strong></td><td>Área de la cola derecha de la normal estándar.</td><td><a href="#gauss">5.3</a></td></tr>
+    <tr><td><strong>Entropía</strong></td><td>Información media por símbolo de una fuente.</td><td><a href="#entropia-preview">5.4</a></td></tr>
+    <tr><td><strong>SNR</strong></td><td>Relación entre potencia de señal y potencia de ruido.</td><td><a href="#ruido-preview">5.5</a></td></tr>
+    <tr><td><strong>Impedancia</strong></td><td>Cociente fasorial \(V/I\); \(R\), \(j\omega L\), \(1/(j\omega C)\).</td><td><a href="#impedancia">6.1</a></td></tr>
+    <tr><td><strong>Frecuencia de corte</strong></td><td>Frecuencia donde \(|H|=1/\sqrt2\) (\(-3\ \text{dB}\)).</td><td><a href="#rc">6.2</a></td></tr>
+    <tr><td><strong>Sistema LTI</strong></td><td>Lineal e invariante en el tiempo; se describe por \(h(t)\) y \(H(f)\).</td><td><a href="#lti">6.3</a></td></tr>
+    <tr><td><strong>Ruido térmico</strong></td><td>Ruido de las resistencias; \(N=kTB\), \(kT\approx-174\ \text{dBm/Hz}\) a 290 K.</td><td><a href="#ruido-termico">6.4</a></td></tr>
+    <tr><td><strong>Bit y baudio</strong></td><td>Unidad de información / símbolo transmitido.</td><td><a href="#bit">7.1</a></td></tr>
+    <tr><td><strong>XOR</strong></td><td>Suma módulo 2; base de la paridad y de los códigos.</td><td><a href="#xor">7.2</a></td></tr>
+    <tr><td><strong>Muestreo y aliasing</strong></td><td>Tomar muestras cada \(T_s\); el aliasing es el solape espectral si \(f_s\lt2B\).</td><td><a href="#adc-preview">7.3</a></td></tr>
+    <tr><td><strong>Cuantización</strong></td><td>Redondeo a \(2^n\) niveles; genera un error inevitable.</td><td><a href="#adc-preview">7.3</a></td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="biblio">12. Dónde estudiarlo</h2>
+<p class="meta">Páginas impresas del libro; entre paréntesis, la página del visor PDF del archivo en <code>05-Bibliografia</code> cuando difiere. Son las mismas referencias verificadas que usan las páginas de los temas y las fichas de repaso.</p>
+<div class="table-wrap"><table class="biblio">
+  <thead><tr><th>Libro</th><th>Cap.</th><th>Epígrafe</th><th>Páginas</th><th>Uso</th></tr></thead>
+  <tbody>
+    <tr><td>Carlson, Crilly y Rutledge, <em>Communication Systems</em>, 4.ª ed., McGraw-Hill, 2002</td><td>2</td><td>2.1 Line Spectra and Fourier Series</td><td>pp. 17–32 (PDF 30–45)</td><td>Fasores, espectro de línea</td></tr>
+    <tr><td>Carlson (ídem)</td><td>2</td><td>2.2 Fourier Transforms and Continuous Spectra · 2.3 Time and Frequency Relations · 2.4 Convolution</td><td>pp. 33–58 (PDF 46–71)</td><td>Transformada, teoremas, convolución</td></tr>
+    <tr><td>Carlson (ídem)</td><td>2</td><td>2.5 Impulses and Transforms in the Limit</td><td>desde p. 59 (PDF 72)</td><td>Impulso y transformadas límite</td></tr>
+    <tr><td>Carlson (ídem)</td><td>3</td><td>3.1 Response of LTI Systems · 3.2 Signal Distortion in Transmission · 3.4 Filters and Filtering</td><td>pp. 76–98 y 109–119 (PDF 89–111 y 122–132)</td><td>LTI, distorsión, filtros</td></tr>
+    <tr><td>Carlson (ídem)</td><td>9</td><td>9.1 Random Processes · 9.2 Random Signals · 9.3 Noise</td><td>pp. 352–380 (PDF 361–387)</td><td>Ruido y procesos aleatorios</td></tr>
+    <tr><td>Sklar y Ray, <em>Digital Communications</em>, 2.ª ed., Pearson, 2014</td><td>1</td><td>1.2 Classification of Signals · 1.3 Spectral Density · 1.4 Autocorrelation · 1.5 Random Signals · 1.6 Signal Transmission through Linear Systems</td><td>pp. 14–45 (PDF 41–72)</td><td>Señales, espectro, LTI</td></tr>
+    <tr><td>Sklar (ídem)</td><td>Ap. A</td><td>A.2 Fourier Techniques · A.3 Properties · A.4 Useful Functions · A.5 Convolution · A.6 Tables</td><td>pp. 1069–1090 (PDF 1096–1117)</td><td>Formulario de Fourier</td></tr>
+    <tr><td>Couch, <em>Digital and Analog Communication Systems</em>, 8.ª ed., Prentice Hall, 2012</td><td>2</td><td>2–1 Properties of Signals and Noise · 2–2 Fourier Transform and Spectra · 2–3 PSD and Autocorrelation · 2–5 Fourier Series · 2–6 Review of Linear Systems</td><td>pp. 34–89 (PDF 59–114)</td><td>Señales, espectros y sistemas</td></tr>
+    <tr><td>Couch (ídem)</td><td>6</td><td>6–1 Some Basic Definitions · 6–2 PSD · 6–3 DC and RMS Values for Ergodic Processes · 6–4 Linear Systems · 6–6 The Gaussian Process</td><td>pp. 415–450 (PDF 440–475)</td><td>Ruido, procesos y gaussiana</td></tr>
+    <tr><td>Haykin, <em>Communication Systems</em>, 4.ª ed., Wiley, 2001</td><td>1</td><td>1.2 Mathematical Definition of a Random Process · 1.4 Mean, Correlation, and Covariance Functions · 1.6 Transmission through an LTI Filter · 1.7 Power Spectral Density · 1.8 Gaussian Process</td><td>pp. 32–57 (PDF 52–77)</td><td>Procesos aleatorios y ruido</td></tr>
+    <tr><td>Stewart, <em>Cálculo. Trascendentes tempranas</em>, 8.ª ed., Cengage, 2018</td><td>Ap. H</td><td>Números complejos</td><td>p. A57 (PDF 1270)</td><td>Complejos y Euler</td></tr>
+    <tr><td>Stewart (ídem)</td><td>Ap. D · 1.5 · 5.3–5.5 · 7.1–7.2 · 11.2 · 11.10</td><td>Trigonometría · funciones inversas y logarítmicas · integrales · integración por partes y trigonométricas · series · Taylor y Maclaurin</td><td>p. A24 · pp. 55–66 · 392–421 · 472–485 · 707 · 759</td><td>Trigonometría, logaritmos, integrales y series</td></tr>
+    <tr><td>Hayt, Kemmerly y Durbin, <em>Análisis de circuitos en ingeniería</em>, 8.ª ed., McGraw-Hill, 2012</td><td>10.4–10.5 · 11.2–11.5 · 5.4</td><td>El fasor · impedancia y admitancia · potencia promedio y valor eficaz · potencia compleja · máxima transferencia de potencia</td><td>pp. 383–389 · 424–441 · 152</td><td>Fasores, impedancia y potencia</td></tr>
+    <tr><td>Hayt (ídem)</td><td>8.3 · 8.8 · 16.6–16.7</td><td>Circuito RC sin fuente · accionamiento de circuitos RC · diagramas de Bode · diseño de filtros básicos</td><td>pp. 272 · 295 · 648–663</td><td>RC, respuesta temporal y filtros</td></tr>
+    <tr><td>Walpole, Myers, Myers y Ye, <em>Probabilidad y estadística para ingeniería y ciencias</em>, 9.ª ed., Pearson, 2012</td><td>2.4–2.6 · 3.1–3.3 · 4.1–4.2 · 6.2–6.3</td><td>Probabilidad de un evento, reglas aditivas, condicional e independencia · variable aleatoria · media, varianza y covarianza · distribución normal y áreas bajo la curva</td><td>p. 52 · pp. 81–93 · 111–127 · 172–182</td><td>Probabilidad, gaussiana y Q</td></tr>
+  </tbody>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="links">13. Para profundizar</h2>
+<ul>
+  <li><strong>Texto (español)</strong> — M. Lichtman, <a href="https://pysdr.org/es/content-es/frequency_domain">«2. Dominio de la Frecuencia», <em>PySDR: Guía de SDR/DSP con Python</em></a>. Capítulo completo en español: series y transformada de Fourier, propiedades, FFT, frecuencias negativas y espectrogramas. La mejor lectura después de las secciones 3 y 4.</li>
+  <li><strong>Texto (español)</strong> — D. H. Johnson, <a href="https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Electrica_(Johnson)/04%3A_Dominio_de_frecuencia/4.01%3A_Introducci%C3%B3n_al_Dominio_de_la_Frecuencia">«4.1 Introducción al Dominio de la Frecuencia»</a> y <a href="https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Electrica_(Johnson)/04%3A_Dominio_de_frecuencia/4.02%3A_Serie_compleja_de_Fourier">«4.2 Serie compleja de Fourier»</a>, LibreTexts. Formaliza con rigor lo de las secciones 3.4 y 4.4.</li>
+  <li><strong>Texto (español)</strong> — B. Wilson, <a href="https://espanol.libretexts.org/Bookshelves/Ingenieria/Introduccion_a_la_electronica_fisica_(Wilson)/06%3A_Transmisi%C3%B3n_de_estado_estacionario_de_CA/6.01%3A_Introducci%C3%B3n_a_los_fasores">«6.1 Introducción a los fasores»</a>, LibreTexts. Refuerza la sección 3.1 con la interpretación de circuito.</li>
+  <li><strong>Vídeo (español)</strong> — 3Blue1Brown, <a href="https://www.youtube.com/watch?v=h4PTucW3Rm0">«¿Qué es la Transformada de Fourier? Una introducción visual»</a> (19:48, doblado al español). Intuición geométrica de por qué la TF «detecta» frecuencias; ver antes de la sección 4.4. Original en inglés: <a href="https://www.youtube.com/watch?v=spUNpyF58BY">«But what is the Fourier Transform?»</a> (19:42).</li>
+  <li><strong>Vídeo (inglés, con subtítulos)</strong> — 3Blue1Brown, <a href="https://www.youtube.com/watch?v=r6sGWTCMz2k">«But what is a Fourier series?»</a> (24:47). Series como suma de fasores giratorios: la mejor animación para entender la sección 3.1 y el Tema II §3–4.</li>
+  <li><strong>Vídeo (español)</strong> — Mate ParaIngenieria, <a href="https://www.youtube.com/watch?v=9k5KZISr5K4">«Series de Fourier: introducción, conceptos básicos y forma general»</a>. Repaso en pizarra de la definición y los coeficientes.</li>
+  <li><strong>Vídeo (inglés)</strong> — SignalSense, <a href="https://www.youtube.com/watch?v=IOXzLMqcLbg">«Visualizando la convolución de señales continuas»</a> (9:09). La convolución que se usa en el Tema II §7 y en el Tema III.</li>
+  <li><strong>Vídeo (inglés)</strong> — Aaron Danner, <a href="https://www.youtube.com/watch?v=LjHs5HJ-Kq8">«Introducción al ruido de Johnson-Nyquist»</a> (11:50). Origen físico de \(4kTRB\) y de la sección 6.4.</li>
+  <li><strong>Curso</strong> — MIT OpenCourseWare, <a href="https://ocw.mit.edu/courses/6-003-signals-and-systems-fall-2011/">6.003 Signals and Systems (Fall 2011)</a>, D. Freeman: vídeos, apuntes y problemas resueltos de convolución, Fourier y sistemas LTI. Es el complemento natural del Tema II.</li>
+  <li><strong>Artículo histórico</strong> — J. B. Johnson, «Thermal agitation of electricity in conductors», <em>Phys. Rev.</em> 32, 97 (1928), <a href="https://doi.org/10.1103/PhysRev.32.97">doi:10.1103/PhysRev.32.97</a>; y H. Nyquist, «Thermal agitation of electric charge in conductors», <em>Phys. Rev.</em> 32, 110 (1928), <a href="https://doi.org/10.1103/PhysRev.32.110">doi:10.1103/PhysRev.32.110</a>. Los dos artículos que explican el ruido térmico.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="faq">14. Preguntas frecuentes</h2>
+<div class="faq">
+  <details><summary>¿Este Tema 0 entra en la evaluación?</summary><div><p>No es un tema del Programa Analítico y no se evalúa como contenido aislado. Pero todo lo que repasa se usa en las Actividades, las CP y las pruebas parciales. Si tienes lagunas, se notan en el Tema II y, sobre todo, en el Tema III.</p></div></details>
+  <details><summary>¿Por dónde empiezo si hace mucho que no estudio matemática?</summary><div><p>Haz el autodiagnóstico de la sección 8 y sigue el plan de seis sesiones. No empieces por el Tema II: primero asegura complejos, trigonometría, dB, integrales e impulso. Son pocas horas y ahorran muchas.</p></div></details>
+  <details><summary>¿Necesito saber programar o usar MATLAB?</summary><div><p>No para aprobar la teoría. El Laboratorio Simulado 2 y el Trabajo Práctico usan MATLAB/GNU Octave, pero el paquete <code>fc1</code> y los simuladores de esta web permiten comprobar casi todos los cálculos sin instalar nada. Si quieres practicar, GNU Octave es libre y ejecuta los mismos ficheros <code>.m</code>.</p></div></details>
+  <details><summary>¿Por qué insisten tanto con las frecuencias negativas?</summary><div><p>Porque la fórmula de Euler escribe un coseno real como suma de dos exponenciales complejas, una en \(+f_0\) y otra en \(-f_0\). No se miden con un frecuencímetro, pero sin ellas no funcionan los teoremas de modulación, desplazamiento y muestreo. Es una contabilidad matemática que simplifica todo.</p></div></details>
+  <details><summary>¿Cuál es la diferencia entre potencia y energía?</summary><div><p>La energía es la integral de \(x^2(t)\) en todo el tiempo; la potencia es su valor medio. Una señal que dura para siempre y no se apaga tiene energía infinita, pero potencia finita; un pulso aislado tiene energía finita y potencia media cero. El curso usa las dos herramientas, según la señal.</p></div></details>
+  <details><summary>¿Por qué el ruido se suma en potencia y no en tensión?</summary><div><p>Porque las fuentes de ruido son independientes: sus tensiones se suman de forma aleatoria, no coherente. La potencia, que es el cuadrado, sí se suma. En dB, dos ruidos iguales de \(-40\ \text{dBm}\) dan \(-37\ \text{dBm}\), no \(-80\ \text{dBm}\).</p></div></details>
+  <details><summary>¿Qué diferencia hay entre \(Q(z)\) y la tabla de la normal?</summary><div><p>La tabla de Walpole suele dar \(\Phi(z)=P(Z\le z)\), el área de la cola izquierda. La función \(Q(z)\) es el área de la cola derecha: \(Q(z)=1-\Phi(z)\). En comunicaciones se usa \(Q\) porque la probabilidad de error es «que el ruido supere un umbral», es decir, una cola derecha.</p></div></details>
+  <details><summary>¿Un filtro RC puede eliminar completamente el ruido de alta frecuencia?</summary><div><p>No. Lo atenúa \(20\ \text{dB}\) por década, pero siempre queda algo. Además, el propio resistor genera ruido térmico. La mejora real se mide con la relación señal/ruido a la salida y con el ancho de banda equivalente de ruido, no con la idea de «ruido cero».</p></div></details>
+  <details><summary>¿Por qué el Tema III necesita el Tema I si la transmisión es analógica en el cable?</summary><div><p>Porque la información se representa con bits y se protege con codificación. La teoría de la información dice cuántos bits hacen falta, cuánta redundancia conviene y cuál es el límite de Shannon; la codificación de canal permite detectar y corregir errores. Sin esas ideas, el Tema III sería solo una colección de formas de pulso.</p></div></details>
+</div>
+
+<p class="source-note"><strong>Origen:</strong> Actividad 1 (Introducción, curso 2026), Programa Analítico FC I (Plan E) y planificación del curso; Conferencia 1 de la edición anterior; fichas de repaso de matemática, probabilidad y circuitos; bibliografía verificada de Carlson, Sklar, Couch, Haykin, Stewart, Hayt y Walpole. Las explicaciones, figuras, simuladores y ejercicios son elaboración propia; no se reproduce material de los profesores.</p>
+</main>
+</div>
+<footer class="site wrap">Fundamentos de las Comunicaciones I · Material de estudio no oficial elaborado a partir de los materiales del curso · <a href="../">Volver a la asignatura</a></footer>
+</body>
+</html>

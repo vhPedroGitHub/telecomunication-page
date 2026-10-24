@@ -26,6 +26,7 @@
     <span class="title">Fundamentos de las Comunicaciones I</span>
     <nav class="tabs" aria-label="Secciones de la asignatura">
       <a href="../">Inicio</a>
+      <a href="tema0-introduccion-y-repaso.html">Tema 0</a>
       <a href="tema1-teoria-informacion.html">Tema I</a>
       <a href="tema2-senales-y-sistemas.html" aria-current="page">Tema II</a>
       <a href="tema3-banda-base.html">Tema III</a>
@@ -343,6 +344,55 @@ $$A\cos(2\pi f_0 t+\varphi)=\underbrace{\tfrac{A}{2}e^{j\varphi}}_{\text{en }+f_
     <div><canvas id="fz-c2" aria-label="Espectro de amplitud"></canvas><canvas id="fz-c3" aria-label="Espectro de fase"></canvas></div>
   </div>
   <canvas id="fz-c4" aria-label="Señal en el tiempo"></canvas>
+</div>
+
+<p>La animación anterior descompone <em>un</em> coseno en dos fasores conjugados. La siguiente generaliza la idea a una <strong>suma de hasta cinco senoides</strong>: cada fasor tiene su propia amplitud, frecuencia y fase; a la izquierda giran todos en el mismo plano complejo y a la derecha se dibujan las senoides que describen, una por una, junto con la suma total. Con frecuencias distintas, la suma ya no es un coseno puro: es una señal compuesta. Por claridad se dibuja un solo fasor por componente (el de frecuencia positiva); el conjugado es su espejo y aporta la misma parte real. Puedes elegir coseno o seno: el seno es el mismo fasor girado \(-90^\circ\).</p>
+
+<div class="sim" id="sim-fasores5">
+  <div class="sim-title">Hasta cinco fasores y las senoides que describen</div>
+  <p class="meta">Activa los fasores que quieras (hasta cinco) y ajusta \(A_i\), \(f_i\) y el desfase \(\varphi_i\). Cada flecha del plano complejo es \(A_i e^{j(2\pi f_i t+\varphi_i)}\); su proyección sobre el eje real es la senoide elegida. La curva gruesa de la derecha es la suma \(x(t)=\sum_i x_i(t)\).</p>
+  <div class="f5-list">
+    <div class="f5-row" style="--c: var(--s1)">
+      <label class="f5-name"><input type="checkbox" id="f5-on-1" checked><span class="f5-dot"></span>Fasor 1</label>
+      <label>\(A_1\) <input type="range" id="f5-A-1" min="0" max="2" step="0.05" value="1.2" data-out="f5-Ao-1" data-unit=" V"><output id="f5-Ao-1"></output></label>
+      <label>\(f_1\) <input type="range" id="f5-f-1" min="0.2" max="3" step="0.1" value="1" data-out="f5-fo-1" data-unit=" Hz"><output id="f5-fo-1"></output></label>
+      <label>\(\varphi_1\) <input type="range" id="f5-p-1" min="-180" max="180" step="15" value="0" data-out="f5-po-1" data-unit="°"><output id="f5-po-1"></output></label>
+    </div>
+    <div class="f5-row" style="--c: var(--s2)">
+      <label class="f5-name"><input type="checkbox" id="f5-on-2" checked><span class="f5-dot"></span>Fasor 2</label>
+      <label>\(A_2\) <input type="range" id="f5-A-2" min="0" max="2" step="0.05" value="0.9" data-out="f5-Ao-2" data-unit=" V"><output id="f5-Ao-2"></output></label>
+      <label>\(f_2\) <input type="range" id="f5-f-2" min="0.2" max="3" step="0.1" value="2" data-out="f5-fo-2" data-unit=" Hz"><output id="f5-fo-2"></output></label>
+      <label>\(\varphi_2\) <input type="range" id="f5-p-2" min="-180" max="180" step="15" value="45" data-out="f5-po-2" data-unit="°"><output id="f5-po-2"></output></label>
+    </div>
+    <div class="f5-row" style="--c: var(--s3)">
+      <label class="f5-name"><input type="checkbox" id="f5-on-3" checked><span class="f5-dot"></span>Fasor 3</label>
+      <label>\(A_3\) <input type="range" id="f5-A-3" min="0" max="2" step="0.05" value="0.7" data-out="f5-Ao-3" data-unit=" V"><output id="f5-Ao-3"></output></label>
+      <label>\(f_3\) <input type="range" id="f5-f-3" min="0.2" max="3" step="0.1" value="3" data-out="f5-fo-3" data-unit=" Hz"><output id="f5-fo-3"></output></label>
+      <label>\(\varphi_3\) <input type="range" id="f5-p-3" min="-180" max="180" step="15" value="-30" data-out="f5-po-3" data-unit="°"><output id="f5-po-3"></output></label>
+    </div>
+    <div class="f5-row is-off" style="--c: var(--s4)">
+      <label class="f5-name"><input type="checkbox" id="f5-on-4"><span class="f5-dot"></span>Fasor 4</label>
+      <label>\(A_4\) <input type="range" id="f5-A-4" min="0" max="2" step="0.05" value="0.6" data-out="f5-Ao-4" data-unit=" V"><output id="f5-Ao-4"></output></label>
+      <label>\(f_4\) <input type="range" id="f5-f-4" min="0.2" max="3" step="0.1" value="1.5" data-out="f5-fo-4" data-unit=" Hz"><output id="f5-fo-4"></output></label>
+      <label>\(\varphi_4\) <input type="range" id="f5-p-4" min="-180" max="180" step="15" value="90" data-out="f5-po-4" data-unit="°"><output id="f5-po-4"></output></label>
+    </div>
+    <div class="f5-row is-off" style="--c: var(--s5)">
+      <label class="f5-name"><input type="checkbox" id="f5-on-5"><span class="f5-dot"></span>Fasor 5</label>
+      <label>\(A_5\) <input type="range" id="f5-A-5" min="0" max="2" step="0.05" value="0.5" data-out="f5-Ao-5" data-unit=" V"><output id="f5-Ao-5"></output></label>
+      <label>\(f_5\) <input type="range" id="f5-f-5" min="0.2" max="3" step="0.1" value="0.5" data-out="f5-fo-5" data-unit=" Hz"><output id="f5-fo-5"></output></label>
+      <label>\(\varphi_5\) <input type="range" id="f5-p-5" min="-180" max="180" step="15" value="-90" data-out="f5-po-5" data-unit="°"><output id="f5-po-5"></output></label>
+    </div>
+  </div>
+  <div class="controls">
+    <label>Función <select id="f5-fn"><option value="cos">coseno</option><option value="sin">seno</option></select></label>
+    <button class="btn ghost" type="button" id="f5-play">⏸ Pausa</button>
+    <button class="btn ghost" type="button" id="f5-reset">↺ Reiniciar tiempo</button>
+  </div>
+  <div class="two">
+    <div><canvas id="f5-c1" aria-label="Hasta cinco fasores girando en el plano complejo"></canvas><p class="meta" style="text-align:center;margin:4px 0 0">plano complejo: la sombra sobre el eje real es la senoide</p></div>
+    <div><canvas id="f5-c2" aria-label="Senoides de cada fasor y suma total"></canvas><p class="meta" style="text-align:center;margin:4px 0 0">cada color: una componente · trazo grueso: la suma</p></div>
+  </div>
+  <div class="readout" id="f5-out"></div>
 </div>
 
 <!-- ============================================================ -->

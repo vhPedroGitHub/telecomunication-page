@@ -75,8 +75,9 @@ Ojo: el PDF de Sklar disponible es la edición 2014 (Sklar & Ray); verificar num
 | Archivo | Contenido |
 |---|---|
 | `index.html` | portada: temas, plan (Actividades 2026 y ed. anterior), evaluación, profesores, bibliografía, software, prerrequisitos, FAQ |
+| `temas/tema0-introduccion-y-repaso.html` + `js/tema0.js` | Tema 0 especial: qué es comunicar, mapa del curso y repaso de matemática, señales, probabilidad, circuitos y bits + 6 simuladores + autodiagnóstico, ejercicios, quiz, glosario, bibliografía y FAQ |
 | `temas/tema1-teoria-informacion.html` + `js/tema1.js` | Tema I completo + 6 simuladores (entropía, Huffman, LZ78, capacidad, Hamming, Viterbi) + PP1 resuelta |
-| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo (11 secciones + glosario + 20 figuras SVG) + 7 simuladores (fasor, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
+| `temas/tema2-senales-y-sistemas.html` + `js/tema2.js` | Tema II completo (11 secciones + glosario + 20 figuras SVG) + 8 simuladores (fasor, suma de hasta 5 fasores, síntesis de Fourier, explorador TF, convolución, RC, ruido, «foury» web) + Lab. Simulado 2 + guía del Trabajo Práctico |
 | `temas/tema3-banda-base.html` + `js/tema3.js` | Tema III completo + 7 simuladores (muestreo, cuantificador, DM, códigos de línea, ojo, umbral/Pe, BER) |
 | `software/fc1/` | paquete Python sin dependencias (CLI `python -m fc1`) + 10 pruebas que reproducen los ejemplos de la web |
 
@@ -96,6 +97,7 @@ Apéndice A, pp. 1069–1090 de la edición 2014; "Carlson p. 158-163" no corres
 
 | Tema | Teoría | Interactivo | Ejemplos | Ejercicios | CP/LAB | Biblio | Links | FAQ |
 |---|---|---|---|---|---|---|---|---|
+| 0. Introducción y repaso (especial) | ✅ | ✅ | ✅ | ✅ | — | ✅ | ✅ | ✅ |
 | I.1 Teoría de la información | ✅ | ✅ | ✅ | ✅ | ✅ CP1 | ✅ | ✅ | ✅ |
 | I.2 Codificación de fuente | ✅ | ✅ | ✅ | ✅ | ✅ CP2 | ✅ | ✅ | ✅ |
 | I.3 Codificación de canal / bloque | ✅ | ✅ | ✅ | ✅ | ✅ CP3 | ✅ | ✅ | ✅ |
@@ -136,6 +138,18 @@ y 11.1; después se añadió el dibujo del espectro bilateral (amplitud y fase) 
 
 ## Bitácora
 
+- **2026-10-24** — Tema II, §3.2: nuevo simulador `sim-fasores5` para sumar hasta cinco fasores
+  con amplitud, frecuencia y desfase independientes, con selector coseno/seno. A la izquierda se
+  dibujan los fasores girando en el plano complejo y su proyección sobre el eje real; a la derecha,
+  las senoides de cada componente y la suma total (ventana móvil de 4 s). Se añadió el token `--s5` (claro/oscuro), los
+  estilos `.f5-*` y la mención en la portada. Verificado en Chromium headless: consola sin errores, 0 `.katex-error`, sin
+  desborde a 390 px; animación, pausa/reinicio y controles de los cinco fasores funcionando.
+- **2026-10-24** — Tema 0 nuevo (`temas/tema0-introduccion-y-repaso.html` + `js/tema0.js`): 14
+  secciones con introducción a las comunicaciones, mapa del curso, repaso de matemática, señales,
+  probabilidad, circuitos y bits, 6 simuladores, autodiagnóstico con plan, ejercicios resueltos,
+  quiz, glosario, bibliografía y FAQ. Enlazado desde la portada (pestaña, tarjeta, plan y
+  prerrequisitos) y desde las pestañas de los Temas I–III. Verificado en Chromium headless:
+  consola sin errores, 0 `.katex-error`, sin desborde a 390 px.
 - **2026-10-22** — Tema II, ampliación didáctica (sin figuras nuevas; siguen 20): en 4.2 se añadió
   «De los \(C_n\) a la amplitud y la fase» (`h4#cn-amplitud-fase`) con la receta de tres cuentas
   (evaluar, separar real/imaginaria, módulo y `atan2`), tabla numérica de \(C_n=2\operatorname{sinc}(n/2)\)

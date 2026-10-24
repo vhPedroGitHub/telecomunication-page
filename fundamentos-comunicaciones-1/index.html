@@ -25,6 +25,7 @@
     <span class="title">Fundamentos de las Comunicaciones I</span>
     <nav class="tabs" aria-label="Secciones de la asignatura">
       <a href="./" aria-current="page">Inicio</a>
+      <a href="temas/tema0-introduccion-y-repaso.html">Tema 0</a>
       <a href="temas/tema1-teoria-informacion.html">Tema I</a>
       <a href="temas/tema2-senales-y-sistemas.html">Tema II</a>
       <a href="temas/tema3-banda-base.html">Tema III</a>
@@ -40,10 +41,14 @@
 <h1>Fundamentos de las Comunicaciones I</h1>
 <p class="lead">Objetivo de la asignatura: <strong>caracterizar sistemas de comunicación digitales en banda base</strong>, desde el punto de vista teórico y práctico-experimental. (Fundamentos II continúa con las modulaciones analógicas y digitales). Aquí encontrarás cada tema explicado desde cero, con simuladores, ejemplos resueltos de las conferencias y clases prácticas, guías de laboratorio, la bibliografía con capítulo y página, y software para comprobar tus cálculos.</p>
 <div class="box idea"><span class="box-title">Por dónde empezar</span>
-<p>El curso 2026 comienza por el <strong>Tema II (Teoría de la señal y los sistemas)</strong>: las Actividades 2–6 ya impartidas corresponden a él. Después siguen la Teoría de la información (Tema I) y la Transmisión digital en banda base (Tema III), que se apoya en los dos anteriores. Cada página empieza con un recuadro <em>Antes de empezar</em> con los conceptos previos que conviene refrescar.</p></div>
+<p>Empieza por el <a href="temas/tema0-introduccion-y-repaso.html"><strong>Tema 0 · Introducción y repaso</strong></a>: explica qué es comunicar, el mapa del curso y, con detalle, la matemática, las señales, la probabilidad, los circuitos y la lógica binaria que se usan después. Si ya dominas esos prerrequisitos, salta al <strong>Tema II (Teoría de la señal y los sistemas)</strong>, que es por donde comienza el curso 2026: las Actividades 2–6 corresponden a él. Después siguen la Teoría de la información (Tema I) y la Transmisión digital en banda base (Tema III), que se apoya en los dos anteriores.</p></div>
 
 <h2 id="temas">Temas</h2>
 <div class="topic-grid">
+  <a href="temas/tema0-introduccion-y-repaso.html">
+    <h3>Tema 0 · Introducción y repaso</h3>
+    <p>Qué es un sistema de comunicación · las cinco preguntas del curso · mapa de dependencias · matemática (complejos, trigonometría, dB, integrales, series, impulso, unidades) · señales · probabilidad y ruido · circuitos y filtros · bits, muestreo y cuantización · plan de repaso y autodiagnóstico.</p>
+  </a>
   <a href="temas/tema2-senales-y-sistemas.html">
     <h3>Tema II · Señales y sistemas</h3>
     <p>Fasores y espectro de línea · series de Fourier · transformada de Fourier y teoremas · impulsos · convolución · potencia, energía, DEP y autocorrelación · sistemas LTI, distorsión y filtros · señales aleatorias y ruido térmico · Lab. Simulado 2 · Trabajo Práctico.</p>
@@ -63,7 +68,7 @@
 <div class="table-wrap"><table>
   <thead><tr><th>Actividad</th><th>Contenido</th><th>CP asociadas (ed. anterior)</th><th>Página</th></tr></thead>
   <tbody>
-    <tr><td>1</td><td>Introducción. Presentación de la asignatura</td><td>—</td><td>esta página</td></tr>
+    <tr><td>1</td><td>Introducción. Presentación de la asignatura. Repaso de prerrequisitos</td><td>—</td><td><a href="temas/tema0-introduccion-y-repaso.html">Tema 0</a></td></tr>
     <tr><td>2</td><td>Fasores y series de Fourier</td><td>CP 5 (espectro de señales periódicas)</td><td><a href="temas/tema2-senales-y-sistemas.html#fasores">Tema II §3–4</a></td></tr>
     <tr><td>3</td><td>Transformada de Fourier, impulsos, transformadas en el límite</td><td>CP 6, CP 7</td><td><a href="temas/tema2-senales-y-sistemas.html#tf">Tema II §5–6</a></td></tr>
     <tr><td>4</td><td>Potencia y energía. Función de autocorrelación</td><td>CP 9</td><td><a href="temas/tema2-senales-y-sistemas.html#potencia">Tema II §8</a></td></tr>
@@ -111,7 +116,8 @@
 <h3 id="sw-web">En el navegador (sin instalar nada)</h3>
 <p>Cada tema incluye simuladores interactivos:</p>
 <ul>
-  <li><strong>Tema II</strong>: fasor giratorio y espectro de línea · sintetizador de series de Fourier (Gibbs) · explorador de la TF · convolución paso a paso · onda cuadrada por un filtro RC · ruido blanco filtrado · <a href="temas/tema2-senales-y-sistemas.html#lab">«foury» en el navegador</a> (el Lab. Simulado 2).</li>
+  <li><strong>Tema 0</strong>: fasor y sinusoide · conversor de dB · calculadora visual de \(Q(z)\) · entropía binaria · Bode de un RC · bits, niveles y SNR de cuantización.</li>
+  <li><strong>Tema II</strong>: fasor giratorio y espectro de línea · suma de hasta cinco fasores con amplitud, frecuencia y desfase · sintetizador de series de Fourier (Gibbs) · explorador de la TF · convolución paso a paso · onda cuadrada por un filtro RC · ruido blanco filtrado · <a href="temas/tema2-senales-y-sistemas.html#lab">«foury» en el navegador</a> (el Lab. Simulado 2).</li>
   <li><strong>Tema I</strong>: calculadora de entropía · constructor de Huffman paso a paso · LZ78 · capacidad BSC y Shannon-Hartley · Hamming (7,4) con errores · codificador convolucional y rejilla de Viterbi.</li>
   <li><strong>Tema III</strong>: muestreo y aliasing · cuantificador uniforme · modulador delta · códigos de línea y DEP · diagrama de ojo · umbral y \(P_e\) · curvas BER.</li>
 </ul>
@@ -162,6 +168,8 @@ N = 1000 muestras, fs = 100.0 Hz, resolución = 0.1 Hz
 <p>Las funciones del Lab. Simulado 2 (<code>foury.m</code>, <code>cuadpuls.m</code>…) funcionan sin cambios en <a href="https://octave.org/download">GNU Octave</a>, libre y multiplataforma (Linux: <code>sudo apt install octave</code> o <code>sudo pacman -S octave</code>; Windows/macOS: instalador de la web oficial). Copia los <code>.m</code> en una carpeta, ábrela en Octave y ejecuta, por ejemplo, <code>s = cuadpuls(10,100,100); f = foury(s,100);</code>.</p>
 
 <h2 id="prerrequisitos">Prerrequisitos</h2>
+<div class="box idea"><span class="box-title">Repaso guiado</span>
+<p>El <a href="temas/tema0-introduccion-y-repaso.html">Tema 0</a> reúne todos estos prerrequisitos en una sola página, con explicaciones, ejemplos resueltos, simuladores y un autodiagnóstico. La tabla siguiente es el atajo a la ficha corta correspondiente.</p></div>
 <div class="table-wrap"><table>
   <thead><tr><th>Concepto</th><th>Dónde se usa</th><th>Repaso</th></tr></thead>
   <tbody>
@@ -176,6 +184,7 @@ N = 1000 muestras, fs = 100.0 Hz, resolución = 0.1 Hz
 
 <h2 id="faq">Preguntas frecuentes de la asignatura</h2>
 <div class="faq">
+  <details><summary>¿Por dónde empiezo si el curso ya comenzó?</summary><div><p>Por el <a href="temas/tema0-introduccion-y-repaso.html">Tema 0</a>. Haz el autodiagnóstico y repasa solo lo que falles. Después sigue el Tema II, que es el que se imparte primero en 2026; el Tema I puede estudiarse en paralelo y el Tema III va al final porque necesita los otros dos.</p></div></details>
   <details><summary>¿Por qué el curso 2026 empieza por el Tema II y no por el I?</summary><div><p>Porque la teoría de la información se puede estudiar sin Fourier, pero la transmisión en banda base (Tema III) necesita espectros, filtros y ruido. Empezar por señales y sistemas da antes las herramientas matemáticas. En la presentación del curso los temas aparecen como 1) Teoría de la señal y los sistemas, 2) Teoría de la información, 3) Sistemas de comunicaciones digitales en banda base; en esta web se mantiene la numeración del Programa Analítico (I información, II señales, III banda base).</p></div></details>
   <details><summary>¿Qué edición de Sklar tengo que usar?</summary><div><p>El programa cita la 2.ª edición (2001); el PDF que circula es la reimpresión de 2014 (Sklar y Ray), con los mismos capítulos pero numeración de páginas distinta. Por eso las guías de las CP citan, por ejemplo, "Sklar p. 711–718" para Fourier, que en la edición de 2014 es el Apéndice A (pp. 1069–1090). En esta web siempre se indica la página de la edición de 2014.</p></div></details>
   <details><summary>¿Necesito MATLAB?</summary><div><p>No. GNU Octave ejecuta los mismos ficheros <code>.m</code>; además, el simulador «foury» del Tema II y el paquete <code>fc1</code> reproducen el laboratorio.</p></div></details>

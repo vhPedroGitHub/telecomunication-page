@@ -6,21 +6,21 @@
   --prereq: #6b3fa0; --prereq-soft: #f0e9f9;
   --code-bg: #f1f2f4;
   --plot-grid: #e3e4e8; --plot-axis: #6b6f7a;
-  --s1: #2456c9; --s2: #c2410c; --s3: #15803d; --s4: #9333ea;
+  --s1: #2456c9; --s2: #c2410c; --s3: #15803d; --s4: #9333ea; --s5: #0f766e;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ok: #5fd08f; --ok-soft: #173326; --warn: #f0b860; --warn-soft: #3a2b12;
     --info: #8db4ff; --info-soft: #1c2944; --prereq: #c4a2f2; --prereq-soft: #2c2140;
     --code-bg: #24272d; --plot-grid: #2c2f36; --plot-axis: #8d919c;
-    --s1: #7aa2ff; --s2: #fb8f5a; --s3: #5fd08f; --s4: #c99cff;
+    --s1: #7aa2ff; --s2: #fb8f5a; --s3: #5fd08f; --s4: #c99cff; --s5: #2dd4bf;
   }
 }
 :root[data-theme="dark"] {
   --ok: #5fd08f; --ok-soft: #173326; --warn: #f0b860; --warn-soft: #3a2b12;
   --info: #8db4ff; --info-soft: #1c2944; --prereq: #c4a2f2; --prereq-soft: #2c2140;
   --code-bg: #24272d; --plot-grid: #2c2f36; --plot-axis: #8d919c;
-  --s1: #7aa2ff; --s2: #fb8f5a; --s3: #5fd08f; --s4: #c99cff;
+  --s1: #7aa2ff; --s2: #fb8f5a; --s3: #5fd08f; --s4: #c99cff; --s5: #2dd4bf;
 }
 
 /* ---------- Layout ---------- */
@@ -132,6 +132,23 @@ td.mono, th.mono { font-family: var(--font-mono); }
 .sim .readout { font-family: var(--font-mono); font-size: .88rem; background: var(--bg); border-radius: 8px; padding: 8px 10px; margin-top: 8px; white-space: pre-wrap; overflow-x: auto; }
 .sim .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 700px) { .sim .two { grid-template-columns: 1fr; } }
+.sim .f5-list { display: grid; gap: 6px; margin: 10px 0 12px; }
+.sim .f5-row {
+  display: grid; grid-template-columns: 118px repeat(3, minmax(0, 1fr)); gap: 6px 14px;
+  align-items: center; padding: 6px 10px; border-left: 3px solid var(--c);
+  border-radius: 6px; background: var(--bg); transition: opacity .15s;
+}
+.sim .f5-row.is-off { opacity: .42; }
+.sim .f5-row > label:not(.f5-name) { display: grid; grid-template-columns: auto minmax(40px, 1fr) auto; gap: 6px; align-items: center; }
+.sim .f5-row input[type="range"] { width: 100%; }
+.sim .f5-name { display: flex; align-items: center; gap: 7px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.sim .f5-name input { accent-color: var(--c); }
+.sim .f5-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: 0 0 auto; }
+@media (max-width: 680px) {
+  .sim .f5-row { grid-template-columns: 1fr 1fr; }
+  .sim .f5-name { grid-column: 1 / -1; }
+}
+@media (max-width: 430px) { .sim .f5-row { grid-template-columns: 1fr; } }
 .btn {
   font: inherit; font-size: .9rem; border: 1px solid var(--accent); background: var(--accent); color: #fff;
   padding: 5px 12px; border-radius: 8px; cursor: pointer;
